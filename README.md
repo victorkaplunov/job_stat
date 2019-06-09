@@ -1,4 +1,7 @@
 # job_stat
-Script and web service for analising data from hh.ru
+Script and web service for analysis data from hh.ru
 
-Скрипт собирает данные через API HH.ru в базу SQLight. Досуп к данным предоставляется через web API на базе Flask.
+Скрипт собирает данные о вакансиях, полученные через API HH.ru, в базу SQLight.
+Доступ к данным предоставляется через web API на базе Flask.
+Демо-версия доступна по адресу http://clingon.pythonanywhere.com/
+
