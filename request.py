@@ -10,7 +10,7 @@ cur = con.cursor()  # Create cursor
 base_url = 'https://api.hh.ru/'
 api_method = 'vacancies/'
 search_string = \
-                '?text=&' \
+                '?text=(QA+OR+тест*+OR+Тест*+OR+SDET)+NOT+"Аналитик"&' \
                 'no_magic=true&' \
                 'order_by=publication_time&' \
                 'area=1&specialization=1.117&' \
