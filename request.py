@@ -1,3 +1,4 @@
+# -*- encoding=utf8 -*-
 import requests
 import json
 import sqlite3
@@ -9,8 +10,7 @@ cur = con.cursor()  # Create cursor
 
 base_url = 'https://api.hh.ru/'
 api_method = 'vacancies/'
-search_string = \
-                '?text=(QA+OR+тест*+OR+Тест*+OR+SDET)+NOT+"Аналитик"&' \
+search_string = u'?text=(QA+OR+тест*+OR+Тест*+OR+SDET)+NOT+"Аналитик"&' \
                 'no_magic=true&' \
                 'order_by=publication_time&' \
                 'area=1&specialization=1.117&' \
@@ -18,7 +18,7 @@ search_string = \
                 'search_field=name&' \
                 'page=0'
 
-req = requests.get(base_url + api_method + search_string)
+req = requests.get((base_url + api_method + search_string).encode('utf-8'))
 pages = req.json()["pages"]
 proxies = {
     "http": "http://127.0.0.1:8888",
