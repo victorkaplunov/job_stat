@@ -10,7 +10,8 @@ cur = con.cursor()  # Create cursor
 
 base_url = 'https://api.hh.ru/'
 api_method = 'vacancies/'
-search_string = u'?text=(QA+OR+тест*+OR+Тест*+OR+SDET)+NOT+"Аналитик"&' \
+search_string = u'?text=(QA+OR+тест*+OR+Тест*+OR+SDET+OR+test*)' \
+                u'+NOT+%22%D0%90%D0%BD%D0%B0%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%22&' \
                 'no_magic=true&' \
                 'order_by=publication_time&' \
                 'area=1&specialization=1.117&' \
@@ -65,11 +66,16 @@ def id_list(response):
                              )
             vac = r.json()
             del vac["branded_description"]  # Remove description in HTML format
-            d = json.dumps(vac, indent=None, ensure_ascii=False, separators=(', ', ': ', ))
-            d = re.sub(r"'", '', d)  # Remove apostrophes from JSON for SQL request safety
-            d = unicodedata.normalize("NFKD", d)  # Return the normal form for the Unicode string
-            sql_in = "INSERT INTO vacancies (id, json) VALUES (%d, '%s');" % (int(i["id"]), d)
-            print(sql_in)
+            json_dump = json.dumps(vac, indent=None, ensure_ascii=False, separators=(', ', ': ', ))
+            json_dump = re.sub(r"'", '', json_dump)  # Remove apostrophes from JSON for SQL request safety
+            json_dump = re.sub(r"’", '', json_dump)  # Remove apostrophes from JSON for SQL request safety
+            json_dump = re.sub(r"&#39;", '', json_dump)  # Remove apostrophes from JSON for SQL request safety, again
+            json_dump = unicodedata.normalize("NFKD", json_dump)  # Return the normal form for the Unicode string
+
+            cleanr = re.compile('<.*?>')  # Remove HTML tags
+            json_dump = re.sub(cleanr, '', json_dump)
+
+            sql_in = "INSERT INTO vacancies (id, json) VALUES (%d, '%s');" % (int(i["id"]), json_dump)
             try:
                 cur.executescript(sql_in)
             except sqlite3.IntegrityError as error:
