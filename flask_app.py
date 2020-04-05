@@ -24,7 +24,7 @@ def index():
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+                               'static/favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/vac/cal/<int:vac_id>')
