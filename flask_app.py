@@ -115,5 +115,14 @@ def chart():
         cur.execute(sql)
         vac = cur.fetchall()
         output.append([i, len(vac)])
+    frameworks_list = ['Pytest', 'Unittest', 'xUnit', 'Mocha', 'Serenity', 'Robot Framework']
+    output1 = []
+    for i in frameworks_list:
+        con = sqlite3.connect("testdb.db")
+        cur = con.cursor()
+        sql = f"SELECT json FROM vacancies WHERE json LIKE '%{i}%';"
+        cur.execute(sql)
+        vac = cur.fetchall()
+        output1.append([i, len(vac)])
     con.close()
-    return render_template('/chart.html', leng=output)
+    return render_template('/chart.html', leng=output, frame=output1)
