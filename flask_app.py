@@ -19,7 +19,7 @@ def index():
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
     <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + url_for('show_vac_of_employer',
                                                                                      empl_name='СофтПро') + "</a><br> \
-    <a href=" + url_for('chart') + " > " + url_for('chart') + "</a><br>\
+    <a href=" + url_for('chart') + " > " + "Популярность языков програмирования" + "</a><br>\
     </html>"
 
 
@@ -106,7 +106,7 @@ def show_vac_of_employer(empl_name):
 
 @app.route('/statistics')
 def chart():
-    languages_list = ['java', 'python', 'javascript', 'ruby', 'c#', 'groovy']
+    languages_list = ['java', 'python', 'javascript', 'c#', "php", 'c++', 'ruby', 'groovy']
     output = []
     for i in languages_list:
         con = sqlite3.connect("testdb.db")

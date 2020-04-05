@@ -22,9 +22,10 @@
         data.addRows({{ leng | safe }});
 
         // Set chart options
-        var options = {'title':'Популярность языков в тестировании*. Все вакансии, с 2019-03-17.',
-                       'width':400,
-                       'height':300};
+        var options = {'title':'Количество упоминаний языков программирования. \
+        Все вакансии раздела "Тестирование" по Москве с 2019-03-17 по настоящий ммомент.',
+                       'width':800,
+                       'height':600};
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
