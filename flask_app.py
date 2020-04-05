@@ -22,7 +22,7 @@ def index():
 
 @app.route('/statistics')
 def chart():
-   return render_template('chart.html')
+   return render_template('/chart.html')
 
 
 @app.route('/favicon.ico')
