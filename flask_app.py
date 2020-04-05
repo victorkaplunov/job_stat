@@ -106,7 +106,7 @@ def show_vac_of_employer(empl_name):
 
 @app.route('/statistics')
 def chart():
-    languages_list = ['java', 'python', 'javascript', 'c#', "php", 'c++', 'ruby', 'groovy']
+    languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PPH", 'C++', 'Ruby', 'Groovy']
     output = []
     for i in languages_list:
         con = sqlite3.connect("testdb.db")
@@ -115,7 +115,7 @@ def chart():
         cur.execute(sql)
         vac = cur.fetchall()
         output.append([i, len(vac)])
-    frameworks_list = ['Pytest', 'Unittest', 'xUnit', 'Mocha', 'Serenity', 'Robot Framework']
+    frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'xUnit', 'Mocha', 'Serenity', 'Robot Framework']
     output1 = []
     for i in frameworks_list:
         con = sqlite3.connect("testdb.db")
