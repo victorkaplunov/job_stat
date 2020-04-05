@@ -106,7 +106,7 @@ def show_vac_of_employer(empl_name):
 
 @app.route('/statistics')
 def chart():
-    languages_list = ['java', 'python', 'javascript', 'ruby', 'c#']
+    languages_list = ['java', 'python', 'javascript', 'ruby', 'c#', 'groovy']
     output = []
     for i in languages_list:
         con = sqlite3.connect("testdb.db")
