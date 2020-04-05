@@ -19,9 +19,8 @@ def index():
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
     <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + url_for('show_vac_of_employer',
                                                                                      empl_name='СофтПро') + "</a><br> \
-    <a href=" + url_for('chart') + " > " + "Популярность языков програмирования" + "</a><br>\
+    <a href=" + url_for('chart') + " > " + "Статистика" + "</a><br>\
     </html>"
-
 
 
 @app.route('/favicon.ico')
@@ -115,7 +114,9 @@ def chart():
         cur.execute(sql)
         vac = cur.fetchall()
         output.append([i, len(vac)])
-    frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'xUnit', 'Mocha', 'Serenity', 'Robot Framework']
+    frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'xUnit', 'Mocha',
+                       'Serenity', 'Robot Framework', 'Jest', 'Jasmine',
+                       'Nightwatch', 'Protractor', 'Karma']
     output1 = []
     for i in frameworks_list:
         con = sqlite3.connect("testdb.db")
