@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, url_for
+from flask import Flask, send_from_directory, url_for, render_template
 import os
 import sqlite3
 import json
@@ -15,10 +15,14 @@ def index():
     <a href = " + url_for('show_vac_description', vac_id='30962151') + " > " + url_for('show_vac_description', vac_id='30962151') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_id') + " > " + url_for('show_vac_top_new_by_id') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
-    <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + \
-    url_for('show_vac_of_employer', empl_name='СофтПро') + \
-    'Тест.' + \
-    "</a><br></html>"
+    <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + url_for('show_vac_of_employer', empl_name='СофтПро') + "</a><br> \
+    <a href=" + url_for('chart') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
+    </html>"
+
+
+@app.route('/statistics')
+def chart():
+   return render_template('chart.html')
 
 
 @app.route('/favicon.ico')
