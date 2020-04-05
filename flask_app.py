@@ -16,7 +16,7 @@ def index():
     <a href = " + url_for('show_vac_top_new_by_id') + " > " + url_for('show_vac_top_new_by_id') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
     <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + url_for('show_vac_of_employer', empl_name='СофтПро') + "</a><br> \
-    <a href=" + url_for('chart') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
+    <a href=" + url_for('chart') + " > " + url_for('chart') + "</a><br>\
     </html>"
 
 
