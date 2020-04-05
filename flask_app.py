@@ -23,10 +23,6 @@ def index():
     </html>"
 
 
-@app.route('/statistics')
-def chart():
-    return render_template('/chart.html')
-
 
 @app.route('/favicon.ico')
 def favicon():
@@ -106,3 +102,18 @@ def show_vac_of_employer(empl_name):
     for i in vac:
         data_list.append('<a href="https://hh.ru/vacancy/' + str(i[0]) + '">' + str(i[0]) + '</a>')
     return str(data_list)
+
+
+@app.route('/statistics')
+def chart():
+    languages_list = ['java', 'python', 'javascript', 'ruby', 'c#']
+    output = []
+    for i in languages_list:
+        con = sqlite3.connect("testdb.db")
+        cur = con.cursor()
+        sql = f"SELECT json FROM vacancies WHERE json LIKE '%{i}%';"
+        cur.execute(sql)
+        vac = cur.fetchall()
+        output.append([i, len(vac)])
+    con.close()
+    return render_template('/chart.html', leng=output)
