@@ -18,7 +18,7 @@
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Topping');
         data.addColumn('number', 'Slices');
-        data.addRows({{ leng | safe }});
+        data.addRows({{ languages | safe }});
 
         // Set chart options
         var options = {'title':'Количество упоминаний языков программирования. \
@@ -47,13 +47,13 @@
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Topping');
         data.addColumn('number', 'Slices');
-        data.addRows({{ frame | safe }});
+        data.addRows({{ frameworks | safe }});
 
         // Set chart options
         var options = {'title':'Количество упоминаний тестовых фреймворков. \
         Все вакансии раздела "Тестирование" по Москве с 2019-03-17 по настоящий момент.',
             'width':800,
-            'height':600};
+            'height':700};
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div1'));
