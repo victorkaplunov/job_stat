@@ -105,7 +105,7 @@ def show_vac_of_employer(empl_name):
 
 @app.route('/statistics')
 def chart():
-    languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PPH", 'C++', 'Ruby', 'Groovy']
+    languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy']
     output = []
     for i in languages_list:
         con = sqlite3.connect("testdb.db")
@@ -114,9 +114,15 @@ def chart():
         cur.execute(sql)
         vac = cur.fetchall()
         output.append([i, len(vac)])
-    frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'xUnit', 'Mocha',
-                       'Serenity', 'Robot Framework', 'Jest', 'Jasmine',
-                       'Nightwatch', 'Protractor', 'Karma']
+
+    frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'Nose',
+                       'jUnit', 'TestNG',
+                       'PHPUnit', 'Codeception',
+                       'RSpec',
+                       'Spock',
+                       'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
+                       'Robot Framework',
+                       ]
     output1 = []
     for i in frameworks_list:
         con = sqlite3.connect("testdb.db")
@@ -126,4 +132,4 @@ def chart():
         vac = cur.fetchall()
         output1.append([i, len(vac)])
     con.close()
-    return render_template('/chart.html', leng=output, frame=output1)
+    return render_template('/chart.html', languages=output, frameworks=output1)
