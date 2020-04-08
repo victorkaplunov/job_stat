@@ -108,7 +108,7 @@ def chart():
     """"""
     con = sqlite3.connect("testdb.db")
     cur = con.cursor()
-    sql = f"SELECT language_name, popularity FROM languages;"
+    sql = "SELECT language_name, popularity FROM languages;"
     cur.execute(sql)
     languages_statistics = cur.fetchall()
     # Convert list of tuples to list of lists
@@ -119,7 +119,7 @@ def chart():
         languages_list.append(list(i))
     print(languages_list)
 
-    sql = f"SELECT framework_name, popularity FROM frameworks;"
+    sql = "SELECT framework_name, popularity FROM frameworks;"
     cur.execute(sql)
     frameworks_statistics = cur.fetchall()
     print(frameworks_statistics)
