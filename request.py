@@ -98,7 +98,7 @@ for i in languages_list:
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
-        print(".")
+        print("Error: ", error)
 
     sql = 'UPDATE languages SET popularity = "%i" WHERE language_name = "%s";' % (len(vac), i)
     cur.executescript(sql)
@@ -122,7 +122,7 @@ for i in frameworks_list:
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
-        print(".")
+        print("Error: ", error)
 
     sql = 'UPDATE frameworks SET popularity = "%i" WHERE framework_name = "%s";' % (len(vac), i)
     cur.executescript(sql)
