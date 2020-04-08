@@ -72,8 +72,8 @@ def id_list(response):
             json_dump = re.sub(r"&#39;", '', json_dump)  # Remove apostrophes from JSON for SQL request safety, again
             json_dump = unicodedata.normalize("NFKD", json_dump)  # Return the normal form for the Unicode string
 
-            cleanr = re.compile('<.*?>')  # Remove HTML tags
-            json_dump = re.sub(cleanr, '', json_dump)
+            cleaner = re.compile('<.*?>')  # Remove HTML tags
+            json_dump = re.sub(cleaner, '', json_dump)
 
             sql_in = "INSERT INTO vacancies (id, json) VALUES (%d, '%s');" % (int(i["id"]), json_dump)
             try:
@@ -85,7 +85,56 @@ def id_list(response):
 
 for n in range(0, pages):
     s = id_list(resp(n))
-    # print("Items on page: ", len(set(s)))
+    print("Items on page: ", len(set(s)))
+
+# Wright languages statistics data to database
+languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy']
+for i in languages_list:
+    sql = f"SELECT json FROM vacancies WHERE json LIKE '%{i}%';"
+    cur.execute(sql)
+    vac = cur.fetchall()
+
+    sql = f"""
+        INSERT INTO languages(language_name, popularity)
+        VALUES("{i}",{len(vac)});"""
+    try:
+        cur.executescript(sql)
+    except sqlite3.IntegrityError as error:
+        print(".", end="")
+
+    sql = f"""
+        UPDATE languages
+        SET popularity = "{len(vac)}"
+        WHERE language_name = "{i}";"""
+    cur.executescript(sql)
+
+
+# Wright test frameworks statistics data to database
+frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'Nose',
+                   'jUnit', 'TestNG',
+                   'PHPUnit', 'Codeception',
+                   'RSpec',
+                   'Spock',
+                   'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
+                   'Robot Framework']
+
+for i in frameworks_list:
+    sql = f"SELECT json FROM vacancies WHERE json LIKE '%{i}%';"
+    cur.execute(sql)
+    vac = cur.fetchall()
+    sql = f"""
+            INSERT INTO frameworks(framework_name, popularity)
+            VALUES("{i}",{len(vac)});"""
+    try:
+        cur.executescript(sql)
+    except sqlite3.IntegrityError as error:
+        print("Error: ", error)
+
+    sql = f"""
+            UPDATE frameworks
+            SET popularity = "{len(vac)}"
+            WHERE framework_name = "{i}";"""
+    cur.executescript(sql)
 
 # Close database connection
 con.close()

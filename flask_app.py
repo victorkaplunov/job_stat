@@ -105,31 +105,32 @@ def show_vac_of_employer(empl_name):
 
 @app.route('/statistics')
 def chart():
-    languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy']
-    output = []
-    for i in languages_list:
-        con = sqlite3.connect("testdb.db")
-        cur = con.cursor()
-        sql = f"SELECT json FROM vacancies WHERE json LIKE '%{i}%';"
-        cur.execute(sql)
-        vac = cur.fetchall()
-        output.append([i, len(vac)])
+    """"""
+    con = sqlite3.connect("testdb.db")
+    cur = con.cursor()
+    sql = f"SELECT language_name, popularity FROM languages;"
+    cur.execute(sql)
+    languages_statistics = cur.fetchall()
+    # Convert list of tuples to list of lists
+    print(languages_statistics)
+    languages_list = []
+    for i in languages_statistics:
+        print(i)
+        languages_list.append(list(i))
+    print(languages_list)
 
-    frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'Nose',
-                       'jUnit', 'TestNG',
-                       'PHPUnit', 'Codeception',
-                       'RSpec',
-                       'Spock',
-                       'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
-                       'Robot Framework',
-                       ]
-    output1 = []
-    for i in frameworks_list:
-        con = sqlite3.connect("testdb.db")
-        cur = con.cursor()
-        sql = f"SELECT json FROM vacancies WHERE json LIKE '%{i}%';"
-        cur.execute(sql)
-        vac = cur.fetchall()
-        output1.append([i, len(vac)])
+    sql = f"SELECT framework_name, popularity FROM frameworks;"
+    cur.execute(sql)
+    frameworks_statistics = cur.fetchall()
+    print(frameworks_statistics)
+    # Convert list of tuples to list of lists
+    frameworks_list = []
+    for i in frameworks_statistics:
+        print(i)
+        frameworks_list.append(list(i))
+    print(frameworks_list)
+
     con.close()
-    return render_template('/chart.html', languages=output, frameworks=output1)
+    return render_template('/chart.html', languages=languages_list,
+                           frameworks=frameworks_list
+                           )
