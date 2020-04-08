@@ -52,7 +52,7 @@ def id_list(response):
     for i in vac_list:
         items.append(i["id"])
         sql = 'INSERT INTO calendar (id, data) VALUES (%d, "%s");' % (int(i["id"]), i["published_at"])
-        print(sql)
+        # print(sql)
         try:
             cur.executescript(sql)
         except sqlite3.IntegrityError as err:
@@ -91,19 +91,15 @@ for n in range(0, pages):
 languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy']
 for i in languages_list:
     sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
-    print(sql)
     cur.execute(sql)
     vac = cur.fetchall()
-    print(vac)
     sql = 'INSERT INTO languages(language_name, popularity) VALUES("%s", %i);' % (i, len(vac))
-    print(sql)
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
 
     sql = 'UPDATE languages SET popularity = "%i" WHERE language_name = "%s";' % (len(vac), i)
-    print(sql)
     cur.executescript(sql)
 
 
