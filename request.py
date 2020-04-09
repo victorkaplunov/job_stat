@@ -20,11 +20,9 @@ search_string = u'?text=(QA+OR+тест*+OR+Тест*+OR+SDET+OR+test*)' \
                 'page=0'
 
 req = requests.get((base_url + api_method + search_string).encode('utf-8'))
+
+# Get quantity of pages in responce
 pages = req.json()["pages"]
-proxies = {
-    "http": "http://127.0.0.1:8888",
-    "https": "http://127.0.0.1:8888",
-}
 
 # Get list of id from "vacancies" table
 vac_id_list = []
@@ -38,15 +36,15 @@ except sqlite3.IntegrityError as err:
         print("Error: ", err)
 
 
-# Make search request
 def resp(n):
+    """Make search request"""
     return requests.get(base_url + api_method + search_string.replace("page=0", "page=" + str(n))
                         # , proxies=proxies
                         )
 
 
-# Get list of vacancies from response and write id and data to "calendar" table.
 def id_list(response):
+    """ Get list of vacancies from response and write id and data to "calendar" table."""
     vac_list = response.json()["items"]
     items = []
     for i in vac_list:
@@ -83,27 +81,33 @@ def id_list(response):
     return items
 
 
-for n in range(0, pages):
-    s = id_list(resp(n))
+for x in range(0, pages):
+    s = id_list(resp(x))
     print("Items on page: ", len(set(s)))
 
-# Wright languages statistics data to database
-languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy']
-for i in languages_list:
-    sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
-    cur.execute(sql)
-    vac = cur.fetchall()
-    sql = 'INSERT INTO languages(language_name, popularity) VALUES("%s", %i);' % (i, len(vac))
-    try:
+
+def wright_statistic_to_db(table_name, first_column_name, param_list):
+    """ Function count an inclusions of some string from param_list in al vacancies. """
+    for i in param_list:
+        sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
+        cur.execute(sql)
+        vac = cur.fetchall()
+        sql = 'INSERT INTO %s(%s, popularity) VALUES("%s", %i);' % (table_name, first_column_name, i, len(vac))
+        try:
+            cur.executescript(sql)
+        except sqlite3.IntegrityError as error:
+            print("Error: ", error)
+
+        sql = 'UPDATE languages SET popularity = "%i" WHERE language_name = "%s";' % (len(vac), i)
+        print(sql)
         cur.executescript(sql)
-    except sqlite3.IntegrityError as error:
-        print("Error: ", error)
-
-    sql = 'UPDATE languages SET popularity = "%i" WHERE language_name = "%s";' % (len(vac), i)
-    cur.executescript(sql)
+    return
 
 
-# Wright test frameworks statistics data to database
+languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy']
+# Wright languages statistics data to database
+wright_statistic_to_db('languages', 'language_name', languages_list)
+
 frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'Nose',
                    'jUnit', 'TestNG',
                    'PHPUnit', 'Codeception',
@@ -111,20 +115,8 @@ frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'Nose',
                    'Spock',
                    'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
                    'Robot Framework']
-
-for i in frameworks_list:
-    sql = 'SELECT json FROM vacancies WHERE json  LIKE "%%%s%%";' % i
-    cur.execute(sql)
-    vac = cur.fetchall()
-
-    sql = 'INSERT INTO frameworks(framework_name, popularity) VALUES("%s", %i);' % (i, len(vac))
-    try:
-        cur.executescript(sql)
-    except sqlite3.IntegrityError as error:
-        print("Error: ", error)
-
-    sql = 'UPDATE frameworks SET popularity = "%i" WHERE framework_name = "%s";' % (len(vac), i)
-    cur.executescript(sql)
+# Wright test frameworks statistics data to database
+wright_statistic_to_db('frameworks', 'framework_name', frameworks_list)
 
 # Close database connection
 con.close()
