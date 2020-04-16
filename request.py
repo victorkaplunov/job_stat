@@ -104,7 +104,7 @@ def wright_statistic_to_db(table_name, first_column_name, param_list):
     return
 
 
-languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy']
+languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy', 'SQL']
 # Wright languages statistics data to database
 wright_statistic_to_db('languages', 'language_name', languages_list)
 
