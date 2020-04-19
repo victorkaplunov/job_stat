@@ -7,7 +7,7 @@
       google.charts.load('current', {'packages':['corechart']});
 
       // Set a callback to run when the Google Visualization API is loaded.
-      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(drawLengChart);
 
       // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
@@ -24,7 +24,7 @@
         var options = {'title':'Количество упоминаний языков программирования. \
         Все вакансии раздела "Тестирование" по Москве с 2019-03-17 по настоящий момент.',
                        'width':800,
-                       'height':600};
+                       'height':400};
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
@@ -36,12 +36,12 @@
       google.charts.load('current', {'packages':['corechart']});
 
       // Set a callback to run when the Google Visualization API is loaded.
-      google.charts.setOnLoadCallback(drawLengChart);
+      google.charts.setOnLoadCallback(drawTestFrameworksChart);
 
       // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
       // draws it.
-      function drawChart() {
+      function drawTestFrameworksChart() {
 
         // Create the data table.
         var data = new google.visualization.DataTable();
@@ -59,6 +59,35 @@
         var chart = new google.visualization.PieChart(document.getElementById('chart_div1'));
         chart.draw(data, options);
       }
+
+
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawLoadTestingToolsChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawLoadTestingToolsChart() {
+
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Topping');
+        data.addColumn('number', 'Slices');
+        data.addRows({{ lt_frameworks | safe }});
+
+        // Set chart options
+        var options = {'title':'Количество упоминаний средств нагрузочного тестирования. \
+        Все вакансии раздела "Тестирование" по Москве с 2019-03-17 по настоящий момент.',
+            'width':800,
+            'height':400};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div2'));
+        chart.draw(data, options);
+      }
     </script>
   </head>
 
@@ -69,6 +98,9 @@
       </tr>
       <tr>
         <td><div id="chart_div1" style="border: 1px solid #ccc"></div></td>
+      </tr>
+      <tr>
+        <td><div id="chart_div2" style="border: 1px solid #ccc"></div></td>
       </tr>
     </table>
   </body>
