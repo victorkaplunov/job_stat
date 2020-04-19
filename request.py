@@ -4,11 +4,8 @@ import json
 import sqlite3
 import unicodedata
 import re
-import os
 
-cwd = os.getcwd()
-print(str(os.getcwd()) + "\\testdb.db")
-con = sqlite3.connect(str(os.getcwd()) + "\\testdb.db")  # Open database
+con = sqlite3.connect("testdb.db")  # Open database
 cur = con.cursor()  # Create cursor
 
 base_url = 'https://api.hh.ru/'
