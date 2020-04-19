@@ -18,7 +18,7 @@ cur = con.cursor()
 # """
 # cur.execute(sql)
 
-cur.execute("DROP TABLE  languages;")
+# cur.execute("DROP TABLE  languages;")
 cur.execute("DROP TABLE  frameworks;")
 cur.execute("DROP TABLE  charts;")
 
