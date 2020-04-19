@@ -81,9 +81,9 @@ def id_list(response):
     return items
 
 
-# for x in range(0, pages):
-#     s = id_list(resp(x))
-#     print("Items on page: ", len(set(s)))
+for x in range(0, pages):
+    s = id_list(resp(x))
+    print("Items on page: ", len(set(s)))
 
 
 def wright_statistic_to_db(chart_name, data, param_list):
@@ -118,7 +118,7 @@ frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'Nose',
 # Wright test frameworks statistics data to database
 wright_statistic_to_db('frameworks', 'framework_name', frameworks_list)
 
-lt_frameworks_list = ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'Grinder']
+lt_frameworks_list = ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench']
 # Wright test frameworks statistics data to database
 wright_statistic_to_db('lt_frameworks', 'framework_name', lt_frameworks_list)
 
