@@ -8,7 +8,7 @@ id_list = []
 l_host = "http://127.0.0.1:5000"
 
 
-@app.route('/')
+@app.route('/api')
 def index():
     return "<html> \
     <a href=" + url_for('show_vac_calendar', vac_id='30962151') + ">" + url_for('show_vac_calendar',
@@ -29,7 +29,7 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-@app.route('/vac/cal/<int:vac_id>')
+@app.route('/api/vac/cal/<int:vac_id>')
 def show_vac_calendar(vac_id):
     """Show the publication data of vacancy with the given id"""
     con = sqlite3.connect("testdb.db")
@@ -44,7 +44,7 @@ def show_vac_calendar(vac_id):
     return str(data_list)
 
 
-@app.route('/vac/<int:vac_id>')
+@app.route('/api/vac/<int:vac_id>')
 def show_vac_description(vac_id):
     """Show the description of vacancy with the given id"""
     con = sqlite3.connect("testdb.db")
@@ -58,7 +58,7 @@ def show_vac_description(vac_id):
         json.loads(vac[1])['description'])
 
 
-@app.route('/vac/last100id')
+@app.route('/api/vac/last100id')
 def show_vac_top_new_by_id():
     """Get last 100 vacancies sorted by id"""
     con = sqlite3.connect("testdb.db")
@@ -73,7 +73,7 @@ def show_vac_top_new_by_id():
     return str(data_list)
 
 
-@app.route('/vac/last100data')
+@app.route('/api/vac/last100data')
 def show_vac_top_new_by_data():
     """Get last 100 vacancies sorted by last publication data"""
     con = sqlite3.connect("testdb.db")
@@ -88,7 +88,7 @@ def show_vac_top_new_by_data():
     return str(data_list)
 
 
-@app.route('/empl/<empl_name>')
+@app.route('/api/empl/<empl_name>')
 def show_vac_of_employer(empl_name):
     """Get vacancies of given employer"""
     con = sqlite3.connect("testdb.db")
@@ -103,7 +103,7 @@ def show_vac_of_employer(empl_name):
     return str(data_list)
 
 
-@app.route('/statistics')
+@app.route('/')
 def chart():
     """"""
     con = sqlite3.connect("testdb.db")
@@ -140,7 +140,6 @@ def chart():
         # print(i)
         lt_frameworks_list.append(list(i))
     print(lt_frameworks_list)
-
 
     con.close()
     return render_template('/chart.html', languages=languages_list,
