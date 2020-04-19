@@ -12,13 +12,13 @@ l_host = "http://127.0.0.1:5000"
 def index():
     return "<html> \
     <a href=" + url_for('show_vac_calendar', vac_id='30962151') + ">" + url_for('show_vac_calendar',
-                                                                                vac_id='30962151') + "</a><br> \
+vac_id='30962151') + "</a><br> \
     <a href = " + url_for('show_vac_description', vac_id='30962151') + " > " + url_for('show_vac_description',
-                                                                                       vac_id='30962151') + "</a><br>\
+vac_id='30962151') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_id') + " > " + url_for('show_vac_top_new_by_id') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
     <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + url_for('show_vac_of_employer',
-                                                                                     empl_name='СофтПро') + "</a><br> \
+empl_name='СофтПро') + "</a><br> \
     <a href=" + url_for('chart') + " > " + "Статистика" + "</a><br>\
     </html>"
 
@@ -108,29 +108,42 @@ def chart():
     """"""
     con = sqlite3.connect("testdb.db")
     cur = con.cursor()
-    sql = "SELECT language_name, popularity FROM languages;"
+    sql = 'SELECT data, popularity FROM charts WHERE chart_name="languages";'
     cur.execute(sql)
     languages_statistics = cur.fetchall()
     # Convert list of tuples to list of lists
-    print(languages_statistics)
+    # print(languages_statistics)
     languages_list = []
     for i in languages_statistics:
-        print(i)
+        # print(i)
         languages_list.append(list(i))
     print(languages_list)
 
-    sql = "SELECT framework_name, popularity FROM frameworks;"
+    sql = 'SELECT data, popularity FROM charts WHERE chart_name="frameworks";'
     cur.execute(sql)
     frameworks_statistics = cur.fetchall()
-    print(frameworks_statistics)
+    # print(frameworks_statistics)
     # Convert list of tuples to list of lists
     frameworks_list = []
     for i in frameworks_statistics:
-        print(i)
+        # print(i)
         frameworks_list.append(list(i))
     print(frameworks_list)
 
+    sql = 'SELECT data, popularity FROM charts WHERE chart_name="lt_frameworks";'
+    cur.execute(sql)
+    lt_frameworks = cur.fetchall()
+    # print(frameworks_statistics)
+    # Convert list of tuples to list of lists
+    lt_frameworks_list = []
+    for i in lt_frameworks:
+        # print(i)
+        lt_frameworks_list.append(list(i))
+    print(lt_frameworks_list)
+
+
     con.close()
     return render_template('/chart.html', languages=languages_list,
-                           frameworks=frameworks_list
+                           frameworks=frameworks_list,
+                           lt_frameworks=lt_frameworks_list
                            )

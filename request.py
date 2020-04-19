@@ -81,24 +81,24 @@ def id_list(response):
     return items
 
 
-for x in range(0, pages):
-    s = id_list(resp(x))
-    print("Items on page: ", len(set(s)))
+# for x in range(0, pages):
+#     s = id_list(resp(x))
+#     print("Items on page: ", len(set(s)))
 
 
-def wright_statistic_to_db(table_name, first_column_name, param_list):
-    """ Function count an inclusions of some string from param_list in al vacancies. """
+def wright_statistic_to_db(chart_name, data, param_list):
+    """ Function count an inclusions of some string from param_list in all vacancies. """
     for i in param_list:
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
         cur.execute(sql)
         vac = cur.fetchall()
-        sql = 'INSERT INTO %s(%s, popularity) VALUES("%s", %i);' % (table_name, first_column_name, i, len(vac))
+        sql = 'INSERT INTO charts(chart_name, data, popularity) VALUES("%s", "%s",%i);' % (chart_name, i, len(vac))
         try:
             cur.executescript(sql)
         except sqlite3.IntegrityError as error:
             print("Error: ", error)
 
-        sql = 'UPDATE languages SET popularity = "%i" WHERE language_name = "%s";' % (len(vac), i)
+        sql = 'UPDATE charts SET popularity = "%i" WHERE data = "%s";' % (len(vac), i)
         print(sql)
         cur.executescript(sql)
     return
@@ -117,6 +117,10 @@ frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'Nose',
                    'Robot Framework']
 # Wright test frameworks statistics data to database
 wright_statistic_to_db('frameworks', 'framework_name', frameworks_list)
+
+lt_frameworks_list = ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'Grinder']
+# Wright test frameworks statistics data to database
+wright_statistic_to_db('lt_frameworks', 'framework_name', lt_frameworks_list)
 
 # Close database connection
 con.close()
