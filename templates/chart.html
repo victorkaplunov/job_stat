@@ -21,10 +21,9 @@
         data.addRows({{ languages | safe }});
 
         // Set chart options
-        var options = {'title':'Количество упоминаний языков программирования. \
-        Все вакансии раздела "Тестирование" по Москве с 2019-03-17 по настоящий момент.',
-                       'width':800,
-                       'height':400};
+        var options = {'title':'Количество упоминаний языков программирования.',
+                       'width':700,
+                       'height':500};
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
@@ -50,9 +49,8 @@
         data.addRows({{ frameworks | safe }});
 
         // Set chart options
-        var options = {'title':'Количество упоминаний тестовых фреймворков. \
-        Все вакансии раздела "Тестирование" по Москве с 2019-03-17 по настоящий момент.',
-            'width':800,
+        var options = {'title':'Количество упоминаний тестовых фреймворков.',
+            'width':700,
             'height':700};
 
         // Instantiate and draw our chart, passing in some options.
@@ -79,10 +77,9 @@
         data.addRows({{ lt_frameworks | safe }});
 
         // Set chart options
-        var options = {'title':'Количество упоминаний средств нагрузочного тестирования. \
-        Все вакансии раздела "Тестирование" по Москве с 2019-03-17 по настоящий момент.',
-            'width':800,
-            'height':400};
+        var options = {'title':'Количество упоминаний инструментов тестирования производительности.',
+            'width':700,
+            'height':500};
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div2'));
@@ -90,9 +87,11 @@
       }
     </script>
   </head>
+  <body style="font-family: Arial">
 
-  <body>
+
      <table class="columns">
+         <thead>Данные по вакансиям раздела "Тестирование" в Москве с 2019-03-17 по настоящий момент.</thead>
       <tr>
         <td><div id="chart_div" style="border: 1px solid #ccc"></div></td>
       </tr>
@@ -103,5 +102,6 @@
         <td><div id="chart_div2" style="border: 1px solid #ccc"></div></td>
       </tr>
     </table>
+
   </body>
 </html>
