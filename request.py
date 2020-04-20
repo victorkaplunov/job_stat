@@ -104,34 +104,34 @@ def wright_statistic_to_db(chart_name, param_list):
     return
 
 
-# Wright programming languages statistics data to database
-wright_statistic_to_db('languages',
-                       ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-                        'Ruby', 'Groovy', 'SQL', " Go ", 'Scala'])
-
-# Wright test frameworks statistics data to database
-wright_statistic_to_db('frameworks',
-                       ['Pytest', 'Py.test', 'Unittest', 'Nose',
-                        'jUnit', 'TestNG',
-                        'PHPUnit', 'Codeception',
-                        'RSpec',
-                        'Spock',
-                        'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
-                        'Robot Framework']
-                       )
-
-# Wright load test tools statistics data to database
-wright_statistic_to_db('lt_frameworks',
-                       ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench'])
-
-# Wright bdd_frameworks statistics data to database
-wright_statistic_to_db('bdd_frameworks',
-                       ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
-                        'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', "Concordion",
-                        'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
-                        'radish', "Spinach"
-                        ]
-                       )
+# # Wright programming languages statistics data to database
+# wright_statistic_to_db('languages',
+#                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
+#                         'Ruby', 'Groovy', 'SQL', " Go ", 'Scala'])
+#
+# # Wright test frameworks statistics data to database
+# wright_statistic_to_db('frameworks',
+#                        ['Pytest', 'Py.test', 'Unittest', 'Nose',
+#                         'jUnit', 'TestNG',
+#                         'PHPUnit', 'Codeception',
+#                         'RSpec',
+#                         'Spock',
+#                         'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
+#                         'Robot Framework']
+#                        )
+#
+# # Wright load test tools statistics data to database
+# wright_statistic_to_db('lt_frameworks',
+#                        ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench'])
+#
+# # Wright bdd_frameworks statistics data to database
+# wright_statistic_to_db('bdd_frameworks',
+#                        ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
+#                         'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', "Concordion",
+#                         'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
+#                         'radish', "Spinach"
+#                         ]
+#                        )
 
 sql = 'DELETE FROM "charts" WHERE "data" = "Go"';
 cur.execute(sql)
