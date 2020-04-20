@@ -107,45 +107,36 @@ def show_vac_of_employer(empl_name):
 
 @app.route('/')
 def chart():
-    """"""
+    """Chart page"""
+
     con = sqlite3.connect("testdb.db")
     cur = con.cursor()
-    sql = 'SELECT data, popularity FROM charts WHERE chart_name="languages";'
-    cur.execute(sql)
-    languages_statistics = cur.fetchall()
-    # Convert list of tuples to list of lists
-    # print(languages_statistics)
-    languages_list = []
-    for i in languages_statistics:
-        # print(i)
-        languages_list.append(list(i))
-    print(sorted(languages_list, key=itemgetter(1)))
 
-    sql = 'SELECT data, popularity FROM charts WHERE chart_name="frameworks";'
+    sql = 'SELECT COUNT(*)  FROM vacancies;'
     cur.execute(sql)
-    frameworks_statistics = cur.fetchall()
-    # print(frameworks_statistics)
-    # Convert list of tuples to list of lists
-    frameworks_list = []
-    for i in frameworks_statistics:
-        # print(i)
-        frameworks_list.append(list(i))
-    print(frameworks_list)
+    vacancies_qty = (cur.fetchone()[0])
 
-    sql = 'SELECT data, popularity FROM charts WHERE chart_name="lt_frameworks";'
-    cur.execute(sql)
-    lt_frameworks = cur.fetchall()
-    # print(frameworks_statistics)
-    # Convert list of tuples to list of lists
-    lt_frameworks_list = []
-    for i in lt_frameworks:
-        # print(i)
-        lt_frameworks_list.append(list(i))
-    print(lt_frameworks_list)
+    def get_statistics_data(chart_name, cursor):
+        request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
+        cursor.execute(request)
+        statistics_data = cursor.fetchall()
+        # Convert list of tuples to list of lists
+        data_list = []
+        for i in statistics_data:
+            data_list.append(list(i))
+        return data_list
+
+    languages_list = get_statistics_data('languages', cur)
+    frameworks_list = get_statistics_data('frameworks', cur)
+    lt_frameworks_list = get_statistics_data('lt_frameworks', cur)
+    bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur)
+
 
     con.close()
     return render_template('/chart.html',
                            languages=sorted(languages_list, key=itemgetter(1), reverse=True),
                            frameworks=sorted(frameworks_list, key=itemgetter(1), reverse=True),
                            lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True),
+                           bdd_frameworks=sorted(bdd_frameworks_list, key=itemgetter(1), reverse=True),
+                           vacancies_qty=vacancies_qty
                            )
