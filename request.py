@@ -135,5 +135,8 @@ def wright_statistic_to_db(chart_name, param_list):
 
 sql = 'DELETE FROM "charts" WHERE "data" = "Go"';
 cur.execute(sql)
+con.commit()
+vac = cur.fetchall()
+print(vac)
 # Close database connection
 con.close()
