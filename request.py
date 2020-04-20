@@ -86,7 +86,7 @@ for x in range(0, pages):
     print("Items on page: ", len(set(s)))
 
 
-def wright_statistic_to_db(chart_name, data, param_list):
+def wright_statistic_to_db(chart_name, param_list):
     """ Function count an inclusions of some string from param_list in all vacancies. """
     for i in param_list:
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
@@ -104,23 +104,34 @@ def wright_statistic_to_db(chart_name, data, param_list):
     return
 
 
-languages_list = ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++', 'Ruby', 'Groovy', 'SQL']
-# Wright languages statistics data to database
-wright_statistic_to_db('languages', 'language_name', languages_list)
+# Wright programming languages statistics data to database
+wright_statistic_to_db('languages',
+                       ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
+                        'Ruby', 'Groovy', 'SQL', "Go", 'Scala'])
 
-frameworks_list = ['Pytest', 'Py.test', 'Unittest', 'Nose',
-                   'jUnit', 'TestNG',
-                   'PHPUnit', 'Codeception',
-                   'RSpec',
-                   'Spock',
-                   'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
-                   'Robot Framework']
 # Wright test frameworks statistics data to database
-wright_statistic_to_db('frameworks', 'framework_name', frameworks_list)
+wright_statistic_to_db('frameworks',
+                       ['Pytest', 'Py.test', 'Unittest', 'Nose',
+                        'jUnit', 'TestNG',
+                        'PHPUnit', 'Codeception',
+                        'RSpec',
+                        'Spock',
+                        'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
+                        'Robot Framework']
+                       )
 
-lt_frameworks_list = ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench']
-# Wright test frameworks statistics data to database
-wright_statistic_to_db('lt_frameworks', 'framework_name', lt_frameworks_list)
+# Wright load test tools statistics data to database
+wright_statistic_to_db('lt_frameworks',
+                       ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench'])
+
+# Wright bdd_frameworks statistics data to database
+wright_statistic_to_db('bdd_frameworks',
+                       ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
+                        'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', "Concordion",
+                        'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
+                        'radish', "Spinach"
+                        ]
+                       )
 
 # Close database connection
 con.close()
