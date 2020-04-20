@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from flask import Flask, send_from_directory, url_for, render_template
 import os
 import sqlite3
@@ -117,7 +119,7 @@ def chart():
     for i in languages_statistics:
         # print(i)
         languages_list.append(list(i))
-    print(languages_list)
+    print(sorted(languages_list, key=itemgetter(1)))
 
     sql = 'SELECT data, popularity FROM charts WHERE chart_name="frameworks";'
     cur.execute(sql)
@@ -142,7 +144,8 @@ def chart():
     print(lt_frameworks_list)
 
     con.close()
-    return render_template('/chart.html', languages=languages_list,
-                           frameworks=frameworks_list,
-                           lt_frameworks=lt_frameworks_list
+    return render_template('/chart.html',
+                           languages=sorted(languages_list, key=itemgetter(1), reverse=True),
+                           frameworks=sorted(frameworks_list, key=itemgetter(1), reverse=True),
+                           lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True),
                            )
