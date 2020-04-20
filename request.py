@@ -81,9 +81,9 @@ def id_list(response):
     return items
 
 
-for x in range(0, pages):
-    s = id_list(resp(x))
-    print("Items on page: ", len(set(s)))
+# for x in range(0, pages):
+#     s = id_list(resp(x))
+#     print("Items on page: ", len(set(s)))
 
 
 def wright_statistic_to_db(chart_name, param_list):
@@ -107,7 +107,7 @@ def wright_statistic_to_db(chart_name, param_list):
 # Wright programming languages statistics data to database
 wright_statistic_to_db('languages',
                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-                        'Ruby', 'Groovy', 'SQL', "Go", 'Scala'])
+                        'Ruby', 'Groovy', 'SQL', " Go ", 'Scala'])
 
 # Wright test frameworks statistics data to database
 wright_statistic_to_db('frameworks',
@@ -133,5 +133,7 @@ wright_statistic_to_db('bdd_frameworks',
                         ]
                        )
 
+sql = 'DELETE FROM "charts" WHERE "data" = "Go"';
+cur.execute(sql)
 # Close database connection
 con.close()
