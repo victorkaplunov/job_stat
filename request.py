@@ -116,7 +116,8 @@ wright_statistic_to_db('frameworks',
                         'PHPUnit', 'Codeception',
                         'RSpec',
                         'Spock',
-                        'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor', 'Karma',
+                        'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor',
+                        'Karma', 'CodeceptJS',
                         'Robot Framework']
                        )
 
@@ -129,8 +130,28 @@ wright_statistic_to_db('bdd_frameworks',
                        ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
                         'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', "Concordion",
                         'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
-                        'radish', "Spinach"
-                        ]
+                        'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD']
+                       )
+# Wright Web UI testing tool statistics data to database
+wright_statistic_to_db('web_ui_tools',
+                       ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress',
+                        'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright']
+                       )
+
+# Wright mobile testing frameworks statistics data to database
+wright_statistic_to_db('mobile_testing_frameworks',
+                       ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
+                        'Calabash', 'UI Automation', 'UIAutomator', 'XCTest']
+                       )
+# Wright bug\test management systems statistics data to database
+wright_statistic_to_db('bugtracking_n_tms',
+                       ['Youtrack', 'TestRail', 'TestLink', 'TestLodge', 'Jira',
+                        'Confluence', 'Redmine', 'TFS', 'Zephyr']
+                       )
+
+# Wright version control systems statistics data to database
+wright_statistic_to_db('cvs',
+                       ['git', 'SVN', 'Subversion', 'Mercurial']
                        )
 
 # Close database connection

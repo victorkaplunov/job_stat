@@ -130,13 +130,21 @@ def chart():
     frameworks_list = get_statistics_data('frameworks', cur)
     lt_frameworks_list = get_statistics_data('lt_frameworks', cur)
     bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur)
-
+    web_ui_tools_list = get_statistics_data('web_ui_tools', cur)
+    mobile_testing_frameworks_list = get_statistics_data('mobile_testing_frameworks', cur)
+    bugtracking_n_tms_list = get_statistics_data('bugtracking_n_tms', cur)
+    cvs_list = get_statistics_data('cvs', cur)
 
     con.close()
     return render_template('/chart.html',
+                           vacancies_qty=vacancies_qty,
                            languages=sorted(languages_list, key=itemgetter(1), reverse=True),
                            frameworks=sorted(frameworks_list, key=itemgetter(1), reverse=True),
                            lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True),
                            bdd_frameworks=sorted(bdd_frameworks_list, key=itemgetter(1), reverse=True),
-                           vacancies_qty=vacancies_qty
+                           web_ui_tools=sorted(web_ui_tools_list, key=itemgetter(1), reverse=True),
+                           mobile_testing_frameworks=sorted(mobile_testing_frameworks_list,
+                                                            key=itemgetter(1), reverse=True),
+                           bugtracking_n_tms=sorted(bugtracking_n_tms_list, key=itemgetter(1), reverse=True),
+                           cvs=sorted(cvs_list, key=itemgetter(1), reverse=True)
                            )
