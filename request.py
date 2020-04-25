@@ -33,7 +33,7 @@ try:
     for i in cur.fetchall():
         vac_id_list.append(i[0])
 except sqlite3.IntegrityError as err:
-        print("Error: ", err)
+    print("Error: ", err)
 
 
 def resp(n):
@@ -107,7 +107,7 @@ def wright_statistic_to_db(chart_name, param_list):
 # Wright programming languages statistics data to database
 wright_statistic_to_db('languages',
                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-                        'Ruby', 'Groovy', 'SQL', " Go ", 'Scala'])
+                        'Ruby', 'Groovy', 'SQL', ' Go ', 'Scala'])
 
 # Wright test frameworks statistics data to database
 wright_statistic_to_db('frameworks',
@@ -128,7 +128,7 @@ wright_statistic_to_db('lt_frameworks',
 # Wright bdd_frameworks statistics data to database
 wright_statistic_to_db('bdd_frameworks',
                        ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
-                        'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', "Concordion",
+                        'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Concordion',
                         'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
                         'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD']
                        )
@@ -153,6 +153,32 @@ wright_statistic_to_db('bugtracking_n_tms',
 wright_statistic_to_db('cvs',
                        ['git', 'SVN', 'Subversion', 'Mercurial']
                        )
+
+
+# Count types of schedule in all vacancies.
+schedule_type = dict(fullDay=0, flexible=0, shift=0, remote=0)
+sql = "SELECT id, json FROM vacancies;"
+cur.execute(sql)
+vacancies = (cur.fetchall())
+print(len(vacancies))
+print(schedule_type)
+for i in vacancies:
+    body = json.loads((i[1]))
+    schedule_type[(body['schedule']['id'])] += 1
+print(schedule_type)
+
+for i in schedule_type:
+    sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
+          f'VALUES("schedule_type", "{i}", {schedule_type[i]});'
+    print(sql)
+    try:
+        cur.executescript(sql)
+    except sqlite3.IntegrityError as error:
+        print("Error: ", error)
+
+    sql = f'UPDATE charts SET popularity = {schedule_type[i]} WHERE data = "{i}";'
+    print(sql)
+    cur.executescript(sql)
 
 # Close database connection
 con.close()

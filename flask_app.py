@@ -126,6 +126,7 @@ def chart():
             data_list.append(list(i))
         return data_list
 
+    schedule_type_list = get_statistics_data('schedule_type', cur)
     languages_list = get_statistics_data('languages', cur)
     frameworks_list = get_statistics_data('frameworks', cur)
     lt_frameworks_list = get_statistics_data('lt_frameworks', cur)
@@ -138,6 +139,7 @@ def chart():
     con.close()
     return render_template('/chart.html',
                            vacancies_qty=vacancies_qty,
+                           schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True),
                            languages=sorted(languages_list, key=itemgetter(1), reverse=True),
                            frameworks=sorted(frameworks_list, key=itemgetter(1), reverse=True),
                            lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True),
