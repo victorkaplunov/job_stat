@@ -116,7 +116,7 @@ wright_statistic_to_db('frameworks',
                         'PHPUnit', 'Codeception',
                         'RSpec',
                         'Spock',
-                        'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch', 'Protractor',
+                        'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch',
                         'Karma', 'CodeceptJS',
                         'Robot Framework']
                        )
@@ -135,7 +135,7 @@ wright_statistic_to_db('bdd_frameworks',
 # Wright Web UI testing tool statistics data to database
 wright_statistic_to_db('web_ui_tools',
                        ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress',
-                        'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright']
+                        'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor']
                        )
 
 # Wright mobile testing frameworks statistics data to database
