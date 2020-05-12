@@ -104,7 +104,6 @@ def wright_statistic_to_db(chart_name, param_list):
         cur.executescript(sql)
     return
 
-
 sql = "DROP TABLE IF EXISTS charts;"
 cur.execute(sql)
 
@@ -119,7 +118,6 @@ CREATE TABLE IF NOT EXISTS charts
 """
 cur.execute(sql)
 
-sql = 'INSERT INTO charts(chart_name, data, popularity) VALUES("%s", "%s",%i);' % (chart_name, i, len(vac))
 
 # Wright programming languages statistics data to database
 wright_statistic_to_db('languages',
