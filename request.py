@@ -166,7 +166,7 @@ wright_statistic_to_db('bugtracking_n_tms',
                         'Deviniti', 'Qase', 'Klaros-Testmanagement',
                         'IBM Rational Quality Manager', 'HP Quality Center',
                         'TestIt', 'XQual', 'Borland Silk Central', 'Testuff',
-                        'Gemini', 'BugZilla Testopia', 'Fitnesse', 'RTH-Turbo',
+                        'Gemini', 'BugZilla', 'Fitnesse', 'RTH-Turbo',
                         'Stryka', 'Test Case Lab']
                        )
 
