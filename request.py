@@ -115,7 +115,7 @@ wright_statistic_to_db('frameworks',
                         'jUnit', 'TestNG',
                         'PHPUnit', 'Codeception',
                         'RSpec',
-                        'Spock',
+                        'Spock', 'NUnit',
                         'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch',
                         'Karma', 'CodeceptJS',
                         'Robot Framework']
