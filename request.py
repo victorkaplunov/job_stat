@@ -86,6 +86,7 @@ for x in range(0, pages):
     print("Items on page: ", len(set(s)))
 
 
+
 def wright_statistic_to_db(chart_name, param_list):
     """ Function count an inclusions of some string from param_list in all vacancies. """
     for i in param_list:
@@ -104,6 +105,22 @@ def wright_statistic_to_db(chart_name, param_list):
     return
 
 
+sql = "DROP TABLE IF EXISTS charts;"
+cur.execute(sql)
+
+sql = """
+CREATE TABLE IF NOT EXISTS charts
+(
+    id INTEGER PRIMARY KEY,
+    chart_name NOT NULL,
+    data NOT NULL UNIQUE,
+    popularity  INTEGER
+);
+"""
+cur.execute(sql)
+
+sql = 'INSERT INTO charts(chart_name, data, popularity) VALUES("%s", "%s",%i);' % (chart_name, i, len(vac))
+
 # Wright programming languages statistics data to database
 wright_statistic_to_db('languages',
                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
@@ -112,7 +129,7 @@ wright_statistic_to_db('languages',
 # Wright test frameworks statistics data to database
 wright_statistic_to_db('frameworks',
                        ['Pytest', 'Py.test', 'Unittest', 'Nose',
-                        'jUnit', 'TestNG',
+                        'JUnit', 'TestNG',
                         'PHPUnit', 'Codeception',
                         'RSpec',
                         'Spock', 'NUnit',
@@ -146,7 +163,13 @@ wright_statistic_to_db('mobile_testing_frameworks',
 # Wright bug\test management systems statistics data to database
 wright_statistic_to_db('bugtracking_n_tms',
                        ['Youtrack', 'TestRail', 'TestLink', 'TestLodge', 'Jira',
-                        'Confluence', 'Redmine', 'TFS', 'Zephyr']
+                        'Confluence', 'Redmine', 'TFS', 'Zephyr',
+                        'Hiptest', 'TestMonitor', 'Xray', 'PractiTest', 'Testpad',
+                        'Deviniti', 'Qase', 'Klaros-Testmanagement',
+                        'IBM Rational Quality Manager', 'HP Quality Center',
+                        'TestIt', 'XQual', 'Borland Silk Central', 'Testuff',
+                        'Gemini', 'BugZilla Testopia', 'Fitnesse', 'RTH-Turbo',
+                        'Stryka', 'Test Case Lab']
                        )
 
 # Wright version control systems statistics data to database
