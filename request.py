@@ -147,7 +147,7 @@ wright_statistic_to_db('bdd_frameworks',
                        ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
                         'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Concordion',
                         'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
-                        'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD']
+                        'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD', 'xBehave.net']
                        )
 # Wright Web UI testing tool statistics data to database
 wright_statistic_to_db('web_ui_tools',
