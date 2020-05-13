@@ -122,7 +122,9 @@ cur.execute(sql)
 # Wright programming languages statistics data to database
 wright_statistic_to_db('languages',
                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-                        'Ruby', 'Groovy', 'SQL', ' Go ', 'Scala'])
+                        'Ruby', 'Groovy', 'SQL', ' Go ', 'Scala', 'Swift',
+                        'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
+                        ])
 
 # Wright test frameworks statistics data to database
 wright_statistic_to_db('frameworks',
