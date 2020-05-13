@@ -152,7 +152,7 @@ wright_statistic_to_db('bdd_frameworks',
 # Wright Web UI testing tool statistics data to database
 wright_statistic_to_db('web_ui_tools',
                        ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress',
-                        'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor']
+                        'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe']
                        )
 
 # Wright mobile testing frameworks statistics data to database
