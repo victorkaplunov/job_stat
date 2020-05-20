@@ -164,7 +164,7 @@ wright_statistic_to_db('bugtracking_n_tms',
                         'Confluence', 'Redmine', 'TFS', 'Zephyr',
                         'Hiptest', 'TestMonitor', 'Xray', 'PractiTest', 'Testpad',
                         'Deviniti', 'Qase', 'Klaros-Testmanagement',
-                        'IBM Rational Quality Manager', 'HP Quality Center',
+                        'IBM Rational Quality Manager', 'HP Quality Center', 'HP ALM',
                         'TestIt', 'XQual', 'Borland Silk Central', 'Testuff',
                         'Gemini', 'BugZilla', 'Fitnesse', 'RTH-Turbo',
                         'Stryka', 'Test Case Lab']
