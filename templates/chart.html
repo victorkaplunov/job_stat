@@ -36,25 +36,13 @@
         data.addColumn('string', 'Topping');
         data.addColumn('number', 'Slices');
         data.addRows({{ schedule_type | safe }});
-        var options = {'title':'Популярность типов рабочего графика.',
+        var options = {'title':'Популярность режимов работы.',
             'width':800,
             'height':700};
         var chart = new google.visualization.PieChart(document.getElementById('chart_schedule_type'));
         chart.draw(data, options);
       }
 
-      google.charts.setOnLoadCallback(drawTestFrameworksChart);
-     function drawTestFrameworksChart() {
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
-        data.addRows({{ frameworks | safe }});
-        var options = {'title':'Количество упоминаний тестовых фреймворков.',
-            'width':800,
-            'height':700};
-        var chart = new google.visualization.PieChart(document.getElementById('chart_div1'));
-        chart.draw(data, options);
-      }
 
       google.charts.setOnLoadCallback(drawLoadTestingToolsChart);
       function drawLoadTestingToolsChart() {
@@ -137,19 +125,18 @@
   </head>
   <body style="font-family: Arial">
 
-
+    
      <table class="columns">
-      <thead>Данные по вакансиям раздела "Тестирование" в Москве с 2019-03-17 по настоящий момент.<br>
-         Всего {{ vacancies_qty }} вакансий.
+      <thead>
+        <h1>Данные по вакансиям раздела "Тестирование" в Москве с 2019-03-17 по настоящий момент.</h1><br>
+    Всего {{ vacancies_qty }} вакансий.<br><br>
+         <a href = "unit_test_frameworks" ><li> Популярность фреймворков для юнит-тестирования (тест-раннеров)</a><br>
       </thead>
-      <tr>
-        <td><div id="chart_div" style="border: 1px solid #ccc"></div></td>
-      </tr>
       <tr>
         <td><div id="chart_schedule_type" style="border: 1px solid #ccc"></div></td>
       </tr>
       <tr>
-        <td><div id="chart_div1" style="border: 1px solid #ccc"></div></td>
+        <td><div id="chart_div" style="border: 1px solid #ccc"></div></td>
       </tr>
       <tr>
         <td><div id="chart_div2" style="border: 1px solid #ccc"></div></td>
