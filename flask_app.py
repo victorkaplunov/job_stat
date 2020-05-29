@@ -105,6 +105,20 @@ def show_vac_of_employer(empl_name):
     return str(data_list)
 
 
+def get_statistics_data(chart_name, cursor):
+    if chart_name == 'frameworks':
+        request = f'SELECT data, popularity, parent FROM charts WHERE chart_name="{chart_name}";'
+    else:
+        request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
+    cursor.execute(request)
+    statistics_data = cursor.fetchall()
+    # Convert list of tuples to list of lists
+    data_list = []
+    for i in statistics_data:
+        data_list.append(list(i))
+    return data_list
+
+
 @app.route('/')
 def chart():
     """Chart page"""
@@ -112,23 +126,13 @@ def chart():
     con = sqlite3.connect("testdb.db")
     cur = con.cursor()
 
-    sql = 'SELECT COUNT(*)  FROM vacancies;'
+    sql = 'SELECT COUNT(*) FROM vacancies;'
     cur.execute(sql)
     vacancies_qty = (cur.fetchone()[0])
 
-    def get_statistics_data(chart_name, cursor):
-        request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
-        cursor.execute(request)
-        statistics_data = cursor.fetchall()
-        # Convert list of tuples to list of lists
-        data_list = []
-        for i in statistics_data:
-            data_list.append(list(i))
-        return data_list
-
     schedule_type_list = get_statistics_data('schedule_type', cur)
     languages_list = get_statistics_data('languages', cur)
-    frameworks_list = get_statistics_data('frameworks', cur)
+
     lt_frameworks_list = get_statistics_data('lt_frameworks', cur)
     bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur)
     web_ui_tools_list = get_statistics_data('web_ui_tools', cur)
@@ -141,7 +145,6 @@ def chart():
                            vacancies_qty=vacancies_qty,
                            schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True),
                            languages=sorted(languages_list, key=itemgetter(1), reverse=True),
-                           frameworks=sorted(frameworks_list, key=itemgetter(1), reverse=True),
                            lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True),
                            bdd_frameworks=sorted(bdd_frameworks_list, key=itemgetter(1), reverse=True),
                            web_ui_tools=sorted(web_ui_tools_list, key=itemgetter(1), reverse=True),
@@ -150,3 +153,19 @@ def chart():
                            bugtracking_n_tms=sorted(bugtracking_n_tms_list, key=itemgetter(1), reverse=True),
                            cvs=sorted(cvs_list, key=itemgetter(1), reverse=True)
                            )
+
+
+@app.route('/unit_test_frameworks')
+def unit_test_frameworks():
+    """Unit test frameworks popularity page"""
+    con = sqlite3.connect("testdb.db")
+    cur = con.cursor()
+    frameworks_list = get_statistics_data('frameworks', cur)
+    frameworks_list = sorted(frameworks_list, key=itemgetter(1), reverse=True)
+    frameworks_list.insert(0, ['Framework', 'Popularity', 'Language'])
+    return render_template(
+        '/unit_test_frameworks.html',
+        frameworks=frameworks_list
+
+    )
+
