@@ -6,7 +6,8 @@ con = sqlite3.connect("testdb.db")
 # Create cursor
 cur = con.cursor()
 
-sql = """CREATE TABLE IF NOT EXISTS vacancies (id INTEGER PRIMARY KEY, json TEXT);"""
+sql = "CREATE TABLE IF NOT EXISTS vacancies (id INTEGER PRIMARY KEY, " \
+      "json TEXT, published_at TEXT, schedule_type TEXT);"
 cur.execute(sql)
 
 sql = """
