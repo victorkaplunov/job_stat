@@ -84,7 +84,6 @@ for x in range(0, pages):
     print("Items on page: ", len(set(s)))
 
 
-
 def wright_statistic_to_db(chart_name, param_list):
     """ Function count an inclusions of some string from param_list in all vacancies. """
     for i in param_list:
@@ -102,6 +101,27 @@ def wright_statistic_to_db(chart_name, param_list):
         cur.executescript(sql)
     return
 
+
+def chart_with_category_filter(chart_name, param_list):
+    """ Function count an inclusions of some string from param_list in all vacancies. """
+    for i in param_list:
+        print(i[0], i[1])
+        sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i[0]
+        cur.execute(sql)
+        vac = cur.fetchall()
+        sql = 'INSERT INTO charts(chart_name, data, popularity, parent) VALUES("%s", "%s", %i, "%s");' % (chart_name, i[0],
+                                                                                                   len(vac), i[1])
+        try:
+            cur.executescript(sql)
+        except sqlite3.IntegrityError as error:
+            print("Error: ", error)
+
+        sql = 'UPDATE charts SET popularity = "%i" WHERE data = "%s";' % (len(vac), i)
+        print(sql)
+        cur.executescript(sql)
+    return
+
+
 sql = "DROP TABLE IF EXISTS charts;"
 cur.execute(sql)
 
@@ -111,13 +131,14 @@ CREATE TABLE IF NOT EXISTS charts
     id INTEGER PRIMARY KEY,
     chart_name NOT NULL,
     data NOT NULL UNIQUE,
-    popularity  INTEGER
+    popularity  INTEGER,
+    parent
 );
 """
 cur.execute(sql)
 
 
-# Wright programming languages statistics data to database
+# # Wright programming languages statistics data to database
 wright_statistic_to_db('languages',
                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
                         'Ruby', 'Groovy', 'SQL', ' Go ', 'Scala', 'Swift',
@@ -125,16 +146,17 @@ wright_statistic_to_db('languages',
                         ])
 
 # Wright test frameworks statistics data to database
-wright_statistic_to_db('frameworks',
-                       ['Pytest', 'Py.test', 'Unittest', 'Nose',
-                        'JUnit', 'TestNG',
-                        'PHPUnit', 'Codeception',
-                        'RSpec',
-                        'Spock', 'NUnit',
-                        'Mocha', 'Serenity', 'Jest', 'Jasmine', 'Nightwatch',
-                        'Karma', 'CodeceptJS',
-                        'Robot Framework']
-                       )
+chart_with_category_filter('frameworks',
+                           [['pytest', 'Python'], ['Py.test', 'Python'], ['Unittest', 'Python'], ['Nose', 'Python'],
+                            ['JUnit', 'Java'], ['TestNG', 'Java'],
+                            ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
+                            ['RSpec', 'Ruby'],
+                            ['Spock', 'C#'], ['NUnit', 'C#'],
+                            ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
+                            ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
+                            ['CodeceptJS', 'JavaScript'],
+                            ['Robot_Framework', 'multiple_language']]
+                           )
 
 # Wright load test tools statistics data to database
 wright_statistic_to_db('lt_frameworks',
