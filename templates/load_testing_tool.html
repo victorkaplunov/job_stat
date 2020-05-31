@@ -4,28 +4,22 @@
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-       // Load the Visualization API and the corechart package.
-       google.charts.load('current', {'packages':['corechart']});
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
 
-       // Set a callback to run when the Google Visualization API is loaded.
-       google.charts.setOnLoadCallback(drawLengChart);
+<!--      // Set a callback to run when the Google Visualization API is loaded.-->
+<!--      google.charts.setOnLoadCallback(drawScheduleTypeChart);-->
 
       // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
       // draws it.
-      function drawLengChart() {
-
-        // Create the data table.
+       google.charts.setOnLoadCallback(drawLoadTestingToolsChart);
+      function drawLoadTestingToolsChart() {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Topping');
         data.addColumn('number', 'Slices');
-        data.addRows({{ languages | safe }});
-
-        // Set chart options
-        var options = {'title':'Количество упоминаний языков программирования.',
-                       'height':500};
-
-        // Instantiate and draw our chart, passing in some options.
+        data.addRows({{ lt_frameworks | safe }});
+        var options = {'title':'Количество упоминаний инструментов тестирования производительности.'};
         var chart = new google.visualization.PieChart(document.getElementById('chart'));
         chart.draw(data, options);
       }
@@ -37,11 +31,7 @@
   {% block title %}Home Page{% endblock %}
   {% block content %}
 
-
-   
-      <!--Divs that will hold each control and chart-->
             <div id="chart" style="height: 500px;"></div>
-
 
   {% endblock %}
 </html>

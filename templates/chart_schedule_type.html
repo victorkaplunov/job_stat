@@ -20,8 +20,7 @@
         data.addColumn('number', 'Slices');
         data.addRows({{ schedule_type | safe }});
         var options = {'title':'Популярность режимов работы.',
-<!--            'width':800,-->
-            'height':500};
+           };
         var chart = new google.visualization.PieChart(document.getElementById('chart_schedule_type'));
         chart.draw(data, options);
       }
@@ -33,13 +32,9 @@
   {% block title %}Home Page{% endblock %}
   {% block content %}
 
-    <!--Div that will hold the dashboard-->
-<!--    <div id="dashboard_div" align="center" style="width: 900px; height: 500px;">-->
-      <div id="dashboard_div" align="center" vertical-align="top" style="height: 400px;">
-   
-      <!--Divs that will hold each control and chart-->
-            <div id="chart_schedule_type"></div>
 
-    </div>
+      <!--Divs that will hold each control and chart-->
+            <div id="chart" style="height: 500px;"></div>
+
   {% endblock %}
 </html>

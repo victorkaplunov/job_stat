@@ -11,6 +11,10 @@ id_list = []
 l_host = "http://127.0.0.1:5000"
 
 
+def cur():
+    con = sqlite3.connect("testdb.db")
+    return con.cursor()
+
 @app.route('/api')
 def index():
     return "<html> \
@@ -200,6 +204,16 @@ def programming_languages():
         '/programming_languages.html',
         languages=sorted(languages_list, key=itemgetter(1), reverse=True)
 
+    )
+
+
+@app.route('/load_testing_tool')
+def load_testing_tool():
+    """Schedule type popularity page"""
+    lt_frameworks_list = get_statistics_data('lt_frameworks', cur())
+    return render_template(
+        '/load_testing_tool.html',
+        lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True)
     )
 
 
