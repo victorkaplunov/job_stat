@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Home Page{% endblock %}
+{% block content %}
+
+
+
+<main role="main" class="container">
+    <br class="row">
+    <h1>Статистика по рынку труда в тестировании ПО</h1>
+    <p class="lead">Данные по вакансиям раздела "Тестирование" на HH.ru по Москве с 2019-03-17 по настоящий момент. Всего <b>{{ vacancies_qty }}</b> вакансий.</p>
+    <p class="text-left"><a href = "schedule_type" > Популярность режимов работы</a></p>
+    <p class="text-left"><a href = "programming_languages" >Количество упоминаний языков программирования</a></p>
+    <p class="text-left"><a href = "unit_test_frameworks" > Популярность фреймворков для юнит-тестирования (тест-раннеров)</a></p>
+    <p class="text-left"><a href = "unit_test_frameworks" > Популярность фреймворков для юнит-тестирования (тест-раннеров)</a></p>
+
+    {% endblock %}
+    </div>
+</main><!-- /.container -->

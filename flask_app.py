@@ -1,11 +1,12 @@
 from operator import itemgetter
-
 from flask import Flask, send_from_directory, url_for, render_template
+from flask_bootstrap import Bootstrap
 import os
 import sqlite3
 import json
 
 app = Flask(__name__)
+bootstrap = Bootstrap(app)
 id_list = []
 l_host = "http://127.0.0.1:5000"
 
@@ -29,6 +30,12 @@ empl_name='СофтПро') + "</a><br> \
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+@app.route('/starter-template.css')
+def starter_template():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'starter-template.css')  #, mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/api/vac/cal/<int:vac_id>')
@@ -168,4 +175,64 @@ def unit_test_frameworks():
         frameworks=frameworks_list
 
     )
+
+
+@app.route('/schedule_type')
+def schedule_type():
+    """Schedule type popularity page"""
+    con = sqlite3.connect("testdb.db")
+    cur = con.cursor()
+    schedule_type_list = get_statistics_data('schedule_type', cur)
+    return render_template(
+        '/chart_schedule_type.html',
+        schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True)
+
+    )
+
+
+@app.route('/programming_languages')
+def programming_languages():
+    """Schedule type popularity page"""
+    con = sqlite3.connect("testdb.db")
+    cur = con.cursor()
+    languages_list = get_statistics_data('languages', cur)
+    return render_template(
+        '/programming_languages.html',
+        languages=sorted(languages_list, key=itemgetter(1), reverse=True)
+
+    )
+
+
+@app.route('/index')
+def index_boot():
+    """Chart page"""
+
+    con = sqlite3.connect("testdb.db")
+    cur = con.cursor()
+
+    sql = 'SELECT COUNT(*) FROM vacancies;'
+    cur.execute(sql)
+    vacancies_qty = (cur.fetchone()[0])
+
+    schedule_type_list = get_statistics_data('schedule_type', cur)
+    languages_list = get_statistics_data('languages', cur)
+
+    lt_frameworks_list = get_statistics_data('lt_frameworks', cur)
+    bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur)
+    web_ui_tools_list = get_statistics_data('web_ui_tools', cur)
+    mobile_testing_frameworks_list = get_statistics_data('mobile_testing_frameworks', cur)
+    bugtracking_n_tms_list = get_statistics_data('bugtracking_n_tms', cur)
+    cvs_list = get_statistics_data('cvs', cur)
+    return render_template('/index.html',
+                           vacancies_qty=vacancies_qty,
+                           schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True),
+                           languages=sorted(languages_list, key=itemgetter(1), reverse=True),
+                           lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True),
+                           bdd_frameworks=sorted(bdd_frameworks_list, key=itemgetter(1), reverse=True),
+                           web_ui_tools=sorted(web_ui_tools_list, key=itemgetter(1), reverse=True),
+                           mobile_testing_frameworks=sorted(mobile_testing_frameworks_list,
+                                                            key=itemgetter(1), reverse=True),
+                           bugtracking_n_tms=sorted(bugtracking_n_tms_list, key=itemgetter(1), reverse=True),
+                           cvs=sorted(cvs_list, key=itemgetter(1), reverse=True)
+                           )
 

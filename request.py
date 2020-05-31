@@ -53,6 +53,7 @@ def id_list(response):
             cur.executescript(sql)
         except sqlite3.IntegrityError as err:
             print("Error: ", err)
+            break
 
         # If vacancy is new, write description to "vacancies" table.
         if int(i["id"]) not in vac_id_list:
@@ -143,6 +144,7 @@ wright_statistic_to_db('languages',
                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
                         'Ruby', 'Groovy', 'SQL', ' Go ', 'Scala', 'Swift',
                         'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
+                        'AutoIT'
                         ])
 
 # Wright test frameworks statistics data to database
@@ -160,7 +162,13 @@ chart_with_category_filter('frameworks',
 
 # Wright load test tools statistics data to database
 wright_statistic_to_db('lt_frameworks',
-                       ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench'])
+                       ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
+                        'Grinder', 'Performance Center', 'IBM Rational Performance'])
+
+# Wright monitoring tools statistics data to database
+
+wright_statistic_to_db('monitoring_tools',
+                       ['Zabbix', 'nmon', 'Oracle EM', 'Grafana', 'ELK', 'Influxdb', 'Nagios', 'Cacti'])
 
 # Wright bdd_frameworks statistics data to database
 wright_statistic_to_db('bdd_frameworks',
@@ -171,7 +179,7 @@ wright_statistic_to_db('bdd_frameworks',
                        )
 # Wright Web UI testing tool statistics data to database
 wright_statistic_to_db('web_ui_tools',
-                       ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress',
+                       ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress', 'Splinter',
                         'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe']
                        )
 

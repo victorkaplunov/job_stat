@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block scripts %}
+    {{ super() }}
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawScheduleTypeChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      google.charts.setOnLoadCallback(drawScheduleTypeChart);
+       function drawScheduleTypeChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Topping');
+        data.addColumn('number', 'Slices');
+        data.addRows({{ schedule_type | safe }});
+        var options = {'title':'Популярность режимов работы.',
+<!--            'width':800,-->
+            'height':500};
+        var chart = new google.visualization.PieChart(document.getElementById('chart_schedule_type'));
+        chart.draw(data, options);
+      }
+    </script>
+{% endblock %}
+
+
+
+  {% block title %}Home Page{% endblock %}
+  {% block content %}
+
+    <!--Div that will hold the dashboard-->
+<!--    <div id="dashboard_div" align="center" style="width: 900px; height: 500px;">-->
+      <div id="dashboard_div" align="center" vertical-align="top" style="height: 400px;">
+   
+      <!--Divs that will hold each control and chart-->
+            <div id="chart_schedule_type"></div>
+
+    </div>
+  {% endblock %}
+</html>
