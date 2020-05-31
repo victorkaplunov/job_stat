@@ -217,6 +217,53 @@ def load_testing_tool():
     )
 
 
+@app.route('/bdd_frameworks')
+def bdd_frameworks():
+    """Schedule type popularity page"""
+    bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur())
+    return render_template(
+        '/bdd_frameworks.html',
+        bdd_frameworks=sorted(bdd_frameworks_list, key=itemgetter(1), reverse=True)
+    )
+
+
+@app.route('/web_ui_tools')
+def web_ui_tools():
+    """Schedule type popularity page"""
+    web_ui_tools_list = get_statistics_data('web_ui_tools', cur())
+    return render_template(
+        '/web_ui_tools.html',
+        web_ui_tools=sorted(web_ui_tools_list, key=itemgetter(1), reverse=True)
+    )
+
+
+@app.route('/mobile_testing_frameworks')
+def mobile_testing_frameworks():
+    """Schedule type popularity page"""
+    mobile_testing_frameworks_list = get_statistics_data('mobile_testing_frameworks', cur())
+    return render_template('/mobile_testing_frameworks.html',
+        mobile_testing_frameworks=sorted(mobile_testing_frameworks_list,
+                                         key=itemgetter(1), reverse=True))
+
+
+@app.route('/bugtracking_n_tms')
+def bugtracking_n_tms():
+    """Schedule type popularity page"""
+    bugtracking_n_tms_list = get_statistics_data('bugtracking_n_tms', cur())
+    return render_template(
+        '/bugtracking_n_tms.html',
+        bugtracking_n_tms=sorted(bugtracking_n_tms_list,
+                                         key=itemgetter(1), reverse=True))
+
+
+@app.route('/cvs')
+def cvs():
+    """Schedule type popularity page"""
+    cvs_list = get_statistics_data('cvs', cur())
+    return render_template('/cvs.html',
+        cvs=sorted(cvs_list, key=itemgetter(1), reverse=True))
+
+
 @app.route('/index')
 def index_boot():
     """Chart page"""
