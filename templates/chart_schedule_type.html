@@ -21,7 +21,7 @@
         data.addRows({{ schedule_type | safe }});
         var options = {'title':'Популярность режимов работы.',
            };
-        var chart = new google.visualization.PieChart(document.getElementById('chart_schedule_type'));
+        var chart = new google.visualization.PieChart(document.getElementById('chart'));
         chart.draw(data, options);
       }
     </script>
