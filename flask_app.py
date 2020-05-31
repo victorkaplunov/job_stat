@@ -15,6 +15,7 @@ def cur():
     con = sqlite3.connect("testdb.db")
     return con.cursor()
 
+
 @app.route('/api')
 def index():
     return "<html> \
@@ -130,42 +131,6 @@ def get_statistics_data(chart_name, cursor):
     return data_list
 
 
-@app.route('/')
-def chart():
-    """Chart page"""
-
-    con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
-
-    sql = 'SELECT COUNT(*) FROM vacancies;'
-    cur.execute(sql)
-    vacancies_qty = (cur.fetchone()[0])
-
-    schedule_type_list = get_statistics_data('schedule_type', cur)
-    languages_list = get_statistics_data('languages', cur)
-
-    lt_frameworks_list = get_statistics_data('lt_frameworks', cur)
-    bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur)
-    web_ui_tools_list = get_statistics_data('web_ui_tools', cur)
-    mobile_testing_frameworks_list = get_statistics_data('mobile_testing_frameworks', cur)
-    bugtracking_n_tms_list = get_statistics_data('bugtracking_n_tms', cur)
-    cvs_list = get_statistics_data('cvs', cur)
-
-    con.close()
-    return render_template('/chart.html',
-                           vacancies_qty=vacancies_qty,
-                           schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True),
-                           languages=sorted(languages_list, key=itemgetter(1), reverse=True),
-                           lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True),
-                           bdd_frameworks=sorted(bdd_frameworks_list, key=itemgetter(1), reverse=True),
-                           web_ui_tools=sorted(web_ui_tools_list, key=itemgetter(1), reverse=True),
-                           mobile_testing_frameworks=sorted(mobile_testing_frameworks_list,
-                                                            key=itemgetter(1), reverse=True),
-                           bugtracking_n_tms=sorted(bugtracking_n_tms_list, key=itemgetter(1), reverse=True),
-                           cvs=sorted(cvs_list, key=itemgetter(1), reverse=True)
-                           )
-
-
 @app.route('/unit_test_frameworks')
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
@@ -264,36 +229,8 @@ def cvs():
         cvs=sorted(cvs_list, key=itemgetter(1), reverse=True))
 
 
-@app.route('/index')
-def index_boot():
+@app.route('/')
+def home_page():
     """Chart page"""
-
-    con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
-
-    sql = 'SELECT COUNT(*) FROM vacancies;'
-    cur.execute(sql)
-    vacancies_qty = (cur.fetchone()[0])
-
-    schedule_type_list = get_statistics_data('schedule_type', cur)
-    languages_list = get_statistics_data('languages', cur)
-
-    lt_frameworks_list = get_statistics_data('lt_frameworks', cur)
-    bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur)
-    web_ui_tools_list = get_statistics_data('web_ui_tools', cur)
-    mobile_testing_frameworks_list = get_statistics_data('mobile_testing_frameworks', cur)
-    bugtracking_n_tms_list = get_statistics_data('bugtracking_n_tms', cur)
-    cvs_list = get_statistics_data('cvs', cur)
-    return render_template('/index.html',
-                           vacancies_qty=vacancies_qty,
-                           schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True),
-                           languages=sorted(languages_list, key=itemgetter(1), reverse=True),
-                           lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True),
-                           bdd_frameworks=sorted(bdd_frameworks_list, key=itemgetter(1), reverse=True),
-                           web_ui_tools=sorted(web_ui_tools_list, key=itemgetter(1), reverse=True),
-                           mobile_testing_frameworks=sorted(mobile_testing_frameworks_list,
-                                                            key=itemgetter(1), reverse=True),
-                           bugtracking_n_tms=sorted(bugtracking_n_tms_list, key=itemgetter(1), reverse=True),
-                           cvs=sorted(cvs_list, key=itemgetter(1), reverse=True)
-                           )
+    return render_template('/index.html')
 
