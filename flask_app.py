@@ -232,5 +232,10 @@ def cvs():
 @app.route('/')
 def home_page():
     """Chart page"""
-    return render_template('/index.html')
+    con = sqlite3.connect("testdb.db")
+    cur = con.cursor()
+    sql = 'SELECT COUNT(*) FROM vacancies;'
+    cur.execute(sql)
+    vacancies_qty = (cur.fetchone()[0])
+    return render_template('/index.html', vacancies_qty=vacancies_qty)
 
