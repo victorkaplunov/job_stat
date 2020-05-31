@@ -15,8 +15,8 @@
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Topping');
         data.addColumn('number', 'Slices');
-        data.addRows({{ mobile_testing_frameworks | safe }});
-        var options = {'title':'Количество упоминаний средств тестирования Web UI.'};
+        data.addRows({{ bugtracking_n_tms | safe }});
+        var options = {'title':'Системы управления тестированием, bugtracking system и т.п.'};
         var chart = new google.visualization.PieChart(document.getElementById('chart'));
         chart.draw(data, options);
       }
