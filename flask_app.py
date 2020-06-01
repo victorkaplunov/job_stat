@@ -231,7 +231,7 @@ def cvs():
 
 @app.route('/')
 def home_page():
-    """Chart page"""
+    """Home page"""
     con = sqlite3.connect("testdb.db")
     cur = con.cursor()
     sql = 'SELECT COUNT(*) FROM vacancies;'
@@ -239,3 +239,8 @@ def home_page():
     vacancies_qty = (cur.fetchone()[0])
     return render_template('/index.html', vacancies_qty=vacancies_qty)
 
+
+@app.route('/word_cloud')
+def word_cloud():
+    """Chart page"""
+    return render_template('/word_cloud.html')
