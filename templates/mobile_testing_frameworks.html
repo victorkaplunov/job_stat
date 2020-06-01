@@ -16,7 +16,7 @@
         data.addColumn('string', 'Topping');
         data.addColumn('number', 'Slices');
         data.addRows({{ mobile_testing_frameworks | safe }});
-        var options = {'title':'Количество упоминаний средств тестирования Web UI.'};
+        var options = {'title':'Количество упоминаний инструментов тестирования мобильных приложений.'};
         var chart = new google.visualization.PieChart(document.getElementById('chart'));
         chart.draw(data, options);
       }
