@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block scripts %}
+    {{ super() }}
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawStuff);
+
+      function drawStuff() {
+        var head = [['test', 'key_skills', { role: 'annotation' }]]
+        head = head.concat({{ key_skills | safe }});
+        console.log(head)
+        var data = new google.visualization.arrayToDataTable(head);
+
+        var options = {
+          title: 'Chess opening moves',
+          width: '90%',
+          legend: { position: 'none' },
+          chart: { title: 'Ключевые навыки',
+                   subtitle: 'Пятьдесят наиболее популяных тегов' },
+          bars: 'horizontal', // Required for Material Bar Charts.
+          // axes: {
+          //   x: {
+          //     0: { side: 'top', label: 'Percentage' } // Top x-axis.
+          //   }
+          // },
+          hAxes: {textPosition: 'in' },
+          bar: { groupWidth: "90%" }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('chart'));
+        chart.draw(data, options);
+      };
+
+
+    </script>
+{% endblock %}
+
+
+
+  {% block title %}Home Page{% endblock %}
+  {% block content %}
+
+            <div id="chart" style="height: 1000px;"></div>
+
+  {% endblock %}
+</html>

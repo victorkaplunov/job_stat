@@ -28,8 +28,8 @@ sql = "SELECT id FROM vacancies"
 try:
     cur.execute(sql)
     # print(type((cur.fetchall()[0])[0]))
-    for i in cur.fetchall():
-        vac_id_list.append(i[0])
+    for n in cur.fetchall():
+        vac_id_list.append(n[0])
 except sqlite3.IntegrityError as err:
     print("Error: ", err)
 
@@ -142,7 +142,7 @@ cur.execute(sql)
 # # Wright programming languages statistics data to database
 wright_statistic_to_db('languages',
                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-                        'Ruby', 'Groovy', 'SQL', ' Go ', 'Scala', 'Swift',
+                        'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
                         'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
                         'AutoIT'
                         ])
@@ -211,24 +211,56 @@ schedule_type = dict(fullDay=0, flexible=0, shift=0, remote=0)
 sql = "SELECT id, json FROM vacancies;"
 cur.execute(sql)
 vacancies = (cur.fetchall())
-print(len(vacancies))
-print(schedule_type)
-for i in vacancies:
-    body = json.loads((i[1]))
-    schedule_type[(body['schedule']['id'])] += 1
-print(schedule_type)
 
-for i in schedule_type:
+for n in vacancies:
+    body = json.loads((n[1]))
+    schedule_type[(body['schedule']['id'])] += 1
+for n in schedule_type:
     sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
-          f'VALUES("schedule_type", "{i}", {schedule_type[i]});'
-    print(sql)
+          f'VALUES("schedule_type", "{n}", {schedule_type[n]});'
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
+    sql = f'UPDATE charts SET popularity = {schedule_type[n]} WHERE data = "{n}";'
+    cur.executescript(sql)
 
-    sql = f'UPDATE charts SET popularity = {schedule_type[i]} WHERE data = "{i}";'
-    print(sql)
+
+
+# Populate skills set
+key_skills = set()
+for n in vacancies:
+    body = json.loads((n[1]))
+    try:
+        for m in body['key_skills']:
+            key_skills.add(m['name'])
+    except IndexError:
+        continue
+    except KeyError:
+        continue
+
+# Count skills
+key_skills_dict = dict.fromkeys(key_skills, 0)
+for i in vacancies:
+    body = json.loads((i[1]))
+    try:
+        for x in body['key_skills']:
+            key_skills_dict[(x['name'])] += 1
+    except IndexError:
+        continue
+    except KeyError:
+        continue
+print(key_skills_dict)
+
+# Wright data to DB
+for n in key_skills_dict:
+    sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
+          f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
+    try:
+        cur.executescript(sql)
+    except sqlite3.IntegrityError as error:
+        print("Error: ", error)
+    sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}";'
     cur.executescript(sql)
 
 # Close database connection

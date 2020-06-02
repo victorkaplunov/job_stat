@@ -134,9 +134,7 @@ def get_statistics_data(chart_name, cursor):
 @app.route('/unit_test_frameworks')
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
-    con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
-    frameworks_list = get_statistics_data('frameworks', cur)
+    frameworks_list = get_statistics_data('frameworks', cur())
     frameworks_list = sorted(frameworks_list, key=itemgetter(1), reverse=True)
     frameworks_list.insert(0, ['Framework', 'Popularity', 'Language'])
     return render_template(
@@ -149,9 +147,7 @@ def unit_test_frameworks():
 @app.route('/schedule_type')
 def schedule_type():
     """Schedule type popularity page"""
-    con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
-    schedule_type_list = get_statistics_data('schedule_type', cur)
+    schedule_type_list = get_statistics_data('schedule_type', cur())
     return render_template(
         '/chart_schedule_type.html',
         schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True)
@@ -159,12 +155,23 @@ def schedule_type():
     )
 
 
+@app.route('/key_skills')
+def key_skills():
+    """Key skills popularity page"""
+    key_skills_list = get_statistics_data('key_skills', cur())
+    for i in key_skills_list:
+        i.append(i[0])
+    sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
+    return render_template(
+        '/key_skills.html',
+        key_skills=sorted_key_skills_list[:50]
+    )
+
+
 @app.route('/programming_languages')
 def programming_languages():
     """Schedule type popularity page"""
-    con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
-    languages_list = get_statistics_data('languages', cur)
+    languages_list = get_statistics_data('languages', cur())
     return render_template(
         '/programming_languages.html',
         languages=sorted(languages_list, key=itemgetter(1), reverse=True)
