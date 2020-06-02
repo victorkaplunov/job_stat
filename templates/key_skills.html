@@ -8,19 +8,19 @@
       google.charts.setOnLoadCallback(drawStuff);
 
       function drawStuff() {
-        var head = [['', 'key_skills', { role: 'annotation' }]]
+        var head = [['тэги', 'key_skills', { role: 'annotation' }]]
         head = head.concat({{ key_skills | safe }});
         var data = new google.visualization.arrayToDataTable(head);
 
         var options = {
           title: 'Chess opening moves',
-          width: '95%',
+<!--          width: '60%',-->
           legend: { position: 'none' },
           chart: { title: 'Ключевые навыки',
                    subtitle: 'Пятьдесят наиболее популяных тегов' },
           bars: 'horizontal', // Required for Material Bar Charts.
           hAxes: {textPosition: 'in' },
-          bar: { groupWidth: "20%" }
+<!--          bar: { groupWidth: "30%" }-->
         };
 
         var chart = new google.charts.Bar(document.getElementById('chart'));
