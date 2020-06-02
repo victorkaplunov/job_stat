@@ -256,11 +256,13 @@ print(key_skills_dict)
 for n in key_skills_dict:
     sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
           f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
+    print(sql)
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
     sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}";'
+    print(sql)
     cur.executescript(sql)
 
 # Close database connection

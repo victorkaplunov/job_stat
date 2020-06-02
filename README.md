@@ -1,6 +1,5 @@
 # job_stat
-Script and web service for analysis data from hh.ru Demo available at: http://clingon.pythonanywhere.com/ 
+This is a web application for analysis of local labour market data. Data collection occurs via API of hh.ru. Front-end are based on Bootstrap and Google Charts, a back-end are used Flask and SQLite. The demo are available at: http://clingon.pythonanywhere.com/
 
-Скрипт собирает вакансии, полученные через API HH.ru, в базу SQLight.
-Доступ к данным предоставляется через web API на базе Flask. Сводные данные отображаются в виде графиков. Для web-версии использованы Google Charts и Bootstrap. Демо-версия доступна по адресу http://clingon.pythonanywhere.com/
+Web-приложение для сбора и анализа данных, полученных через API HH.ru. Доступ к данным предоставляется через web GUI на базе Google Charts и Bootstrap. В бэк-энеде Демо-инстанс доступен по адресу http://clingon.pythonanywhere.com/
 
