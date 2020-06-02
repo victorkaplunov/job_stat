@@ -15,18 +15,13 @@
 
         var options = {
           title: 'Chess opening moves',
-          width: '90%',
+<!--          width: '90%',-->
           legend: { position: 'none' },
           chart: { title: 'Ключевые навыки',
                    subtitle: 'Пятьдесят наиболее популяных тегов' },
           bars: 'horizontal', // Required for Material Bar Charts.
-          // axes: {
-          //   x: {
-          //     0: { side: 'top', label: 'Percentage' } // Top x-axis.
-          //   }
-          // },
           hAxes: {textPosition: 'in' },
-          bar: { groupWidth: "20%" }
+          bar: { groupWidth: "10%" }
         };
 
         var chart = new google.charts.Bar(document.getElementById('chart'));
