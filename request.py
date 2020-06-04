@@ -117,7 +117,7 @@ def chart_with_category_filter(chart_name, param_list):
         except sqlite3.IntegrityError as error:
             print("Error: ", error)
 
-        sql = 'UPDATE charts SET popularity = "%i" WHERE data = "%s";' % (len(vac), i)
+        sql = 'UPDATE charts SET popularity = "%i" WHERE data = "%s" AND chart_name = "%s";' % (len(vac), i, chart_name)
         print(sql)
         cur.executescript(sql)
     return
@@ -222,7 +222,7 @@ for n in schedule_type:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
-    sql = f'UPDATE charts SET popularity = {schedule_type[n]} WHERE data = "{n}";'
+    sql = f'UPDATE charts SET popularity = {schedule_type[n]} WHERE data = "{n}" AND chart_name = "schedule_type";'
     cur.executescript(sql)
 
 
@@ -256,13 +256,11 @@ print(key_skills_dict)
 for n in key_skills_dict:
     sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
           f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
-    print(sql)
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
-    sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}";'
-    print(sql)
+    sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}" AND chart_name = "key_skills";'
     cur.executescript(sql)
 
 # Close database connection
