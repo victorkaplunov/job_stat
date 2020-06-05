@@ -27,7 +27,6 @@ vac_id='30962151') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
     <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + url_for('show_vac_of_employer',
 empl_name='СофтПро') + "</a><br> \
-    <a href=" + url_for('chart') + " > " + "Статистика" + "</a><br>\
     </html>"
 
 
