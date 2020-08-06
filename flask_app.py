@@ -25,8 +25,8 @@ vac_id='30962151') + "</a><br> \
 vac_id='30962151') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_id') + " > " + url_for('show_vac_top_new_by_id') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
-    <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + url_for('show_vac_of_employer',
-empl_name='Python') + "</a><br> \
+    <a href=" + url_for('search_vac', search_phrase='Python') + ">" + url_for('search_vac',
+search_phrase='Python') + "</a><br> \
     </html>"
 
 
