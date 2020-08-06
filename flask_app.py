@@ -106,7 +106,7 @@ def search_vac(search_phrase):
     """Get vacancies of given employer"""
     con = sqlite3.connect("testdb.db")
     cur = con.cursor()
-    sql = 'SELECT * FROM vacancies WHERE json LIKE "%{}%" ORDER BY id DESC;'.format(search_phrase)
+    sql = 'SELECT * FROM vacancies WHERE json LIKE "%{}%" ORDER BY id DESC LIMIT 100;'.format(search_phrase)
     cur.execute(sql)
     vac = cur.fetchall()
     con.close()
