@@ -26,7 +26,7 @@ vac_id='30962151') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_id') + " > " + url_for('show_vac_top_new_by_id') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
     <a href=" + url_for('show_vac_of_employer', empl_name='СофтПро') + ">" + url_for('show_vac_of_employer',
-empl_name='СофтПро') + "</a><br> \
+empl_name='Python') + "</a><br> \
     </html>"
 
 
@@ -101,12 +101,12 @@ def show_vac_top_new_by_data():
     return str(data_list)
 
 
-@app.route('/api/empl/<empl_name>')
-def show_vac_of_employer(empl_name):
+@app.route('/api/search/<search_phrase>')
+def search_vac(search_phrase):
     """Get vacancies of given employer"""
     con = sqlite3.connect("testdb.db")
     cur = con.cursor()
-    sql = 'SELECT * FROM vacancies WHERE json LIKE "%{}%";'.format(empl_name)
+    sql = 'SELECT * FROM vacancies WHERE json LIKE "%{}%" ORDER BY id DESC;'.format(search_phrase)
     cur.execute(sql)
     vac = cur.fetchall()
     con.close()
