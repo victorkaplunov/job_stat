@@ -103,7 +103,7 @@ def show_vac_top_new_by_data():
 
 @app.route('/api/search/<search_phrase>')
 def search_vac(search_phrase):
-    """Get vacancies of given employer"""
+    """Get vacancies with search phrase in JSON"""
     con = sqlite3.connect("testdb.db")
     cur = con.cursor()
     sql = 'SELECT * FROM vacancies WHERE json LIKE "%{}%" ORDER BY id DESC LIMIT 100;'.format(search_phrase)
