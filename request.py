@@ -152,7 +152,7 @@ chart_with_category_filter('frameworks',
                            [['pytest', 'Python'], ['Py.test', 'Python'], ['Unittest', 'Python'], ['Nose', 'Python'],
                             ['JUnit', 'Java'], ['TestNG', 'Java'],
                             ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
-                            ['RSpec', 'Ruby'], ['Capybara', 'Ruby']
+                            ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
                             ['Spock', 'C#'], ['NUnit', 'C#'],
                             ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
                             ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
