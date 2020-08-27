@@ -205,6 +205,11 @@ wright_statistic_to_db('cvs',
                        ['git', 'SVN', 'Subversion', 'Mercurial']
                        )
 
+# Wright CI/CD systems statistics data to database
+wright_statistic_to_db('ci_cd',
+                       ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI']
+                       )
+
 
 # Count types of schedule in all vacancies.
 schedule_type = dict(fullDay=0, flexible=0, shift=0, remote=0)

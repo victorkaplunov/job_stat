@@ -229,10 +229,16 @@ def bugtracking_n_tms():
 
 @app.route('/cvs')
 def cvs():
-    """Schedule type popularity page"""
+    """CVS popularity page"""
     cvs_list = get_statistics_data('cvs', cur())
-    return render_template('/cvs.html',
-        cvs=sorted(cvs_list, key=itemgetter(1), reverse=True))
+    return render_template('/cvs.html', cvs=sorted(cvs_list, key=itemgetter(1), reverse=True))
+
+
+@app.route('/ci_cd')
+def ci_cd():
+    """CI/CD system popularity page"""
+    ci_cd = get_statistics_data('ci_cd', cur())
+    return render_template('/ci_cd.html', ci_cd=sorted(ci_cd, key=itemgetter(1), reverse=True))
 
 
 @app.route('/')
