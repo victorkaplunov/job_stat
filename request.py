@@ -207,7 +207,8 @@ wright_statistic_to_db('cvs',
 
 # Wright CI/CD systems statistics data to database
 wright_statistic_to_db('ci_cd',
-                       ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI']
+                       ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI', 'Travis CI',
+                        'Bamboo', 'TeamCity', 'Apache Gump']
                        )
 
 
