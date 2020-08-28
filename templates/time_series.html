@@ -9,29 +9,14 @@
 
       function drawStuff() {
         var data = new google.visualization.arrayToDataTable({{time_series | safe }});
-
-        var view = new google.visualization.DataView(data);
-        view.setColumns([0, 1,
-                       { calc: "stringify",
-                         sourceColumn: 2,
-                         type: "number",
-                         role: "annotation" },
-                       2]);
-
-
         var options = {
-          width: '10%',
-          legend: { position: 'top' },
           chart: { title: 'Количество вакансий по месяцам',
-                   subtitle: 'Считается количество уникальных ID вакансий, опубликованых в этом месяце' },
+                   subtitle: 'Уникальных ID в месяц' },
           bars: 'horizontal', // Required for Material Bar Charts.
-          hAxes: {textPosition: 'in' },
-          bar: { groupWidth: "90%" }
         };
 
         var chart = new google.charts.Bar(document.getElementById('chart'));
         chart.draw(data,
-        view,
         options);
       };
 
@@ -44,7 +29,7 @@
   {% block title %}Home Page{% endblock %}
   {% block content %}
 
-            <div id="chart" style="height: 1000px;"></div>
+            <div id="chart" style="height: 500px;"></div>
 
   {% endblock %}
 </html>
