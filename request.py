@@ -86,7 +86,7 @@ for x in range(0, pages):
 
 
 def wright_statistic_to_db(chart_name, param_list):
-    """ Function count an inclusions of some string from param_list in all vacancies. """
+    """ Function count an inclusions of some string from param_list in the JSON of all vacancies. """
     for i in param_list:
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
         cur.execute(sql)
@@ -123,8 +123,7 @@ def chart_with_category_filter(chart_name, param_list):
     return
 
 
-sql = "DROP TABLE IF EXISTS charts;"
-cur.execute(sql)
+cur.execute("DROP TABLE IF EXISTS charts;")
 
 sql = """
 CREATE TABLE IF NOT EXISTS charts
@@ -258,7 +257,7 @@ for i in vacancies:
         continue
 print(key_skills_dict)
 
-# Wright data to DB
+# Wright skills data to DB
 for n in key_skills_dict:
     sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
           f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
@@ -268,6 +267,8 @@ for n in key_skills_dict:
         print("Error: ", error)
     sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}" AND chart_name = "key_skills";'
     cur.executescript(sql)
+
+
 
 # Close database connection
 con.close()

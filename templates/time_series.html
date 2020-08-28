@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block scripts %}
+    {{ super() }}
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawStuff);
+
+      function drawStuff() {
+        var data = new google.visualization.arrayToDataTable({{time_series | safe }});
+
+        var options = {
+          title: 'Chess opening moves',
+<!--          width: '10%',-->
+          legend: { position: 'none' },
+          chart: { title: 'Количество вакансий по месяцам',
+                   subtitle: 'Считается количество уникальных ID вакансий, опубликованых в этом месяце' },
+          bars: 'horizontal', // Required for Material Bar Charts.
+          hAxes: {textPosition: 'in' },
+<!--          bar: { groupWidth: "90%" }-->
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('chart'));
+        chart.draw(data, options);
+      };
+
+
+    </script>
+{% endblock %}
+
+
+
+  {% block title %}Home Page{% endblock %}
+  {% block content %}
+
+            <div id="chart" style="height: 1000px;"></div>
+
+  {% endblock %}
+</html>

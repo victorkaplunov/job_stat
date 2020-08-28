@@ -117,6 +117,7 @@ def search_vac(search_phrase):
 
 
 def get_statistics_data(chart_name, cursor):
+    """ Get data from 'charts' DB table for chart drawing"""
     if chart_name == 'frameworks':
         request = f'SELECT data, popularity, parent FROM charts WHERE chart_name="{chart_name}";'
     else:
@@ -128,6 +129,38 @@ def get_statistics_data(chart_name, cursor):
     for i in statistics_data:
         data_list.append(list(i))
     return data_list
+
+
+def get_time_series_data(cursor):
+    month_tuples = (('01', 'январь', '31'), ('02', 'февраль', "29"), ('03', 'март', '31'),
+                    ('04', 'апрель', '30'), ('05', 'май', '31'), ('06', 'июнь', '30'),
+                    ('07', 'июль', '31'), ('08', 'август', '31'), ('09', 'сентябрь', '30'),
+                    ('10', 'октябрь', '31'), ('11', 'ноябрь', '30'), ('12', 'декабрь', '31'))
+
+    year_tuple = ('2019', '2020')
+
+    head_time_series = [['Месяц']]
+    output_list = []
+    for y in year_tuple:
+        head_time_series[0].append(y)
+        for n, month in enumerate(month_tuples):
+            # Запрашиваем количество вакансий за месяц
+            sql = f'SELECT DISTINCT id ' \
+                  f'FROM calendar ' \
+                  f'WHERE data ' \
+                  f'BETWEEN "{y}-{month[0]}-01T00:00:00+03:00" and "{y}-{month[0]}-{month[2]}T23:59:59+03:00";'
+            cursor.execute(sql)
+            vacancies_tuple = (cursor.fetchall())
+            if y == '2019':
+                # Данные за февраль неполные, поэтому вместо них пишем ноль
+                if month[1] == 'февраль':
+                    output_list.append([month[1], 0])
+                else:
+                    output_list.append([month[1], len(vacancies_tuple)])
+            else:
+                output_list[n].append(len(vacancies_tuple))
+    output_list = head_time_series + output_list
+    return output_list
 
 
 @app.route('/unit_test_frameworks')
@@ -151,6 +184,15 @@ def schedule_type():
         '/chart_schedule_type.html',
         schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True)
 
+    )
+
+
+@app.route('/time_series')
+def time_series():
+    """Time series page"""
+    return render_template(
+        '/time_series.html',
+        time_series=get_time_series_data(cur())
     )
 
 
