@@ -10,19 +10,29 @@
       function drawStuff() {
         var data = new google.visualization.arrayToDataTable({{time_series | safe }});
 
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 2,
+                         type: "number",
+                         role: "annotation" },
+                       2]);
+
+
         var options = {
-          title: 'Chess opening moves',
-<!--          width: '10%',-->
-          legend: { position: 'none' },
+          width: '10%',
+          legend: { position: 'top' },
           chart: { title: 'Количество вакансий по месяцам',
                    subtitle: 'Считается количество уникальных ID вакансий, опубликованых в этом месяце' },
           bars: 'horizontal', // Required for Material Bar Charts.
           hAxes: {textPosition: 'in' },
-<!--          bar: { groupWidth: "90%" }-->
+          bar: { groupWidth: "90%" }
         };
 
         var chart = new google.charts.Bar(document.getElementById('chart'));
-        chart.draw(data, options);
+        chart.draw(data,
+        view,
+        options);
       };
 
 
