@@ -138,7 +138,8 @@ CREATE TABLE IF NOT EXISTS charts
 cur.execute(sql)
 
 
-# # Wright programming languages statistics data to database
+#  Wright statistics data to database
+
 wright_statistic_to_db('languages',
                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
                         'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
@@ -146,7 +147,6 @@ wright_statistic_to_db('languages',
                         'AutoIT'
                         ])
 
-# Wright test frameworks statistics data to database
 chart_with_category_filter('frameworks',
                            [['pytest', 'Python'], ['Py.test', 'Python'], ['Unittest', 'Python'], ['Nose', 'Python'],
                             ['JUnit', 'Java'], ['TestNG', 'Java'],
@@ -159,35 +159,27 @@ chart_with_category_filter('frameworks',
                             ['Robot_Framework', 'multiple_language']]
                            )
 
-# Wright load test tools statistics data to database
 wright_statistic_to_db('lt_frameworks',
                        ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
                         'Grinder', 'Performance Center', 'IBM Rational Performance'])
 
-# Wright monitoring tools statistics data to database
-
 wright_statistic_to_db('monitoring_tools',
                        ['Zabbix', 'nmon', 'Oracle EM', 'Grafana', 'ELK', 'Influxdb', 'Nagios', 'Cacti'])
 
-# Wright bdd_frameworks statistics data to database
 wright_statistic_to_db('bdd_frameworks',
                        ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
                         'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Concordion',
                         'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
-                        'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD', 'xBehave.net']
-                       )
-# Wright Web UI testing tool statistics data to database
+                        'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD', 'xBehave.net'])
+
 wright_statistic_to_db('web_ui_tools',
                        ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress', 'Splinter',
-                        'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe']
-                       )
+                        'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe'])
 
-# Wright mobile testing frameworks statistics data to database
 wright_statistic_to_db('mobile_testing_frameworks',
                        ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
-                        'Calabash', 'UI Automation', 'UIAutomator', 'XCTest']
-                       )
-# Wright bug\test management systems statistics data to database
+                        'Calabash', 'UI Automation', 'UIAutomator', 'XCTest'])
+
 wright_statistic_to_db('bugtracking_n_tms',
                        ['Youtrack', 'TestRail', 'TestLink', 'TestLodge', 'Jira',
                         'Confluence', 'Redmine', 'TFS', 'Zephyr',
@@ -196,19 +188,14 @@ wright_statistic_to_db('bugtracking_n_tms',
                         'IBM Rational Quality Manager', 'HP Quality Center', 'HP ALM',
                         'TestIt', 'XQual', 'Borland Silk Central', 'Testuff',
                         'Gemini', 'BugZilla', 'Fitnesse', 'RTH-Turbo',
-                        'Stryka', 'Test Case Lab']
-                       )
+                        'Stryka', 'Test Case Lab'])
 
-# Wright version control systems statistics data to database
 wright_statistic_to_db('cvs',
-                       ['git', 'SVN', 'Subversion', 'Mercurial']
-                       )
+                       ['git', 'SVN', 'Subversion', 'Mercurial'])
 
-# Wright CI/CD systems statistics data to database
 wright_statistic_to_db('ci_cd',
                        ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI', 'Travis CI',
-                        'Bamboo', 'TeamCity', 'Apache Gump']
-                       )
+                        'Bamboo', 'TeamCity', 'Apache Gump'])
 
 
 # Count types of schedule in all vacancies.
@@ -231,6 +218,24 @@ for n in schedule_type:
     cur.executescript(sql)
 
 
+# Count types of experience in all vacancies.
+experience = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
+sql = "SELECT id, json FROM vacancies;"
+cur.execute(sql)
+vacancies = (cur.fetchall())
+
+for n in vacancies:
+    body = json.loads((n[1]))
+    experience[(body['experience']['id'])] += 1
+for n in experience:
+    sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
+          f'VALUES("experience", "{n}", {experience[n]});'
+    try:
+        cur.executescript(sql)
+    except sqlite3.IntegrityError as error:
+        print("Error: ", error)
+    sql = f'UPDATE charts SET popularity = {experience[n]} WHERE data = "{n}" AND chart_name = "schedule_type";'
+    cur.executescript(sql)
 
 # Populate skills set
 key_skills = set()

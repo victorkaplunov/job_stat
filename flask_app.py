@@ -182,9 +182,16 @@ def schedule_type():
     schedule_type_list = get_statistics_data('schedule_type', cur())
     return render_template(
         '/chart_schedule_type.html',
-        schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True)
+        schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True))
 
-    )
+
+@app.route('/experience')
+def experience():
+    """Schedule type popularity page"""
+    experience_list = get_statistics_data('experience', cur())
+    return render_template(
+        '/chart_experience.html',
+        experience=sorted(experience_list, key=itemgetter(1), reverse=True))
 
 
 @app.route('/time_series')
