@@ -80,11 +80,6 @@ def id_list(response):
     return items
 
 
-for x in range(0, pages):
-    s = id_list(resp(x))
-    print("Items on page: ", len(set(s)))
-
-
 def wright_statistic_to_db(chart_name, param_list):
     """ Function count an inclusions of some string from param_list in the JSON of all vacancies. """
     for i in param_list:
@@ -123,6 +118,11 @@ def chart_with_category_filter(chart_name, param_list):
     return
 
 
+# Run request to HH.ru API
+for x in range(0, pages):
+    s = id_list(resp(x))
+    print("Items on page: ", len(set(s)))
+
 cur.execute("DROP TABLE IF EXISTS charts;")
 
 sql = """
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS charts
 (
     id INTEGER PRIMARY KEY,
     chart_name NOT NULL,
-    data NOT NULL UNIQUE,
+    data NOT NULL,
     popularity  INTEGER,
     parent
 );
@@ -199,23 +199,34 @@ wright_statistic_to_db('ci_cd',
 
 
 # Count types of schedule in all vacancies.
-schedule_type = dict(fullDay=0, flexible=0, shift=0, remote=0)
-sql = "SELECT id, json FROM vacancies;"
-cur.execute(sql)
-vacancies = (cur.fetchall())
 
-for n in vacancies:
-    body = json.loads((n[1]))
-    schedule_type[(body['schedule']['id'])] += 1
-for n in schedule_type:
-    sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
-          f'VALUES("schedule_type", "{n}", {schedule_type[n]});'
-    try:
+years_tuple = (2019, 2020,)
+
+for y in years_tuple:
+    sql = "SELECT id, json FROM vacancies;"
+    cur.execute(sql)
+    vacancies = (cur.fetchall())
+    schedule_type = dict(fullDay=0, flexible=0, shift=0, remote=0)
+    print(y)
+    # Count vacancies with given tipe in current year.
+    for n in vacancies:
+        body = json.loads((n[1]))
+        if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
+                (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300"):
+            schedule_type[(body['schedule']['id'])] += 1
+        else:
+            continue
+    # Write ready data to DB.
+    for n in schedule_type:
+        sql = f'INSERT INTO charts(chart_name, data, popularity, parent) ' \
+              f'VALUES("schedule_type", "{n}", {schedule_type[n]}, {str(y)});'
+        # try:
+        #     cur.executescript(sql)
+        # except sqlite3.IntegrityError as error:
+        #     print("Error: ", error)
+        # sql = f'UPDATE charts SET popularity = {schedule_type[n]} ' \
+        #       f'WHERE data = "{n}" AND chart_name = "schedule_type" AND parent = {str(y)};'
         cur.executescript(sql)
-    except sqlite3.IntegrityError as error:
-        print("Error: ", error)
-    sql = f'UPDATE charts SET popularity = {schedule_type[n]} WHERE data = "{n}" AND chart_name = "schedule_type";'
-    cur.executescript(sql)
 
 
 # Count types of experience in all vacancies.

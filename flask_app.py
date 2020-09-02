@@ -120,6 +120,7 @@ def get_statistics_data(chart_name, cursor):
     """ Get data from 'charts' DB table for chart drawing"""
     if chart_name == 'frameworks':
         request = f'SELECT data, popularity, parent FROM charts WHERE chart_name="{chart_name}";'
+
     else:
         request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
     cursor.execute(request)
@@ -163,6 +164,20 @@ def get_time_series_data(cursor):
     return output_list
 
 
+def get_schedule_type_data(cursor, year):
+    request = f'SELECT data, popularity ' \
+              f'FROM charts ' \
+              f'WHERE chart_name="schedule_type" AND parent={str(year)};'
+    head = [['Task', 'Hours per Day']]
+    cursor.execute(request)
+    statistics_data = cursor.fetchall()
+    data_list = []
+    for i in statistics_data:
+        data_list.append(list(i))
+    print(head + data_list)
+    return head + data_list
+
+
 @app.route('/unit_test_frameworks')
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
@@ -179,10 +194,11 @@ def unit_test_frameworks():
 @app.route('/schedule_type')
 def schedule_type():
     """Schedule type popularity page"""
-    schedule_type_list = get_statistics_data('schedule_type', cur())
+
     return render_template(
-        '/chart_schedule_type.html',
-        schedule_type=sorted(schedule_type_list, key=itemgetter(1), reverse=True))
+        '/schedule_type.html',
+        schedule_type2019=get_schedule_type_data(cur(), 2019),
+        schedule_type2020=get_schedule_type_data(cur(), 2020))
 
 
 @app.route('/experience')
