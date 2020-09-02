@@ -234,7 +234,7 @@ for n in experience:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
-    sql = f'UPDATE charts SET popularity = {experience[n]} WHERE data = "{n}" AND chart_name = "schedule_type";'
+    sql = f'UPDATE charts SET popularity = {experience[n]} WHERE data = "{n}" AND chart_name = "experience";'
     cur.executescript(sql)
 
 # Populate skills set
