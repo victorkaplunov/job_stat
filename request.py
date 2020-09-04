@@ -120,10 +120,14 @@ def chart_with_category_filter(chart_name, param_list):
     return
 
 
-# # Run request to HH.ru API
-# for x in range(0, pages):
-#     s = id_list(resp(x))
-#     print("Items on page: ", len(set(s)))
+# Run request to HH.ru API
+for x in range(0, pages):
+    s = id_list(resp(x))
+    print("Items on page: ", len(set(s)))
+
+sql = "SELECT id, json FROM vacancies;"
+cur.execute(sql)
+all_vacancies = (cur.fetchall())
 
 cur.execute("DROP TABLE IF EXISTS charts;")
 
@@ -142,74 +146,71 @@ cur.execute(sql)
 
 
 #  Wright statistics data to database
-#
-# wright_statistic_to_db('languages',
-#                        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-#                         'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
-#                         'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
-#                         'AutoIT'
-#                         ])
-#
-# chart_with_category_filter('frameworks',
-#                            [['pytest', 'Python'], ['Py.test', 'Python'], ['Unittest', 'Python'], ['Nose', 'Python'],
-#                             ['JUnit', 'Java'], ['TestNG', 'Java'],
-#                             ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
-#                             ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
-#                             ['Spock', 'C#'], ['NUnit', 'C#'],
-#                             ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
-#                             ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
-#                             ['CodeceptJS', 'JavaScript'],
-#                             ['Robot_Framework', 'multiple_language']]
-#                            )
-#
-# wright_statistic_to_db('lt_frameworks',
-#                        ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
-#                         'Grinder', 'Performance Center', 'IBM Rational Performance'])
-#
-# wright_statistic_to_db('monitoring_tools',
-#                        ['Zabbix', 'nmon', 'Oracle EM', 'Grafana', 'ELK', 'Influxdb', 'Nagios', 'Cacti'])
-#
-# wright_statistic_to_db('bdd_frameworks',
-#                        ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
-#                         'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Concordion',
-#                         'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
-#                         'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD', 'xBehave.net'])
-#
-# wright_statistic_to_db('web_ui_tools',
-#                        ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress', 'Splinter',
-#                         'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe'])
-#
-# wright_statistic_to_db('mobile_testing_frameworks',
-#                        ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
-#                         'Calabash', 'UI Automation', 'UIAutomator', 'XCTest'])
-#
-# wright_statistic_to_db('bugtracking_n_tms',
-#                        ['Youtrack', 'TestRail', 'TestLink', 'TestLodge', 'Jira',
-#                         'Confluence', 'Redmine', 'TFS', 'Zephyr',
-#                         'Hiptest', 'TestMonitor', 'Xray', 'PractiTest', 'Testpad',
-#                         'Deviniti', 'Qase', 'Klaros-Testmanagement',
-#                         'IBM Rational Quality Manager', 'HP Quality Center', 'HP ALM',
-#                         'TestIt', 'XQual', 'Borland Silk Central', 'Testuff',
-#                         'Gemini', 'BugZilla', 'Fitnesse', 'RTH-Turbo',
-#                         'Stryka', 'Test Case Lab'])
-#
-# wright_statistic_to_db('cvs',
-#                        ['git', 'SVN', 'Subversion', 'Mercurial'])
-#
-# wright_statistic_to_db('ci_cd',
-#                        ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI', 'Travis CI',
-#                         'Bamboo', 'TeamCity', 'Apache Gump'])
+
+wright_statistic_to_db('languages',
+                       ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
+                        'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
+                        'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
+                        'AutoIT'
+                        ])
+
+chart_with_category_filter('frameworks',
+                           [['pytest', 'Python'], ['Py.test', 'Python'], ['Unittest', 'Python'], ['Nose', 'Python'],
+                            ['JUnit', 'Java'], ['TestNG', 'Java'],
+                            ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
+                            ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
+                            ['Spock', 'C#'], ['NUnit', 'C#'],
+                            ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
+                            ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
+                            ['CodeceptJS', 'JavaScript'],
+                            ['Robot_Framework', 'multiple_language']]
+                           )
+
+wright_statistic_to_db('lt_frameworks',
+                       ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
+                        'Grinder', 'Performance Center', 'IBM Rational Performance'])
+
+wright_statistic_to_db('monitoring_tools',
+                       ['Zabbix', 'nmon', 'Oracle EM', 'Grafana', 'ELK', 'Influxdb', 'Nagios', 'Cacti'])
+
+wright_statistic_to_db('bdd_frameworks',
+                       ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
+                        'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Concordion',
+                        'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
+                        'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD', 'xBehave.net'])
+
+wright_statistic_to_db('web_ui_tools',
+                       ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress', 'Splinter',
+                        'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe'])
+
+wright_statistic_to_db('mobile_testing_frameworks',
+                       ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
+                        'Calabash', 'UI Automation', 'UIAutomator', 'XCTest'])
+
+wright_statistic_to_db('bugtracking_n_tms',
+                       ['Youtrack', 'TestRail', 'TestLink', 'TestLodge', 'Jira',
+                        'Confluence', 'Redmine', 'TFS', 'Zephyr',
+                        'Hiptest', 'TestMonitor', 'Xray', 'PractiTest', 'Testpad',
+                        'Deviniti', 'Qase', 'Klaros-Testmanagement',
+                        'IBM Rational Quality Manager', 'HP Quality Center', 'HP ALM',
+                        'TestIt', 'XQual', 'Borland Silk Central', 'Testuff',
+                        'Gemini', 'BugZilla', 'Fitnesse', 'RTH-Turbo',
+                        'Stryka', 'Test Case Lab'])
+
+wright_statistic_to_db('cvs',
+                       ['git', 'SVN', 'Subversion', 'Mercurial'])
+
+wright_statistic_to_db('ci_cd',
+                       ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI', 'Travis CI',
+                        'Bamboo', 'TeamCity', 'Apache Gump'])
 
 
-def stat_with_year(years_tuple, types, chart_name, key_name):
+def stat_with_year(types, chart_name, key_name):
     # Count types of schedule in all vacancies.
     for y in years_tuple:
-        sql = "SELECT id, json FROM vacancies;"
-        cur.execute(sql)
-        vacancies = (cur.fetchall())
         types = types.fromkeys(types, 0)  # set all values to zero
         # Count vacancies with given type in current year.
-        for n in vacancies:
+        for n in all_vacancies:
             body = json.loads((n[1]))
             if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
                     (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300"):
@@ -225,64 +226,47 @@ def stat_with_year(years_tuple, types, chart_name, key_name):
 
 
 schedule_types_dict = dict(fullDay=0, flexible=0, shift=0, remote=0)
-stat_with_year(years_tuple, schedule_types_dict, 'schedule_type', 'schedule')
+stat_with_year(schedule_types_dict, 'schedule_type', 'schedule')
 
 experience_types_dict = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
-stat_with_year(years_tuple, experience_types_dict, 'experience', 'experience')
-
-
-# # Count types of experience in all vacancies.
-# experience = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
-# sql = "SELECT id, json FROM vacancies;"
-# cur.execute(sql)
-# vacancies = (cur.fetchall())
-#
-# for n in vacancies:
-#     body = json.loads((n[1]))
-#     experience[(body['experience']['id'])] += 1
-# for n in experience:
-#     sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
-#           f'VALUES("experience", "{n}", {experience[n]});'
-#     cur.executescript(sql)
+stat_with_year(experience_types_dict, 'experience', 'experience')
 
 
 # Populate skills set
-# key_skills = set()
-# for n in vacancies:
-#     body = json.loads((n[1]))
-#     try:
-#         for m in body['key_skills']:
-#             key_skills.add(m['name'])
-#     except IndexError:
-#         continue
-#     except KeyError:
-#         continue
-#
-# # Count skills
-# key_skills_dict = dict.fromkeys(key_skills, 0)
-# for i in vacancies:
-#     body = json.loads((i[1]))
-#     try:
-#         for x in body['key_skills']:
-#             key_skills_dict[(x['name'])] += 1
-#     except IndexError:
-#         continue
-#     except KeyError:
-#         continue
-# print(key_skills_dict)
-#
-# # Wright skills data to DB
-# for n in key_skills_dict:
-#     sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
-#           f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
-#     try:
-#         cur.executescript(sql)
-#     except sqlite3.IntegrityError as error:
-#         print("Error: ", error)
-#     sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}" AND chart_name = "key_skills";'
-#     cur.executescript(sql)
+key_skills = set()
+for n in all_vacancies:
+    body = json.loads((n[1]))
+    try:
+        for m in body['key_skills']:
+            key_skills.add(m['name'])
+    except IndexError:
+        continue
+    except KeyError:
+        continue
 
+# Count skills
+key_skills_dict = dict.fromkeys(key_skills, 0)
+for i in all_vacancies:
+    body = json.loads((i[1]))
+    try:
+        for x in body['key_skills']:
+            key_skills_dict[(x['name'])] += 1
+    except IndexError:
+        continue
+    except KeyError:
+        continue
+print(key_skills_dict)
 
+# Wright skills data to DB
+for n in key_skills_dict:
+    sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
+          f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
+    try:
+        cur.executescript(sql)
+    except sqlite3.IntegrityError as error:
+        print("Error: ", error)
+    sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}" AND chart_name = "key_skills";'
+    cur.executescript(sql)
 
 # Close database connection
 con.close()
