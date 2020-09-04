@@ -17,7 +17,7 @@ def cur():
 
 
 @app.route('/api')
-def index():
+def api():
     return "<html> \
     <a href=" + url_for('show_vac_calendar', vac_id='14658327') + ">" + url_for('show_vac_calendar',
 vac_id='14658327') + "</a><br> \
@@ -164,17 +164,16 @@ def get_time_series_data(cursor):
     return output_list
 
 
-def get_schedule_type_data(cursor, year):
+def get_data_with_year(cursor, year, chart_name):
     request = f'SELECT data, popularity ' \
               f'FROM charts ' \
-              f'WHERE chart_name="schedule_type" AND parent={str(year)};'
-    head = [['Task', 'Hours per Day']]
+              f'WHERE chart_name="{chart_name}" AND year={str(year)};'
+    head = [['Type', 'Popularity']]
     cursor.execute(request)
     statistics_data = cursor.fetchall()
     data_list = []
     for i in statistics_data:
         data_list.append(list(i))
-    print(head + data_list)
     return head + data_list
 
 
@@ -197,8 +196,8 @@ def schedule_type():
 
     return render_template(
         '/schedule_type.html',
-        schedule_type2019=get_schedule_type_data(cur(), 2019),
-        schedule_type2020=get_schedule_type_data(cur(), 2020))
+        schedule_type2019=get_data_with_year(cur(), 2019, 'schedule_type'),
+        schedule_type2020=get_data_with_year(cur(), 2020, 'schedule_type'))
 
 
 @app.route('/experience')
@@ -207,7 +206,10 @@ def experience():
     experience_list = get_statistics_data('experience', cur())
     return render_template(
         '/chart_experience.html',
-        experience=sorted(experience_list, key=itemgetter(1), reverse=True))
+        # experience=sorted(experience_list, key=itemgetter(1), reverse=True)
+        experience2019=get_data_with_year(cur(), 2019, 'experience'),
+        experience2020=get_data_with_year(cur(), 2020, 'experience')
+    )
 
 
 @app.route('/time_series')
