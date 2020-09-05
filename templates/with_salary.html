@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block scripts %}
+    {{ super() }}
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawLengChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawLengChart() {
+
+        // Create the data table.
+         var data = google.visualization.arrayToDataTable({{ with_salary2019 | safe }});
+
+        // Set chart options
+        var options = {'title':'Количество вакансий с указанной зарплатой в 2019 году.',
+                                   chartArea:{width:'90%',height:'80%'},
+                                   pieSliceTextStyle: {fontSize: 11},
+                       };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('with_salary2019'));
+        chart.draw(data, options);
+      }
+
+      google.charts.setOnLoadCallback(drawScheduleTypeChart);
+     function drawScheduleTypeChart() {
+        var data = google.visualization.arrayToDataTable({{ with_salary2020 | safe }});
+        var options = {'title':'Количество вакансий с указанной зарплатой в 2020 году.',
+            chartArea:{width:'90%',height:'80%'},
+            pieSliceTextStyle: {fontSize: 11}
+            };
+        var chart = new google.visualization.PieChart(document.getElementById('with_salary2020'));
+        chart.draw(data, options);
+      }
+    </script>
+
+{% endblock %}
+
+
+
+  {% block title %}Home Page{% endblock %}
+  {% block content %}
+
+    <div id="with_salary2019" style="height: 300px;"></div>
+    <div id="with_salary2020" style="height: 300px;"></div>
+<!--   <table class="columns">-->
+<!--      <tr>-->
+<!--        <td><div id="schedule_type2019" style="height: 300px;"></div></td>-->
+<!--      </tr>-->
+<!--      <tr>-->
+<!--        <td><div id="schedule_type2020" style="height: 300px;"></div></td>-->
+<!--      </tr>-->
+<!--    </table>-->
+
+  {% endblock %}
+</html>

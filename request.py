@@ -82,7 +82,7 @@ def id_list(response):
     return items
 
 
-def wright_statistic_to_db(chart_name, param_list):
+def wright_statistic_to_db(chart_name: str, param_list: list):
     """ Function count an inclusions of some string from param_list in the JSON of all vacancies. """
     for i in param_list:
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
@@ -100,7 +100,7 @@ def wright_statistic_to_db(chart_name, param_list):
     return
 
 
-def chart_with_category_filter(chart_name, param_list):
+def chart_with_category_filter(chart_name: str, param_list: list):
     """ Function count an inclusions of some string from param_list in all vacancies. """
     for i in param_list:
         print(i[0], i[1])
@@ -218,6 +218,7 @@ def stat_with_year(types, chart_name, key_name):
             else:
                 continue
         # Write ready data to DB.
+        print(types)
         for n in types:
             sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
                   f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
@@ -230,6 +231,34 @@ stat_with_year(schedule_types_dict, 'schedule_type', 'schedule')
 
 experience_types_dict = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
 stat_with_year(experience_types_dict, 'experience', 'experience')
+
+
+def vacancy_with_salary(types: dict, chart_name: str):
+    # Count types of schedule in all vacancies.
+    for y in years_tuple:
+        types = types.fromkeys(types, 0)  # set all values to zero
+        # Count vacancies with given type in current year.
+        for n in all_vacancies:
+            body = json.loads((n[1]))
+            if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
+                    (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300"):
+                if body['salary'] is not None:
+                    types['with_salary'] += 1
+                else:
+                    types['without_salary'] += 1
+            else:
+                continue
+        # Write ready data to DB.
+        print(types)
+        for n in types:
+            sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
+                  f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
+            cur.executescript(sql)
+    return
+
+
+with_salary = dict(with_salary=0, without_salary=0)
+vacancy_with_salary(with_salary, 'with_salary')
 
 
 # Populate skills set

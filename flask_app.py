@@ -212,6 +212,18 @@ def experience():
     )
 
 
+@app.route('/with_salary')
+def with_salary():
+    """Schedule type popularity page"""
+    experience_list = get_statistics_data('with_salary', cur())
+    return render_template(
+        '/with_salary.html',
+        # experience=sorted(experience_list, key=itemgetter(1), reverse=True)
+        with_salary2019=get_data_with_year(cur(), 2019, 'with_salary'),
+        with_salary2020=get_data_with_year(cur(), 2020, 'with_salary')
+    )
+
+
 @app.route('/time_series')
 def time_series():
     """Time series page"""
