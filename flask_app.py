@@ -20,13 +20,13 @@ def cur():
 def api():
     return "<html> \
     <a href=" + url_for('show_vac_calendar', vac_id='14658327') + ">" + url_for('show_vac_calendar',
-vac_id='14658327') + "</a><br> \
+                                                                                vac_id='14658327') + "</a><br> \
     <a href = " + url_for('show_vac_description', vac_id='14658327') + " > " + url_for('show_vac_description',
-vac_id='14658327') + "</a><br>\
+                                                                                       vac_id='14658327') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_id') + " > " + url_for('show_vac_top_new_by_id') + "</a><br>\
     <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
     <a href=" + url_for('search_vac', search_phrase='Python') + ">" + url_for('search_vac',
-search_phrase='Python') + "</a><br> \
+                                                                              search_phrase='Python') + "</a><br> \
     </html>"
 
 
@@ -39,7 +39,7 @@ def favicon():
 @app.route('/starter-template.css')
 def starter_template():
     return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'starter-template.css')  #, mimetype='image/vnd.microsoft.icon')
+                               'starter-template.css')  # , mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/api/vac/cal/<int:vac_id>')
@@ -200,6 +200,38 @@ def schedule_type():
         schedule_type2020=get_data_with_year(cur(), 2020, 'schedule_type'))
 
 
+@app.route('/employment_type')
+def employment_type():
+    """Schedule type popularity page"""
+    employment_type2019 = get_data_with_year(cur(), 2019, 'employment_type')
+    import copy
+    employment_table2019 = copy.deepcopy(employment_type2019)
+    employment_table2019.remove(['Type', 'Popularity'])
+    sum_vac = 0
+    for i in employment_table2019:
+        sum_vac += i[1]
+    for i in employment_table2019:
+        percent = str(round(i[1]/sum_vac * 100, 1))
+        i.append(percent)
+
+    employment_type2020 = get_data_with_year(cur(), 2020, 'employment_type')
+    employment_table2020 = copy.deepcopy(employment_type2020)
+    employment_table2020.remove(['Type', 'Popularity'])
+    sum_vac = 0
+    for i in employment_table2020:
+        sum_vac += i[1]
+    for i in employment_table2020:
+        percent = str(round(i[1] / sum_vac * 100, 1))
+        i.append(percent)
+    return render_template(
+        '/employment_type.html',
+        employment_type_chart_2019=employment_type2019,
+        employment_type_table_2019=employment_table2019,
+        employment_type_chart_2020=employment_type2020,
+        employment_type_table_2020=employment_table2020
+    )
+
+
 @app.route('/experience')
 def experience():
     """Schedule type popularity page"""
@@ -227,6 +259,7 @@ def with_salary():
 @app.route('/time_series')
 def time_series():
     """Time series page"""
+    print(get_time_series_data(cur()))
     return render_template(
         '/time_series.html',
         time_series=get_time_series_data(cur())
@@ -292,8 +325,8 @@ def mobile_testing_frameworks():
     """Schedule type popularity page"""
     mobile_testing_frameworks_list = get_statistics_data('mobile_testing_frameworks', cur())
     return render_template('/mobile_testing_frameworks.html',
-        mobile_testing_frameworks=sorted(mobile_testing_frameworks_list,
-                                         key=itemgetter(1), reverse=True))
+                           mobile_testing_frameworks=sorted(mobile_testing_frameworks_list,
+                                                            key=itemgetter(1), reverse=True))
 
 
 @app.route('/bugtracking_n_tms')
@@ -303,7 +336,7 @@ def bugtracking_n_tms():
     return render_template(
         '/bugtracking_n_tms.html',
         bugtracking_n_tms=sorted(bugtracking_n_tms_list,
-                                         key=itemgetter(1), reverse=True))
+                                 key=itemgetter(1), reverse=True))
 
 
 @app.route('/cvs')

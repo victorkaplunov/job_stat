@@ -232,6 +232,9 @@ stat_with_year(schedule_types_dict, 'schedule_type', 'schedule')
 experience_types_dict = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
 stat_with_year(experience_types_dict, 'experience', 'experience')
 
+employment_types_dict = dict(full=0, part=0, project=0, probation=0)
+stat_with_year(employment_types_dict, 'employment_type', 'employment')
+
 
 def vacancy_with_salary(types: dict, chart_name: str):
     # Count types of schedule in all vacancies.

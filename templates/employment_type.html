@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block scripts %}
+    {{ super() }}
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.load('current', {'packages':['table']});
+
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawFirstChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawFirstChart() {
+
+        // Create the data table.
+         var data = google.visualization.arrayToDataTable({{ employment_type_chart_2019 | safe }});
+
+        // Set chart options
+        var options = {
+            'title':'Популярность видов найма в 2019 году.',
+            chartArea:{width:'90%',height:'80%'},
+            pieSliceTextStyle: {fontSize: 11},
+<!--            'legend': {position: 'top',-->
+<!--            textStyle: {color: 'blue', fontSize: 16}}-->
+                       };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('employment_type2019'));
+        chart.draw(data, options);
+      }
+
+       google.charts.setOnLoadCallback(drawFirstTable);
+       function drawFirstTable() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Вид');
+            data.addColumn('number', 'Количество вакансий');
+            data.addColumn('string', 'Доля, %');
+            data.addRows({{ employment_type_table_2019 | safe }});
+
+            var table = new google.visualization.Table(document.getElementById('table2019div'));
+
+            table.draw(data, {width: '90%', height: '100%'});
+          }
+
+
+      google.charts.setOnLoadCallback(drawSecondChart);
+     function drawSecondChart() {
+        var data = google.visualization.arrayToDataTable({{ employment_type_chart_2020 | safe }});
+        var options = {'title':'Популярность видов найма в 2020 году.',
+            chartArea:{width:'90%',height:'80%'},
+            pieSliceTextStyle: {fontSize: 11}
+            };
+        var chart = new google.visualization.PieChart(document.getElementById('employment_type2020'));
+        chart.draw(data, options);
+      }
+
+       google.charts.setOnLoadCallback(drawSecondTable);
+       function drawSecondTable() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Вид');
+            data.addColumn('number', 'Количество вакансий');
+            data.addColumn('string', 'Доля, %');
+            data.addRows({{ employment_type_table_2020 | safe }});
+
+            var table = new google.visualization.Table(document.getElementById('table2020div'));
+
+            table.draw(data, {width: '90%', height: '100%'});
+          }
+    </script>
+
+{% endblock %}
+
+
+
+  {% block title %}Home Page{% endblock %}
+  {% block content %}
+
+    <div id="employment_type2019" style="height: 300px;"></div>
+    <div id="table2019div"></div>
+
+    <hr>
+    <br>
+    <div id="employment_type2020" style="height: 300px;"></div>
+    <div id="table2020div"></div>
+<!--   <table class="columns">-->
+<!--      <tr>-->
+<!--        <td><div id="schedule_type2019" style="height: 300px;"></div></td>-->
+<!--      </tr>-->
+<!--      <tr>-->
+<!--        <td><div id="schedule_type2020" style="height: 300px;"></div></td>-->
+<!--      </tr>-->
+<!--    </table>-->
+
+  {% endblock %}
+</html>
