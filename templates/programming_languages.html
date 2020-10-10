@@ -8,27 +8,34 @@
        google.charts.load('current', {'packages':['corechart']});
 
        // Set a callback to run when the Google Visualization API is loaded.
-       google.charts.setOnLoadCallback(drawLengChart);
+       google.charts.setOnLoadCallback(drawLanguages2019Chart);
 
       // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
       // draws it.
-      function drawLengChart() {
+      function drawLanguages2019Chart() {
 
         // Create the data table.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
-        data.addRows({{ languages | safe }});
+        var data = google.visualization.arrayToDataTable({{ languages2019 | safe }});
 
         // Set chart options
         var options = {
-        'title':'Количество упоминаний языков программирования.',
+        'title':'Количество упоминаний языков программирования в 2019 г.',
         chartArea:{width:'90%',height:'75%'},
         };
 
         // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.PieChart(document.getElementById('chart'));
+        var chart = new google.visualization.PieChart(document.getElementById('languages_2019'));
+        chart.draw(data, options);
+      }
+       google.charts.setOnLoadCallback(drawLanguages2020Chart);
+     function drawLanguages2020Chart() {
+        var data = google.visualization.arrayToDataTable({{ languages2020 | safe }});
+        var options = {'title':'Количество упоминаний языков программирования  в 2020 году.',
+            chartArea:{width:'90%',height:'75%'},
+            pieSliceTextStyle: {fontSize: 11}
+            };
+        var chart = new google.visualization.PieChart(document.getElementById('languages_2020'));
         chart.draw(data, options);
       }
     </script>
@@ -39,10 +46,9 @@
   {% block title %}Home Page{% endblock %}
   {% block content %}
 
-
-   
       <!--Divs that will hold each control and chart-->
-            <div id="chart" style="height: 500px;"></div>
+    <div id="languages_2019" style="height: 400px;"></div>
+    <div id="languages_2020" style="height: 400px;"></div>
 
 
   {% endblock %}

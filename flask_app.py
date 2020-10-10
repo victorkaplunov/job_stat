@@ -174,6 +174,7 @@ def get_data_with_year(cursor, year, chart_name):
     data_list = []
     for i in statistics_data:
         data_list.append(list(i))
+    data_list.sort(reverse=True, key=itemgetter(1))
     return head + data_list
 
 
@@ -247,10 +248,8 @@ def experience():
 @app.route('/with_salary')
 def with_salary():
     """Schedule type popularity page"""
-    experience_list = get_statistics_data('with_salary', cur())
     return render_template(
         '/with_salary.html',
-        # experience=sorted(experience_list, key=itemgetter(1), reverse=True)
         with_salary2019=get_data_with_year(cur(), 2019, 'with_salary'),
         with_salary2020=get_data_with_year(cur(), 2020, 'with_salary')
     )
@@ -282,11 +281,11 @@ def key_skills():
 @app.route('/programming_languages')
 def programming_languages():
     """Schedule type popularity page"""
-    languages_list = get_statistics_data('languages', cur())
+    print(get_data_with_year(cur(), 2019, 'languages'))
     return render_template(
         '/programming_languages.html',
-        languages=sorted(languages_list, key=itemgetter(1), reverse=True)
-
+        languages2019=get_data_with_year(cur(), 2019, 'languages'),
+        languages2020=get_data_with_year(cur(), 2020, 'languages')
     )
 
 

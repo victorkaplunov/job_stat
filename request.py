@@ -83,7 +83,7 @@ def id_list(response):
 
 
 def wright_statistic_to_db(chart_name: str, param_list: list):
-    """ Function count an inclusions of some string from param_list in the JSON of all vacancies. """
+    """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
     for i in param_list:
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
         cur.execute(sql)
@@ -100,8 +100,32 @@ def wright_statistic_to_db(chart_name: str, param_list: list):
     return
 
 
+def stat_with_year(chart_name: str, param_list: list):
+    """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
+    types = {i: 0 for i in param_list}  # Convert list to dictionary
+    for y in years_tuple:
+        types = types.fromkeys(types, 0)  # Reset all values to zero
+        # Count vacancies with given type in current year.
+        for n in all_vacancies:
+            for t in types:
+                body = json.loads((n[1]))
+                if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
+                        (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300") and \
+                        (t in body['description']):
+                    types[t] += 1
+                else:
+                    continue
+        # Write ready data to DB.
+        print(types)
+        for n in types:
+            sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
+                  f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
+            cur.executescript(sql)
+    return
+
+
 def chart_with_category_filter(chart_name: str, param_list: list):
-    """ Function count an inclusions of some string from param_list in all vacancies. """
+    """ Function count a number of entries of some string from param_list in all vacancies. """
     for i in param_list:
         print(i[0], i[1])
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i[0]
@@ -120,17 +144,37 @@ def chart_with_category_filter(chart_name: str, param_list: list):
     return
 
 
-# Run request to HH.ru API
-for x in range(0, pages):
+def types_stat_with_year(types: dict, chart_name: str, key_name: str):
+    # Count types of schedule in all vacancies.
+    for y in years_tuple:
+        types = types.fromkeys(types, 0)  # set all values to zero
+        # Count vacancies with given type in current year.
+        for n in all_vacancies:
+            body = json.loads((n[1]))
+            if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
+                    (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300"):
+                types[(body[key_name]['id'])] += 1
+            else:
+                continue
+        # Write ready data to DB.
+        print(types)
+        for n in types:
+            sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
+                  f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
+            cur.executescript(sql)
+    return
+
+
+for x in range(0, pages):  # Run request to HH.ru API
     s = id_list(resp(x))
     print("Items on page: ", len(set(s)))
 
 sql = "SELECT id, json FROM vacancies;"
 cur.execute(sql)
+
 all_vacancies = (cur.fetchall())
 
 cur.execute("DROP TABLE IF EXISTS charts;")
-
 sql = """
 CREATE TABLE IF NOT EXISTS charts
 (
@@ -147,12 +191,12 @@ cur.execute(sql)
 
 #  Wright statistics data to database
 
-wright_statistic_to_db('languages',
-                       ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-                        'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
-                        'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
-                        'AutoIT'
-                        ])
+stat_with_year('languages',
+               ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
+                'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
+                'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
+                'AutoIT'
+                ])
 
 chart_with_category_filter('frameworks',
                            [['pytest', 'Python'], ['Py.test', 'Python'], ['Unittest', 'Python'], ['Nose', 'Python'],
@@ -200,40 +244,20 @@ wright_statistic_to_db('bugtracking_n_tms',
 wright_statistic_to_db('cvs',
                        ['git', 'SVN', 'Subversion', 'Mercurial'])
 
+
 wright_statistic_to_db('ci_cd',
                        ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI', 'Travis CI',
                         'Bamboo', 'TeamCity', 'Apache Gump'])
 
 
-def stat_with_year(types, chart_name, key_name):
-    # Count types of schedule in all vacancies.
-    for y in years_tuple:
-        types = types.fromkeys(types, 0)  # set all values to zero
-        # Count vacancies with given type in current year.
-        for n in all_vacancies:
-            body = json.loads((n[1]))
-            if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
-                    (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300"):
-                types[(body[key_name]['id'])] += 1
-            else:
-                continue
-        # Write ready data to DB.
-        print(types)
-        for n in types:
-            sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
-                  f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
-            cur.executescript(sql)
-    return
-
-
 schedule_types_dict = dict(fullDay=0, flexible=0, shift=0, remote=0)
-stat_with_year(schedule_types_dict, 'schedule_type', 'schedule')
+types_stat_with_year(schedule_types_dict, 'schedule_type', 'schedule')
 
 experience_types_dict = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
-stat_with_year(experience_types_dict, 'experience', 'experience')
+types_stat_with_year(experience_types_dict, 'experience', 'experience')
 
 employment_types_dict = dict(full=0, part=0, project=0, probation=0)
-stat_with_year(employment_types_dict, 'employment_type', 'employment')
+types_stat_with_year(employment_types_dict, 'employment_type', 'employment')
 
 
 def vacancy_with_salary(types: dict, chart_name: str):
