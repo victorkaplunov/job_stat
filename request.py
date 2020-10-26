@@ -269,10 +269,16 @@ def vacancy_with_salary(types: dict, chart_name: str):
             body = json.loads((n[1]))
             if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
                     (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300"):
-                if body['salary'] is not None:
-                    types['with_salary'] += 1
-                else:
+                if body['salary'] is None:
                     types['without_salary'] += 1
+                else:
+                    if body['salary']['to'] is None:
+                        types['open_up'] += 1
+                    elif body['salary']['from'] is None:
+                        types['open_down'] += 1
+                    else:
+                        types['closed'] += 1
+
             else:
                 continue
         # Write ready data to DB.
@@ -284,7 +290,7 @@ def vacancy_with_salary(types: dict, chart_name: str):
     return
 
 
-with_salary = dict(with_salary=0, without_salary=0)
+with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
 vacancy_with_salary(with_salary, 'with_salary')
 
 
