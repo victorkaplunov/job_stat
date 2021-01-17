@@ -187,7 +187,6 @@ def unit_test_frameworks():
     return render_template(
         '/unit_test_frameworks.html',
         frameworks=frameworks_list
-
     )
 
 
@@ -292,7 +291,7 @@ def programming_languages():
 @app.route('/load_testing_tool')
 def load_testing_tool():
     """Schedule type popularity page"""
-    lt_frameworks_list = get_statistics_data('lt_frameworks', cur())
+    lt_frameworks_list = get_statistics_data('load_testing_tools', cur())
     return render_template(
         '/load_testing_tool.html',
         lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True)
