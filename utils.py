@@ -4,12 +4,11 @@ import requests
 import json
 import unicodedata
 
-con = sqlite3.connect("testdb.db")  # Open database
-cur = con.cursor()
-
 
 def vac_id_list():
     """Get list of id from "vacancies" table"""
+    con = sqlite3.connect("testdb.db")  # Open database
+    cur = con.cursor()
     id_list = []
     sql = "SELECT id FROM vacancies"
     try:
@@ -19,11 +18,14 @@ def vac_id_list():
             id_list.append(n[0])
     except sqlite3.IntegrityError as err:
         print("Error: ", err)
+    con.close()
     return id_list
 
 
 def id_list(response, base_url):
     """ Get list of vacancies from response and write "calendar" and "vacancies" tables."""
+    con = sqlite3.connect("testdb.db")  # Open database
+    cur = con.cursor()
     vac_list = response.json()["items"]
     items = []
     for i in vac_list:
@@ -58,11 +60,14 @@ def id_list(response, base_url):
                 cur.executescript(sql_in)
             except sqlite3.IntegrityError as error:
                 print("Error: ", error)
+    con.close()
     return items
 
 
 def chart_with_category_filter(chart_name: str, param_list: list):
     """ Function count a number of entries of some string from param_list in all vacancies. """
+    con = sqlite3.connect("testdb.db")  # Open database
+    cur = con.cursor()
     for i in param_list:
         print(i[0], i[1])
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i[0]
@@ -90,11 +95,14 @@ def chart_with_category_filter(chart_name: str, param_list: list):
     cur.execute(sql)
     sql = """DELETE FROM charts WHERE data = 'py.test';"""
     cur.execute(sql)
+    con.close()
     return
 
 
 def stat_with_year(chart_name: str, param_list: list, years: tuple, all_vacancies):
     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
+    con = sqlite3.connect("testdb.db")  # Open database
+    cur = con.cursor()
     types = {i: 0 for i in param_list}  # Convert list to dictionary
     for y in years:
         types = types.fromkeys(types, 0)  # Reset all values to zero
@@ -114,11 +122,14 @@ def stat_with_year(chart_name: str, param_list: list, years: tuple, all_vacancie
             sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
                   f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
             cur.executescript(sql)
+    con.close()
     return
 
 
 def wright_statistic_to_db(chart_name: str, param_list: list):
     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
+    con = sqlite3.connect("testdb.db")  # Open database
+    cur = con.cursor()
     for i in param_list:
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
         cur.execute(sql)
@@ -132,10 +143,13 @@ def wright_statistic_to_db(chart_name: str, param_list: list):
         sql = 'UPDATE charts SET popularity = "%i" WHERE data = "%s";' % (len(vac), i)
         print(sql)
         cur.executescript(sql)
+    con.close()
     return
 
 
 def types_stat_with_year(types: dict, chart_name: str, key_name: str, years: tuple, all_vacancies):
+    con = sqlite3.connect("testdb.db")  # Open database
+    cur = con.cursor()
     # Count types of schedule in all vacancies.
     for y in years:
         types = types.fromkeys(types, 0)  # set all values to zero
@@ -153,10 +167,13 @@ def types_stat_with_year(types: dict, chart_name: str, key_name: str, years: tup
             sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
                   f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
             cur.executescript(sql)
+    con.close()
     return
 
 
 def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancies):
+    con = sqlite3.connect("testdb.db")  # Open database
+    cur = con.cursor()
     # Count types of schedule in all vacancies.
     for y in years:
         types = types.fromkeys(types, 0)  # set all values to zero
@@ -183,5 +200,6 @@ def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancie
             sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
                   f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
             cur.executescript(sql)
+    con.close()
     return
 
