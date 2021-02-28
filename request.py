@@ -37,9 +37,9 @@ def resp(n):
                         )
 
 
-for x in range(0, pages):  # Run request to HH.ru API
-    s = utils.id_list(resp(x), base_url)
-    print("Items on page: ", len(set(s)))
+# for x in range(0, pages):  # Run request to HH.ru API
+#     s = utils.id_list(resp(x), base_url)
+#     print("Items on page: ", len(set(s)))
 
 sql = "SELECT id, json FROM vacancies;"
 cur.execute(sql)
@@ -68,7 +68,7 @@ utils.stat_with_year('languages',
                       'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
                       'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
                       'AutoIT'
-                      ], years_tuple, all_vacancies)
+                      ], years_tuple, all_vacancies, cur)
 
 utils.chart_with_category_filter('frameworks',
                                  [['pytest', 'Python'], ['py.test', 'Python'], ['Unittest', 'Python'],
@@ -80,28 +80,28 @@ utils.chart_with_category_filter('frameworks',
                                   ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
                                   ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
                                   ['CodeceptJS', 'JavaScript'],
-                                  ['Robot_Framework', 'multiple_language']])
+                                  ['Robot_Framework', 'multiple_language']], cur)
 
 utils.wright_statistic_to_db('load_testing_tools',
                              ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
-                              'Grinder', 'Performance Center', 'IBM Rational Performance'])
+                              'Grinder', 'Performance Center', 'IBM Rational Performance'], cur)
 
 utils.wright_statistic_to_db('monitoring_tools',
-                             ['Zabbix', 'nmon', 'Oracle EM', 'Grafana', 'ELK', 'Influxdb', 'Nagios', 'Cacti'])
+                             ['Zabbix', 'nmon', 'Oracle EM', 'Grafana', 'ELK', 'Influxdb', 'Nagios', 'Cacti'], cur)
 
 utils.wright_statistic_to_db('bdd_frameworks',
                              ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave', 'Robot_Framework',
                               'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Concordion',
                               'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
-                              'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD', 'xBehave.net'])
+                              'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD', 'xBehave.net'], cur)
 
 utils.wright_statistic_to_db('web_ui_tools',
                              ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress', 'Splinter',
-                              'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe'])
+                              'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe'], cur)
 
 utils.wright_statistic_to_db('mobile_testing_frameworks',
                              ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
-                              'Calabash', 'UI Automation', 'UIAutomator', 'XCTest'])
+                              'Calabash', 'UI Automation', 'UIAutomator', 'XCTest'], cur)
 
 utils.wright_statistic_to_db('bugtracking_n_tms',
                              ['Youtrack', 'TestRail', 'TestLink', 'TestLodge', 'Jira',
@@ -111,28 +111,28 @@ utils.wright_statistic_to_db('bugtracking_n_tms',
                               'IBM Rational Quality Manager', 'HP Quality Center', 'HP ALM',
                               'TestIt', 'XQual', 'Borland Silk Central', 'Testuff',
                               'Gemini', 'BugZilla', 'Fitnesse', 'RTH-Turbo',
-                              'Stryka', 'Test Case Lab'])
+                              'Stryka', 'Test Case Lab'], cur)
 
 utils.wright_statistic_to_db('cvs',
-                             ['git', 'SVN', 'Subversion', 'Mercurial'])
+                             ['git', 'SVN', 'Subversion', 'Mercurial'], cur)
 
 
 utils.wright_statistic_to_db('ci_cd',
                              ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI',
-                              'Travis CI', 'Bamboo', 'TeamCity', 'Apache Gump'])
+                              'Travis CI', 'Bamboo', 'TeamCity', 'Apache Gump'], cur)
 
 
 schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0)
-utils.types_stat_with_year(schedule_types, 'schedule_type', 'schedule', years_tuple, all_vacancies)
+utils.types_stat_with_year(schedule_types, 'schedule_type', 'schedule', years_tuple, all_vacancies, cur)
 
 experience_types = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
-utils.types_stat_with_year(experience_types, 'experience', 'experience', years_tuple, all_vacancies)
+utils.types_stat_with_year(experience_types, 'experience', 'experience', years_tuple, all_vacancies, cur)
 
 employment_types = dict(full=0, part=0, project=0, probation=0)
-utils.types_stat_with_year(employment_types, 'employment_type', 'employment', years_tuple, all_vacancies)
+utils.types_stat_with_year(employment_types, 'employment_type', 'employment', years_tuple, all_vacancies, cur)
 
 with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
-utils.vacancy_with_salary(with_salary, 'with_salary', years_tuple, all_vacancies)
+utils.vacancy_with_salary(with_salary, 'with_salary', years_tuple, all_vacancies, cur)
 
 
 # Populate skills set
@@ -171,5 +171,6 @@ for n in key_skills_dict:
     sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}" AND chart_name = "key_skills";'
     cur.executescript(sql)
 
+con.commit()
 # Close database connection
 con.close()

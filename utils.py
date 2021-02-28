@@ -64,10 +64,10 @@ def id_list(response, base_url):
     return items
 
 
-def chart_with_category_filter(chart_name: str, param_list: list):
+def chart_with_category_filter(chart_name: str, param_list: list, cur):
     """ Function count a number of entries of some string from param_list in all vacancies. """
-    con = sqlite3.connect("testdb.db")  # Open database
-    cur = con.cursor()
+    # con = sqlite3.connect("testdb.db")  # Open database
+    # cur = con.cursor()
     for i in param_list:
         print(i[0], i[1])
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i[0]
@@ -95,15 +95,15 @@ def chart_with_category_filter(chart_name: str, param_list: list):
     cur.execute(sql)
     sql = """DELETE FROM charts WHERE data = 'py.test';"""
     cur.execute(sql)
-    con.commit()
-    con.close()
+
+    # con.close()
     return
 
 
-def stat_with_year(chart_name: str, param_list: list, years: tuple, all_vacancies):
+def stat_with_year(chart_name: str, param_list: list, years: tuple, all_vacancies, cur):
     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
-    con = sqlite3.connect("testdb.db")  # Open database
-    cur = con.cursor()
+    # con = sqlite3.connect("testdb.db")  # Open database
+    # cur = con.cursor()
     types = {i: 0 for i in param_list}  # Convert list to dictionary
     for y in years:
         types = types.fromkeys(types, 0)  # Reset all values to zero
@@ -123,14 +123,12 @@ def stat_with_year(chart_name: str, param_list: list, years: tuple, all_vacancie
             sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
                   f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
             cur.executescript(sql)
-    con.close()
+    # con.close()
     return
 
 
-def wright_statistic_to_db(chart_name: str, param_list: list):
+def wright_statistic_to_db(chart_name: str, param_list: list, cur):
     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
-    con = sqlite3.connect("testdb.db")  # Open database
-    cur = con.cursor()
     for i in param_list:
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
         cur.execute(sql)
@@ -144,13 +142,11 @@ def wright_statistic_to_db(chart_name: str, param_list: list):
         sql = 'UPDATE charts SET popularity = "%i" WHERE data = "%s";' % (len(vac), i)
         print(sql)
         cur.executescript(sql)
-    con.close()
     return
 
 
-def types_stat_with_year(types: dict, chart_name: str, key_name: str, years: tuple, all_vacancies):
-    con = sqlite3.connect("testdb.db")  # Open database
-    cur = con.cursor()
+def types_stat_with_year(types: dict, chart_name: str, key_name: str, years: tuple, all_vacancies, cur):
+
     # Count types of schedule in all vacancies.
     for y in years:
         types = types.fromkeys(types, 0)  # set all values to zero
@@ -168,13 +164,10 @@ def types_stat_with_year(types: dict, chart_name: str, key_name: str, years: tup
             sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
                   f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
             cur.executescript(sql)
-    con.close()
     return
 
 
-def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancies):
-    con = sqlite3.connect("testdb.db")  # Open database
-    cur = con.cursor()
+def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancies, cur):
     # Count types of schedule in all vacancies.
     for y in years:
         types = types.fromkeys(types, 0)  # set all values to zero
@@ -201,6 +194,5 @@ def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancie
             sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
                   f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
             cur.executescript(sql)
-    con.close()
     return
 
