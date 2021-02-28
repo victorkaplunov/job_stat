@@ -5,11 +5,10 @@
 
 import json
 import sqlite3
-from pprint import pprint
 
 exchange_rate = {'RUR': 1, 'EUR': 91, 'USD': 73, 'UAH': 2.58}
 # {'between1And3', 'moreThan6', 'between3And6', 'noExperience'}
-experience = 'between1And3'
+experience = 'between3And6'
 print('experience: ', experience)
 
 
@@ -23,12 +22,10 @@ vac = cur.fetchall()
 # Отбираем вакансии с нужным опытом и собираем зарплаты в список
 salary_list = []
 for i in vac:
-    # pprint(json.loads(i[0])['id'])
     if json.loads(i[0])['experience']['id'] == experience and json.loads(i[0])['salary'] is not None:
-        salary = json.loads(i[0])['salary']
-        salary.update({'id': json.loads(i[0])['id']})
-        # print(salary)
-        salary_list.append(salary)
+        salary_obj = json.loads(i[0])['salary']
+        salary_obj.update({'id': json.loads(i[0])['id']})
+        salary_list.append(salary_obj)
 
 # Подсчет зарплат с "чистой" и "грязной" зарплатой
 net_list = []
@@ -56,20 +53,41 @@ for i in closed_salary:
 average_delta_for_closed_salary = closed_salary_sum/len(closed_salary)
 print('average_delta_for_closed_salary: ', average_delta_for_closed_salary)
 
-# Считаем среднюю предполагаемую зарплату с учетом открытых диапазонов.
+# Считаем среднюю предполагаемую зарплату с учетом открытых диапазонов и НДФЛ.
 all_salary = []
 for i in salary_list:
-    # закрытый диапазон
-    if (i['from'] is not None) and (i['to'] is not None):
-        all_salary.append((i['to'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']])
-    # открытый вверх
-    elif i['to'] is None:
-        all_salary.append((i['from'] + average_delta_for_closed_salary/2) * exchange_rate[i['currency']])
-    # открытый вниз
-    elif i['from'] is None:
-        all_salary.append((i['to'] - average_delta_for_closed_salary/2) * exchange_rate[i['currency']])
+    # "Чистая" зарплата
+    if i['gross'] is False:
+        # закрытый диапазон
+        if (i['from'] is not None) and (i['to'] is not None):
+            all_salary.append((i['to'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']])
+        # открытый вверх
+        elif i['to'] is None:
+            all_salary.append((i['from'] + average_delta_for_closed_salary/2) * exchange_rate[i['currency']])
+        # открытый вниз
+        elif i['from'] is None:
+            all_salary.append((i['to'] - average_delta_for_closed_salary/2) * exchange_rate[i['currency']])
+        else:
+            print('!!!', i)
+    # "Грязная" зарплата
+    elif i['gross'] is True:
+        # закрытый диапазон
+        if (i['from'] is not None) and (i['to'] is not None):
+            gross_salary = (i['to'] + (i['to'] - i['from']) / 2) * exchange_rate[i['currency']]
+            all_salary.append(gross_salary - gross_salary * 0.13)
+        # открытый вверх
+        elif i['to'] is None:
+            gross_salary = (i['from'] + average_delta_for_closed_salary / 2) * exchange_rate[i['currency']]
+            all_salary.append(gross_salary - gross_salary * 0.13)
+        # открытый вниз
+        elif i['from'] is None:
+            gross_salary = (i['to'] - average_delta_for_closed_salary / 2) * exchange_rate[i['currency']]
+            all_salary.append(gross_salary - gross_salary * 0.13)
+        else:
+            print('!!', i)
     else:
-        print(i)
+        # Зарплаты без указания "чистоты" в расчете не учитываются
+        print('!', i)
 salary_sum = 0
 for i in all_salary:
     salary_sum += i
