@@ -95,6 +95,7 @@ def chart_with_category_filter(chart_name: str, param_list: list):
     cur.execute(sql)
     sql = """DELETE FROM charts WHERE data = 'py.test';"""
     cur.execute(sql)
+    con.commit()
     con.close()
     return
 
