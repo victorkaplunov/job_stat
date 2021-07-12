@@ -7,7 +7,7 @@ import re
 import utils
 
 
-years_tuple = (2019, 2020,)
+years_tuple = (2019, 2020, 2021)
 
 con = sqlite3.connect("testdb.db")  # Open database
 cur = con.cursor()  # Create cursor

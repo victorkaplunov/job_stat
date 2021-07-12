@@ -284,7 +284,8 @@ def programming_languages():
     return render_template(
         '/programming_languages.html',
         languages2019=get_data_with_year(cur(), 2019, 'languages'),
-        languages2020=get_data_with_year(cur(), 2020, 'languages')
+        languages2020=get_data_with_year(cur(), 2020, 'languages'),
+        languages2021=get_data_with_year(cur(), 2021, 'languages'),
     )
 
 
