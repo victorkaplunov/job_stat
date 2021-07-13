@@ -197,7 +197,9 @@ def schedule_type():
     return render_template(
         '/schedule_type.html',
         schedule_type2019=get_data_with_year(cur(), 2019, 'schedule_type'),
-        schedule_type2020=get_data_with_year(cur(), 2020, 'schedule_type'))
+        schedule_type2020=get_data_with_year(cur(), 2020, 'schedule_type'),
+        schedule_type2021=get_data_with_year(cur(), 2021, 'schedule_type')
+    )
 
 
 @app.route('/employment_type')

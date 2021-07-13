@@ -39,6 +39,17 @@
         var chart = new google.visualization.PieChart(document.getElementById('schedule_type2020'));
         chart.draw(data, options);
       }
+
+      google.charts.setOnLoadCallback(drawScheduleTypeChart2021);
+     function drawScheduleTypeChart2021() {
+        var data = google.visualization.arrayToDataTable({{ schedule_type2021 | safe }});
+        var options = {'title':'Популярность режимов работы в 2021 году.',
+            chartArea:{width:'90%',height:'80%'},
+            pieSliceTextStyle: {fontSize: 11}
+            };
+        var chart = new google.visualization.PieChart(document.getElementById('schedule_type2021'));
+        chart.draw(data, options);
+      }
     </script>
 
 {% endblock %}
@@ -48,8 +59,9 @@
   {% block title %}Home Page{% endblock %}
   {% block content %}
 
-    <div id="schedule_type2019" style="height: 300px;"></div>
-    <div id="schedule_type2020" style="height: 300px;"></div>
+<div id="schedule_type2021" style="height: 300px;"></div>
+<div id="schedule_type2020" style="height: 300px;"></div>
+<div id="schedule_type2019" style="height: 300px;"></div>
 
   {% endblock %}
 </html>
