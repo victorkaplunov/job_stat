@@ -204,7 +204,7 @@ def schedule_type():
 
 @app.route('/employment_type')
 def employment_type():
-    """Schedule type popularity page"""
+    """Employment type popularity page"""
     employment_type2019 = get_data_with_year(cur(), 2019, 'employment_type')
     import copy
     employment_table2019 = copy.deepcopy(employment_type2019)
@@ -225,12 +225,24 @@ def employment_type():
     for i in employment_table2020:
         percent = str(round(i[1] / sum_vac * 100, 1))
         i.append(percent)
+
+    employment_type2021 = get_data_with_year(cur(), 2021, 'employment_type')
+    employment_table2021 = copy.deepcopy(employment_type2021)
+    employment_table2021.remove(['Type', 'Popularity'])
+    sum_vac = 0
+    for i in employment_table2021:
+        sum_vac += i[1]
+    for i in employment_table2021:
+        percent = str(round(i[1] / sum_vac * 100, 1))
+        i.append(percent)
     return render_template(
         '/employment_type.html',
         employment_type_chart_2019=employment_type2019,
         employment_type_table_2019=employment_table2019,
         employment_type_chart_2020=employment_type2020,
-        employment_type_table_2020=employment_table2020
+        employment_type_table_2020=employment_table2020,
+        employment_type_chart_2021=employment_type2021,
+        employment_type_table_2021=employment_table2021
     )
 
 
