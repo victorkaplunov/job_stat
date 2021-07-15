@@ -1,21 +1,26 @@
 """Подсчет средней зарплаты для вакансий с различным опытом.
 Для вакансий с закрытым диапазоном берется среднее, для вакансий
 с открытым диапазоном к началу диапазона прибавляется половина от
-срденего разброса из вакансий с закрытым диапазоном."""
+средней разницы из вакансий с закрытым диапазоном."""
 
 import json
 import sqlite3
+import statistics
 
 exchange_rate = {'RUR': 1, 'EUR': 91, 'USD': 73, 'UAH': 2.58}
 # {'between1And3', 'moreThan6', 'between3And6', 'noExperience'}
-experience = 'between3And6'
+experience = 'noExperience'
 print('experience: ', experience)
 
 
 # Загружаем вакансии из БД
 con = sqlite3.connect("testdb.db")
 cur = con.cursor()
-sql = "SELECT json FROM vacancies;"
+sql = """SELECT v.json
+FROM vacancies v
+INNER JOIN calendar c
+ON v.id = c.id
+WHERE c.data LIKE "2021%";"""
 cur.execute(sql)
 vac = cur.fetchall()
 
@@ -63,10 +68,10 @@ for i in salary_list:
             all_salary.append((i['to'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']])
         # открытый вверх
         elif i['to'] is None:
-            all_salary.append((i['from'] + average_delta_for_closed_salary/2) * exchange_rate[i['currency']])
+            all_salary.append(i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary/2)
         # открытый вниз
         elif i['from'] is None:
-            all_salary.append((i['to'] - average_delta_for_closed_salary/2) * exchange_rate[i['currency']])
+            all_salary.append(i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary/2)
         else:
             print('!!!', i)
     # "Грязная" зарплата
@@ -77,20 +82,32 @@ for i in salary_list:
             all_salary.append(gross_salary - gross_salary * 0.13)
         # открытый вверх
         elif i['to'] is None:
-            gross_salary = (i['from'] + average_delta_for_closed_salary / 2) * exchange_rate[i['currency']]
+            gross_salary = (i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary / 2)
             all_salary.append(gross_salary - gross_salary * 0.13)
         # открытый вниз
         elif i['from'] is None:
-            gross_salary = (i['to'] - average_delta_for_closed_salary / 2) * exchange_rate[i['currency']]
+            gross_salary = (i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary / 2)
             all_salary.append(gross_salary - gross_salary * 0.13)
         else:
             print('!!', i)
-    else:
+    # else:
         # Зарплаты без указания "чистоты" в расчете не учитываются
-        print('!', i)
+        # print('!', i)
 salary_sum = 0
 for i in all_salary:
     salary_sum += i
 
 average_salary = salary_sum/len(all_salary)
 print("average_salary: ", average_salary)
+print("median: ", statistics.median(all_salary))
+# print(all_salary)
+
+import csv
+
+
+with open('GFG.csv', 'w', newline='') as f:
+    # using csv.writer method from CSV package
+    write = csv.writer(f)
+    for i in all_salary:
+        write.writerow([i])
+
