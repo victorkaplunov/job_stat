@@ -4,8 +4,11 @@ jobs:
   my_job:
     name: deploy to staging
     runs-on: ubuntu-latest
+    env:
+      api_token: ${{ secrets.PA_TOKEN}}
     steps:
       - uses: actions/checkout@v2
       - uses: fylein/python-pytest-github-action@v2
         with:
+
           args: pip3 install -r requirements.txt && PythonAnywhereAPI.py
