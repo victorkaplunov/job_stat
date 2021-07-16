@@ -6,7 +6,7 @@ username = 'clingon'
 TOKEN = os.getenv('PA_TOKEN')
 headers = {'Authorization': f'Token {TOKEN}'}
 prefix = f'https://www.pythonanywhere.com/api/v0/user/{username}/'
-
+print(prefix)
 # response = requests.post(prefix, json={'executable': 'bash', "working_directory": 'job_stat'}, headers=headers)
 # print(response.status_code)
 # print(response.text)
