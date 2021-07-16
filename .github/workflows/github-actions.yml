@@ -5,10 +5,6 @@ jobs:
   build:
     env:
       api_token: ${{ secrets.PA_TOKEN}}
-      - name: Display Python version
-
-
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
