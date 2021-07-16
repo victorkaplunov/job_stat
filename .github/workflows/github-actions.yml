@@ -4,7 +4,7 @@ on: [push]
 jobs:
   build:
     env:
-      api_token: ${{ secrets.PA_TOKEN}}
+      PA_TOKEN: ${{ secrets.PA_TOKEN}}
     runs-on: ubuntu-latest
 
     steps:
