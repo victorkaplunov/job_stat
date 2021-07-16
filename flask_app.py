@@ -251,7 +251,7 @@ def experience():
     """Schedule type popularity page"""
     experience_list = get_statistics_data('experience', cur())
     return render_template(
-        '/chart_experience.html',
+        '/experience.html',
         # experience=sorted(experience_list, key=itemgetter(1), reverse=True)
         experience2019=get_data_with_year(cur(), 2019, 'experience'),
         experience2020=get_data_with_year(cur(), 2020, 'experience'),
