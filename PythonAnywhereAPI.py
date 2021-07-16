@@ -17,6 +17,7 @@ console_id = str(response.json()[0]['id'])
 
 # Send command to first console
 command = {'input': 'cd ~\n cd job_stat\n git pull\n'}
+command = {'input': 'python3 request.py\n'}
 response = requests.post(prefix + f'consoles/{console_id}/send_input/',
                          json=command, headers=headers)
 print('send_input: ', response.status_code)
