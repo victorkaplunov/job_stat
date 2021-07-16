@@ -6,9 +6,6 @@ jobs:
     env:
       api_token: ${{ secrets.PA_TOKEN}}
     runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        python-version: [3.7]
 
     steps:
       - uses: actions/checkout@v2
