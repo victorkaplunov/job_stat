@@ -1,14 +1,21 @@
 name: github-actions
 on: [push]
+
 jobs:
-  my_job:
-    name: deploy to staging
+  build:
+
     runs-on: ubuntu-latest
     env:
       api_token: ${{ secrets.PA_TOKEN}}
     steps:
       - uses: actions/checkout@v2
-      - uses: fylein/python-pytest-github-action@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
         with:
-
-          args: pip3 install -r requirements.txt && PythonAnywhereAPI.py
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+      # You can test your matrix by printing the current Python version
+      - name: Display Python version
+        run: python -m PythonAnywhereAPI.py
