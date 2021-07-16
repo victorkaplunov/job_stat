@@ -9,7 +9,7 @@ import statistics
 
 exchange_rate = {'RUR': 1, 'EUR': 91, 'USD': 73, 'UAH': 2.58}
 # {'between1And3', 'moreThan6', 'between3And6', 'noExperience'}
-experience = 'noExperience'
+experience = 'between3And6'
 print('experience: ', experience)
 
 
