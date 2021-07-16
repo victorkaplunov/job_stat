@@ -12,7 +12,7 @@ prefix = f'https://www.pythonanywhere.com/api/v0/user/{username}/'
 
 # Get first console ID
 response = requests.get(prefix + 'consoles/', headers=headers)
-print(response.json())
+print(response.text)
 console_id = str(response.json()[0]['id'])
 
 # Send command to first console
