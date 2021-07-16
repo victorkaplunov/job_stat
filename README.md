@@ -3,3 +3,4 @@ This is a web application for analysis of local labour market. Data are collects
 
 Web-приложение для сбора и анализа данных, полученных через API HH.ru. Доступ к данным предоставляется через web GUI на базе Google Charts и Bootstrap. Back-end базируется на Flask и SQLite. Работающее приложение с актуальными данными доступно по адресу http://clingon.pythonanywhere.com/
 
+.
