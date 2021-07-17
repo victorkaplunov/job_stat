@@ -21,7 +21,7 @@ command = {'input': 'cd /home/clingon/job_stat\n git pull\n'}
 response = requests.post(prefix + f'consoles/{console_id}/send_input/',
                          json=command, headers=headers)
 print('send_input: ', response.status_code)
-
+print(response.text)
 # Get first webapps name
 response = requests.get(prefix + 'webapps/', headers=headers)
 domain_name = response.json()[0]['domain_name']
