@@ -10,9 +10,11 @@
     function draw2021() {
         var data = new google.visualization.arrayToDataTable({{salary2021 | safe }});
         var options = {
-          chart: { title: 'Медианнный уровень заработной платы 2021',
-                   subtitle: 'в зависимости от опыта работы',
-                   legend: { position: "in" },},
+            legend: { position: 'none' },
+            chart: { title: '2021 г.',
+                   subtitle: 'Медианнный уровень заработной платы',
+                   },
+            bars: 'horizontal',
         };
 
         var chart = new google.charts.Bar(document.getElementById('2021'));
@@ -24,9 +26,11 @@
     function draw2020() {
         var data = new google.visualization.arrayToDataTable({{salary2020 | safe }});
         var options = {
-          chart: { title: 'Медианнный уровень заработной платы 2020',
-                   subtitle: 'в зависимости от опыта работы',
-                   legend: { position: "none" },},
+            legend: { position: 'none' },
+            chart: { title: '2020 г.',
+                   subtitle: 'Медианнный уровень заработной платы',
+                   },
+            bars: 'horizontal',
         };
 
         var chart = new google.charts.Bar(document.getElementById('salary2020'));
@@ -38,11 +42,12 @@
       function draw2019() {
         var data = new google.visualization.arrayToDataTable({{salary2019 | safe }});
         var options = {
-          chart: { title: 'Медианнный уровень заработной платы 2019',
-                   subtitle: 'в зависимости от опыта работы',
-                    legend: { position: "none" },},
+            legend: { position: 'none' },
+            chart: { title: '2019 г.',
+                   subtitle: 'Медианнный уровень заработной платы',
+                   },
+            bars: 'horizontal',
         };
-
         var chart = new google.charts.Bar(document.getElementById('salary2019'));
         chart.draw(data,
         options);
