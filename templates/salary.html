@@ -1,70 +1,82 @@
 {% extends "base.html" %}
 {% block scripts %}
     {{ super() }}
-    <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-    google.charts.load('current', {'packages':['bar']});
+  <script type="text/javascript">
+    google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(salary2021);
+    function salary2021() {
 
-    google.charts.setOnLoadCallback(draw2021);
-    function draw2021() {
-        var data = new google.visualization.arrayToDataTable({{salary2021 | safe }});
-        var options = {
-            legend: { position: 'none' },
-            chart: { title: '2021 г.',
-                   subtitle: 'Медианнный уровень заработной платы',
-                   },
-            bars: 'horizontal',
-        };
+      var data = new google.visualization.arrayToDataTable({{salary2021 | safe }});
+      var view = new google.visualization.DataView(data);
+      view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       ]);
 
-        var chart = new google.charts.Bar(document.getElementById('2021'));
-        chart.draw(data,
-        options);
+      var options = {
+        title: "Медианный уровень заработной платы, 2021 г.",
+        width: 450,
+        bar: {groupWidth: "95%"},
+        legend: { position: "none" },
       };
+      var chart = new google.visualization.BarChart(document.getElementById("2021"));
+      chart.draw(view, options);
+  }
 
-    google.charts.setOnLoadCallback(draw2020);
-    function draw2020() {
-        var data = new google.visualization.arrayToDataTable({{salary2020 | safe }});
-        var options = {
-            legend: { position: 'none' },
-            chart: { title: '2020 г.',
-                   subtitle: 'Медианнный уровень заработной платы',
-                   },
-            bars: 'horizontal',
-        };
+  google.charts.setOnLoadCallback(salary2020);
+    function salary2020() {
 
-        var chart = new google.charts.Bar(document.getElementById('salary2020'));
-        chart.draw(data,
-        options);
+      var data = new google.visualization.arrayToDataTable({{salary2020 | safe }});
+      var view = new google.visualization.DataView(data);
+      view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       ]);
+
+      var options = {
+        title: "Медианный уровень заработной платы, 2020 г.",
+        width: 450,
+        bar: {groupWidth: "95%"},
+        legend: { position: "none" },
       };
+      var chart = new google.visualization.BarChart(document.getElementById("2020"));
+      chart.draw(view, options);
+  }
 
-    google.charts.setOnLoadCallback(draw2019);
-      function draw2019() {
-        var data = new google.visualization.arrayToDataTable({{salary2019 | safe }});
-        var options = {
-            legend: { position: 'none' },
-            chart: { title: '2019 г.',
-                   subtitle: 'Медианнный уровень заработной платы',
-                   },
-            bars: 'horizontal',
-        };
-        var chart = new google.charts.Bar(document.getElementById('salary2019'));
-        chart.draw(data,
-        options);
+   google.charts.setOnLoadCallback(salary2019);
+    function salary2019() {
+
+      var data = new google.visualization.arrayToDataTable({{salary2019 | safe }});
+      var view = new google.visualization.DataView(data);
+      view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       ]);
+
+      var options = {
+        title: "Медианный уровень заработной платы, 2019 г.",
+        width: 450,
+        bar: {groupWidth: "95%"},
+        legend: { position: "none" },
       };
+      var chart = new google.visualization.BarChart(document.getElementById("2019"));
+      chart.draw(view, options);
+  }
+  </script>
 
-
-    </script>
 {% endblock %}
-
-
-
   {% block title %}Home Page{% endblock %}
   {% block content %}
-
     <div id="2021" style="height: 500px;"></div>
-    <div id="salary2020" style="height: 500px;"></div>
-    <div id="salary2019" style="height: 500px;"></div>
+    <div id="2020" style="height: 500px;"></div>
+    <div id="2019" style="height: 500px;"></div>
 
   {% endblock %}
 </html>
