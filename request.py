@@ -8,6 +8,8 @@ import utils
 
 
 years_tuple = (2019, 2020, 2021)
+exchange_rates = {'RUR': 1, 'EUR': 91, 'USD': 73, 'UAH': 2.58}
+experience_grades = ('noExperience', 'between1And3', 'between3And6', 'moreThan6')
 
 con = sqlite3.connect("testdb.db")  # Open database
 cur = con.cursor()  # Create cursor
@@ -40,6 +42,7 @@ def resp(n):
 for x in range(0, pages):  # Run request to HH.ru API
     s = utils.id_list(resp(x), base_url)
     print("Items on page: ", len(set(s)))
+
 
 sql = "SELECT id, json FROM vacancies;"
 cur.execute(sql)
@@ -170,6 +173,16 @@ for n in key_skills_dict:
         print("Error: ", error)
     sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}" AND chart_name = "key_skills";'
     cur.executescript(sql)
+
+
+for year in years_tuple:
+    print("Год: ", year)
+    for experience in experience_grades:
+        print("Опыт: ", experience)
+        median = utils.salary_to_db(year, experience, exchange_rates, cur)
+        sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
+              f'VALUES("salary", "{experience}", "{median}", {str(year)});'
+        cur.executescript(sql)
 
 con.commit()
 # Close database connection

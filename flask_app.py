@@ -164,7 +164,7 @@ def get_time_series_data(cursor):
     return output_list
 
 
-def get_data_with_year(cursor, year, chart_name):
+def get_data_with_year(cursor, year, chart_name, sort=True):
     request = f'SELECT data, popularity ' \
               f'FROM charts ' \
               f'WHERE chart_name="{chart_name}" AND year={str(year)};'
@@ -174,7 +174,8 @@ def get_data_with_year(cursor, year, chart_name):
     data_list = []
     for i in statistics_data:
         data_list.append(list(i))
-    data_list.sort(reverse=True, key=itemgetter(1))
+    data_list.sort(reverse=sort
+                   , key=itemgetter(1))
     return head + data_list
 
 
@@ -264,19 +265,30 @@ def with_salary():
     """Schedule type popularity page"""
     return render_template(
         '/with_salary.html',
-        with_salary2019=get_data_with_year(cur(), 2019, 'with_salary'),
-        with_salary2020=get_data_with_year(cur(), 2020, 'with_salary'),
-        with_salary2021=get_data_with_year(cur(), 2021, 'with_salary')
+        with_salary2019=get_data_with_year(cur(), 2019, 'salary'),
+        with_salary2020=get_data_with_year(cur(), 2020, 'salary'),
+        with_salary2021=get_data_with_year(cur(), 2021, 'salary')
     )
 
 
 @app.route('/time_series')
 def time_series():
     """Time series page"""
-    print(get_time_series_data(cur()))
     return render_template(
         '/time_series.html',
         time_series=get_time_series_data(cur())
+    )
+
+
+@app.route('/salary')
+def salary():
+    """Time series page"""
+    # print(get_data_with_year(cur(), 2019, 'salary'))
+    return render_template(
+        '/salary.html',
+        salary2021=get_data_with_year(cur(), 2021, 'salary', sort=False),
+        salary2020=get_data_with_year(cur(), 2020, 'salary', sort=False),
+        salary2019=get_data_with_year(cur(), 2019, 'salary', sort=False)
     )
 
 
@@ -296,7 +308,7 @@ def key_skills():
 @app.route('/programming_languages')
 def programming_languages():
     """Schedule type popularity page"""
-    print(get_data_with_year(cur(), 2019, 'languages'))
+    # print(get_data_with_year(cur(), 2019, 'languages'))
     return render_template(
         '/programming_languages.html',
         languages2019=get_data_with_year(cur(), 2019, 'languages'),

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block scripts %}
+    {{ super() }}
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+    google.charts.load('current', {'packages':['bar']});
+
+    google.charts.setOnLoadCallback(draw2021);
+    function draw2021() {
+        var data = new google.visualization.arrayToDataTable({{salary2021 | safe }});
+        var options = {
+          chart: { title: 'Медианнный уровень заработной платы 2021',
+                   subtitle: 'в зависимости от опыта работы',
+                   legend: { position: "in" },},
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('2021'));
+        chart.draw(data,
+        options);
+      };
+
+    google.charts.setOnLoadCallback(draw2020);
+    function draw2020() {
+        var data = new google.visualization.arrayToDataTable({{salary2020 | safe }});
+        var options = {
+          chart: { title: 'Медианнный уровень заработной платы 2020',
+                   subtitle: 'в зависимости от опыта работы',
+                   legend: { position: "none" },},
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('salary2020'));
+        chart.draw(data,
+        options);
+      };
+
+    google.charts.setOnLoadCallback(draw2019);
+      function draw2019() {
+        var data = new google.visualization.arrayToDataTable({{salary2019 | safe }});
+        var options = {
+          chart: { title: 'Медианнный уровень заработной платы 2019',
+                   subtitle: 'в зависимости от опыта работы',
+                    legend: { position: "none" },},
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('salary2019'));
+        chart.draw(data,
+        options);
+      };
+
+
+    </script>
+{% endblock %}
+
+
+
+  {% block title %}Home Page{% endblock %}
+  {% block content %}
+
+    <div id="2021" style="height: 500px;"></div>
+    <div id="salary2020" style="height: 500px;"></div>
+    <div id="salary2019" style="height: 500px;"></div>
+
+  {% endblock %}
+</html>
