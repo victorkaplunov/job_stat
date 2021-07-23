@@ -265,9 +265,9 @@ def with_salary():
     """Schedule type popularity page"""
     return render_template(
         '/with_salary.html',
-        with_salary2019=get_data_with_year(cur(), 2019, 'salary'),
-        with_salary2020=get_data_with_year(cur(), 2020, 'salary'),
-        with_salary2021=get_data_with_year(cur(), 2021, 'salary')
+        with_salary2019=get_data_with_year(cur(), 2019, 'with_salary'),
+        with_salary2020=get_data_with_year(cur(), 2020, 'with_salary'),
+        with_salary2021=get_data_with_year(cur(), 2021, 'with_salary')
     )
 
 
