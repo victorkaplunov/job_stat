@@ -17,10 +17,11 @@
                        ]);
 
       var options = {
-        title: "Медианный уровень заработной платы, 2021 г.",
-<!--        width: 400,-->
+        title: "Медианный уровень зарплаты, 2021 г.",
+        width:'150%',
         bar: {groupWidth: "95%"},
         legend: { position: "none" },
+        chartArea:{left:'30%',top:80,width:'100%',height:'50%'}
       };
       var chart = new google.visualization.BarChart(document.getElementById("2021"));
       chart.draw(view, options);
@@ -39,10 +40,10 @@
                        ]);
 
       var options = {
-        title: "Медианный уровень заработной платы, 2020 г.",
-<!--        width: 400,-->
+        title: "Медианный уровень зарплаты, 2020 г.",
         bar: {groupWidth: "95%"},
         legend: { position: "none" },
+        chartArea:{left:'30%',top:80,width:'100%',height:'50%'}
       };
       var chart = new google.visualization.BarChart(document.getElementById("2020"));
       chart.draw(view, options);
@@ -61,10 +62,11 @@
                        ]);
 
       var options = {
-        title: "Медианный уровень заработной платы, 2019 г.",
+        title: "Медианный уровень зарплаты, 2019 г.",
 <!--        width: 400,-->
         bar: {groupWidth: "95%"},
         legend: { position: "none" },
+        chartArea:{left:'30%',top:80,width:'100%',height:'50%'}
       };
       var chart = new google.visualization.BarChart(document.getElementById("2019"));
       chart.draw(view, options);
@@ -74,9 +76,9 @@
 {% endblock %}
   {% block title %}Home Page{% endblock %}
   {% block content %}
-    <div id="2021" style="height: 500px;"></div>
-    <div id="2020" style="height: 500px;"></div>
-    <div id="2019" style="height: 500px;"></div>
+    <div id="2021" style="width: 100%;"></div>
+    <div id="2020" style="width: 100%;"></div>
+    <div id="2019" style="width: 100%;"></div>
 
   {% endblock %}
 </html>
