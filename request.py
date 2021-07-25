@@ -174,7 +174,7 @@ for n in key_skills_dict:
     sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}" AND chart_name = "key_skills";'
     cur.executescript(sql)
 
-
+# Wright salary data to DB
 for year in years_tuple:
     print("Год: ", year)
     for experience in experience_grades:

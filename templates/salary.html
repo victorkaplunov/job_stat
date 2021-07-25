@@ -4,81 +4,50 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
     google.charts.load("current", {packages:["corechart"]});
-    google.charts.setOnLoadCallback(salary2021);
-    function salary2021() {
+    google.charts.setOnLoadCallback(salary);
+    function salary() {
 
-      var data = new google.visualization.arrayToDataTable({{salary2021 | safe }});
+      var data = new google.visualization.arrayToDataTable({{salary | safe }});
       var view = new google.visualization.DataView(data);
       view.setColumns([0, 1,
                        { calc: "stringify",
                          sourceColumn: 1,
                          type: "string",
                          role: "annotation" },
-                       ]);
-
-      var options = {
-        title: "Медианный уровень зарплаты, 2021 г.",
-        width:'150%',
-        bar: {groupWidth: "95%"},
-        legend: { position: "none" },
-        chartArea:{left:'30%',top:80,width:'100%',height:'50%'}
-      };
-      var chart = new google.visualization.BarChart(document.getElementById("2021"));
-      chart.draw(view, options);
-  }
-
-  google.charts.setOnLoadCallback(salary2020);
-    function salary2020() {
-
-      var data = new google.visualization.arrayToDataTable({{salary2020 | safe }});
-      var view = new google.visualization.DataView(data);
-      view.setColumns([0, 1,
-                       { calc: "stringify",
-                         sourceColumn: 1,
+                         2,
+                         { calc: "stringify",
+                         sourceColumn: 2,
                          type: "string",
                          role: "annotation" },
-                       ]);
-
-      var options = {
-        title: "Медианный уровень зарплаты, 2020 г.",
-        bar: {groupWidth: "95%"},
-        legend: { position: "none" },
-        chartArea:{left:'30%',top:80,width:'100%',height:'50%'}
-      };
-      var chart = new google.visualization.BarChart(document.getElementById("2020"));
-      chart.draw(view, options);
-  }
-
-   google.charts.setOnLoadCallback(salary2019);
-    function salary2019() {
-
-      var data = new google.visualization.arrayToDataTable({{salary2019 | safe }});
-      var view = new google.visualization.DataView(data);
-      view.setColumns([0, 1,
-                       { calc: "stringify",
-                         sourceColumn: 1,
+                         3,
+                         { calc: "stringify",
+                         sourceColumn: 3,
                          type: "string",
                          role: "annotation" },
+
                        ]);
 
       var options = {
-        title: "Медианный уровень зарплаты, 2019 г.",
-<!--        width: 400,-->
-        bar: {groupWidth: "95%"},
-        legend: { position: "none" },
-        chartArea:{left:'30%',top:80,width:'100%',height:'50%'}
+        title: "Медианный уровень зарплаты",
+        subtitle: "в зависимости от опыта",
+        height: 600,
+        bar: {groupWidth: "90%"},
+        legend: { position: "top", maxLines: 3, alignment: 'start'},
+        chartArea:{left:'30%'}
       };
-      var chart = new google.visualization.BarChart(document.getElementById("2019"));
+      var chart = new google.visualization.BarChart(document.getElementById("chart"));
       chart.draw(view, options);
   }
-  </script>
+ </script>
 
 {% endblock %}
   {% block title %}Home Page{% endblock %}
   {% block content %}
-    <div id="2021" style="width: 100%;"></div>
-    <div id="2020" style="width: 100%;"></div>
-    <div id="2019" style="width: 100%;"></div>
-
+    <div id="disclaimer">Данные по категории "noExperience" могут быть завышены.
+        Часто встречаются вакансии, в которых описание противоречит категории, к которой отнесена
+        вакансия. Причина, вероятно, в том, что категория "noExperience" используется при вводе
+        данных по умолчанию.</div>
+    <hr>
+    <div id="chart"></div>
   {% endblock %}
 </html>

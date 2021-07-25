@@ -6,6 +6,10 @@ import json
 import unicodedata
 
 
+def years_tuple():
+    return 2019, 2020, 2021
+
+
 def vac_id_list():
     """Get list of id from "vacancies" table"""
     con = sqlite3.connect("testdb.db")  # Open database

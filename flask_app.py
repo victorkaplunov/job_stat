@@ -4,6 +4,7 @@ from flask_bootstrap import Bootstrap
 import os
 import sqlite3
 import json
+import utils
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -164,6 +165,25 @@ def get_time_series_data(cursor):
     return output_list
 
 
+def get_salary_data_with_year(cursor, chart_name):
+    experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
+    data = [['Range']]
+    for year in utils.years_tuple():
+        data[0].append(str(year))
+        request = f'SELECT data, popularity ' \
+                  f'FROM charts ' \
+                  f'WHERE chart_name="{chart_name}" AND year={str(year)};'
+        cursor.execute(request)
+        statistics_data = cursor.fetchall()
+        for i in statistics_data:
+            experience_ranges[i[0]].append(i[1])
+    for i in experience_ranges:
+        rang_data = experience_ranges[i]
+        rang_data.insert(0, i)
+        data.append(rang_data)
+    return data
+
+
 def get_data_with_year(cursor, year, chart_name, sort=True):
     request = f'SELECT data, popularity ' \
               f'FROM charts ' \
@@ -283,12 +303,9 @@ def time_series():
 @app.route('/salary')
 def salary():
     """Time series page"""
-    # print(get_data_with_year(cur(), 2019, 'salary'))
     return render_template(
         '/salary.html',
-        salary2021=get_data_with_year(cur(), 2021, 'salary', sort=False),
-        salary2020=get_data_with_year(cur(), 2020, 'salary', sort=False),
-        salary2019=get_data_with_year(cur(), 2019, 'salary', sort=False)
+        salary=get_salary_data_with_year(cur(), 'salary'),
     )
 
 
