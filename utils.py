@@ -1,7 +1,6 @@
 import sqlite3
 import re
 import statistics
-
 import requests
 import json
 import unicodedata
@@ -278,6 +277,7 @@ def salary_to_db(year, experience, exchange_rate, cur):
 
     average_salary = salary_sum/len(all_salary)
     print("average_salary: ", average_salary)
-    median_salary = statistics.median(all_salary)
+    # Rounding salary to roubles
+    median_salary = int(statistics.median(all_salary))
     print("median: ", median_salary)
     return median_salary
