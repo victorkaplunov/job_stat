@@ -10,20 +10,51 @@
       // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
       // draws it.
-       google.charts.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
-        data.addRows({{ bdd_frameworks | safe }});
-        var options = {
-        'title':'Количество упоминаний фреймворков BDD.',
-        chartArea:{width:'100%',height:'75%'},
-        };
-        var chart = new google.visualization.PieChart(document.getElementById('chart'));
-        chart.draw(data, options);
-      }
+<!--       google.charts.setOnLoadCallback(drawChart);-->
+<!--      function drawChart() {-->
+<!--        var data = new google.visualization.DataTable();-->
+<!--        data.addColumn('string', 'Topping');-->
+<!--        data.addColumn('number', 'Slices');-->
+<!--        data.addRows({{ bdd_frameworks | safe }});-->
+<!--        var options = {-->
+<!--        'title':'Количество упоминаний фреймворков BDD.',-->
+<!--        chartArea:{width:'100%',height:'75%'},-->
+<!--        };-->
+<!--        var chart = new google.visualization.PieChart(document.getElementById('chart'));-->
+<!--        chart.draw(data, options);-->
+<!--      }-->
+    google.charts.setOnLoadCallback(Chart2021);
+         function Chart2021() {
+            var data = google.visualization.arrayToDataTable({{ bdd_frameworks2021 | safe }});
+            var options = {'title':'Количество упоминаний фреймворков  в 2021 году.',
+                chartArea:{width:'90%',height:'75%'},
+                pieSliceTextStyle: {fontSize: 11}
+                };
+            var chart = new google.visualization.PieChart(document.getElementById('bdd_frameworks2021'));
+            chart.draw(data, options);
+           }
 
+    google.charts.setOnLoadCallback(Chart2020);
+     function Chart2020() {
+        var data = google.visualization.arrayToDataTable({{ bdd_frameworks2020 | safe }});
+        var options = {'title':'Количество упоминаний фреймворков  в 2020 году.',
+            chartArea:{width:'90%',height:'75%'},
+            pieSliceTextStyle: {fontSize: 11}
+            };
+        var chart = new google.visualization.PieChart(document.getElementById('bdd_frameworks2020'));
+        chart.draw(data, options);
+       }
+
+     google.charts.setOnLoadCallback(Chart2019);
+     function Chart2019() {
+        var data = google.visualization.arrayToDataTable({{ bdd_frameworks2019 | safe }});
+        var options = {'title':'Количество упоминаний фреймворков  в 2019 году.',
+            chartArea:{width:'90%',height:'75%'},
+            pieSliceTextStyle: {fontSize: 11}
+            };
+        var chart = new google.visualization.PieChart(document.getElementById('bdd_frameworks2019'));
+        chart.draw(data, options);
+        }
     </script>
 {% endblock %}
 
@@ -32,7 +63,9 @@
   {% block title %}Home Page{% endblock %}
   {% block content %}
 
-            <div id="chart" style="height: 500px;"></div>
+            <div id="bdd_frameworks2021" style="height: 500px;"></div>
+            <div id="bdd_frameworks2020" style="height: 500px;"></div>
+            <div id="bdd_frameworks2019" style="height: 500px;"></div>
 
   {% endblock %}
 </html>

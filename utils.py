@@ -105,30 +105,23 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur):
     return
 
 
-def stat_with_year(chart_name: str, param_list: list, years: tuple, all_vacancies, cur):
+def stat_with_year(chart_name: str, param_list: list, years: tuple, cur):
     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
-    # con = sqlite3.connect("testdb.db")  # Open database
-    # cur = con.cursor()
     types = {i: 0 for i in param_list}  # Convert list to dictionary
     for y in years:
         types = types.fromkeys(types, 0)  # Reset all values to zero
-        # Count vacancies with given type in current year.
-        for n in all_vacancies:
-            for t in types:
-                body = json.loads((n[1]))
-                if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
-                        (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300") and \
-                        (t in body['description']):
-                    types[t] += 1
-                else:
-                    continue
-        # Write ready data to DB.
-        print(types)
-        for n in types:
+        for t in types:
+            # Count vacancies with given type in current year.
+            sql = f"""SELECT COUNT(*),v.json
+                    FROM vacancies v
+                    INNER JOIN calendar c
+                    ON v.id = c.id
+                    WHERE c.data LIKE "{y}%" AND json LIKE '%{t}%';"""
+            cur.execute(sql)
+            type_count = cur.fetchall()
             sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
-                  f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
+                  f'VALUES("{chart_name}", "{t}", {type_count[0][0]}, {str(y)});'
             cur.executescript(sql)
-    # con.close()
     return
 
 

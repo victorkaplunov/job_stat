@@ -350,7 +350,9 @@ def bdd_frameworks():
     bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur())
     return render_template(
         '/bdd_frameworks.html',
-        bdd_frameworks=sorted(bdd_frameworks_list, key=itemgetter(1), reverse=True)
+        bdd_frameworks2019=get_data_with_year(cur(), 2019, 'bdd_frameworks'),
+        bdd_frameworks2020=get_data_with_year(cur(), 2020, 'bdd_frameworks'),
+        bdd_frameworks2021=get_data_with_year(cur(), 2021, 'bdd_frameworks'),
     )
 
 

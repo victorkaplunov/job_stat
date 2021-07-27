@@ -2,8 +2,6 @@
 import requests
 import json
 import sqlite3
-import unicodedata
-import re
 import utils
 
 
@@ -71,7 +69,7 @@ utils.stat_with_year('languages',
                       'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
                       'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
                       'AutoIT'
-                      ], years_tuple, all_vacancies, cur)
+                      ], years_tuple, cur)
 
 utils.chart_with_category_filter('frameworks',
                                  [['pytest', 'Python'], ['py.test', 'Python'], ['Unittest', 'Python'],
@@ -92,11 +90,13 @@ utils.wright_statistic_to_db('load_testing_tools',
 utils.wright_statistic_to_db('monitoring_tools',
                              ['Zabbix', 'nmon', 'Oracle EM', 'Grafana', 'ELK', 'Influxdb', 'Nagios', 'Cacti'], cur)
 
-utils.wright_statistic_to_db('bdd_frameworks',
-                             ['Cucumber', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave', 'Robot_Framework',
-                              'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Concordion',
-                              'JDave', "EasyB", 'Lettuce', 'SubSpec', 'Cucumber-JVM', 'pytest-bdd',
-                              'radish', "Spinach", 'Yadda', 'Vows', 'NSpec', 'Serenity BDD', 'xBehave.net'], cur)
+
+utils.stat_with_year('bdd_frameworks',
+                     ['Cucumber', 'Robot_Framework', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
+                      'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Cucumber-JVM',
+                      'pytest-bdd', 'NSpec', 'Serenity BDD'],
+                     years_tuple, cur)
+
 
 utils.wright_statistic_to_db('web_ui_tools',
                              ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress', 'Splinter',
