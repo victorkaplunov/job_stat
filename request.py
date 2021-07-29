@@ -4,13 +4,17 @@ import json
 import sqlite3
 import utils
 
-
-years_tuple = (2019, 2020, 2021)
+update = True
+years_tuple = (
+    # 2019,
+    # 2020,
+    2021,
+)
 exchange_rates = {'RUR': 1, 'EUR': 91, 'USD': 73, 'UAH': 2.58}
 experience_grades = ('noExperience', 'between1And3', 'between3And6', 'moreThan6')
 
-con = sqlite3.connect("testdb.db")  # Open database
-cur = con.cursor()  # Create cursor
+conn = sqlite3.connect("testdb.db")  # Open database
+cur = conn.cursor()  # Create cursor
 
 base_url = 'https://api.hh.ru/vacancies/'
 search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR ТЕСТ* ' \
@@ -20,12 +24,13 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
                 'search_field=name&' \
                 'page=0'
 
+
 req = requests.get((base_url + search_string).encode('utf-8'))
 
-# http_proxy = "http://127.0.0.1:8888"
-# https_proxy = "http://127.0.0.1:8888"
-# proxies = {"http": http_proxy, "https": https_proxy}
-
+# # http_proxy = "http://127.0.0.1:8888"
+# # https_proxy = "http://127.0.0.1:8888"
+# # proxies = {"http": http_proxy, "https": https_proxy}
+#
 # Get quantity of pages in responce
 pages = req.json()["pages"]
 
@@ -42,34 +47,94 @@ for x in range(0, pages):  # Run request to HH.ru API
     print("Items on page: ", len(set(s)))
 
 
-sql = "SELECT id, json FROM vacancies;"
-cur.execute(sql)
+if update is False:
+    # Drop table with statistics and recreate it
+    cur.execute("DROP TABLE IF EXISTS charts;")
+    sql = """
+    CREATE TABLE IF NOT EXISTS charts
+    (
+        id INTEGER PRIMARY KEY,
+        chart_name NOT NULL,
+        data NOT NULL,
+        popularity  INTEGER,
+        parent,
+        year INTEGER
+    );
+    """
+    cur.execute(sql)
+#
+# #  Wright statistics data to database
+for year in years_tuple:
+    sql = """DROP TABLE IF EXISTS temp_table;"""
+    cur.execute(sql)
+    sql = f"""CREATE TABLE temp_table AS SELECT DISTINCT v.id, v.json 
+                FROM vacancies v
+                JOIN calendar c
+                ON v.id = c.id
+                WHERE c.data LIKE "{year}%";"""
+    cur.execute(sql)
+    sql = f"""SELECT json FROM temp_table;"""
+    cur.execute(sql)
+    all_vacancies = cur.fetchall()
 
-all_vacancies = (cur.fetchall())
+    utils.stat_with_one_year('languages',
+                             ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
+                              'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
+                              'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
+                              'AutoIT'
+                              ], year, cur, update)
 
-# Drop table with statistics and recreate it
-cur.execute("DROP TABLE IF EXISTS charts;")
-sql = """
-CREATE TABLE IF NOT EXISTS charts
-(
-    id INTEGER PRIMARY KEY,
-    chart_name NOT NULL,
-    data NOT NULL,
-    popularity  INTEGER,
-    parent,
-    year INTEGER
-);
-"""
-cur.execute(sql)
+    utils.stat_with_one_year('bdd_frameworks',
+                             ['Cucumber', 'Robot_Framework', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
+                              'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Cucumber-JVM',
+                              'pytest-bdd', 'NSpec', 'Serenity BDD'
+                              ], year, cur, update)
 
-#  Wright statistics data to database
+    utils.stat_with_one_year('load_testing_tools',
+                             ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
+                              'Grinder', 'Performance Center', 'IBM Rational Performance'],
+                             year, cur, update)
 
-utils.stat_with_year('languages',
-                     ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-                      'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
-                      'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
-                      'AutoIT'
-                      ], years_tuple, cur)
+    utils.stat_with_one_year('web_ui_tools',
+                             ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene',
+                              'Cypress', 'Splinter', 'Puppeteer', 'WebDriverIO', 'Galen',
+                              'Playwright', 'Protractor', 'TestCafe'],
+                             year, cur, update)
+
+    utils.stat_with_one_year('mobile_testing_frameworks',
+                             ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
+                              'Calabash', 'UI Automation', 'UIAutomator', 'XCTest'],
+                             year, cur, update)
+
+    utils.stat_with_one_year('bugtracking_n_tms',
+                             ['Youtrack', 'TestRail', 'TestLink', 'TestLodge',
+                              'Jira', 'Confluence', 'Redmine', 'TFS', 'Zephyr',
+                              'Hiptest', 'Xray', 'PractiTest', 'Testpad',
+                              'Deviniti', 'Qase', 'IBM Rational Quality Manager',
+                              'HP Quality Center', 'HP ALM', 'TestIt',
+                              'Gemini', 'BugZilla', 'Fitnesse'], year, cur, update)
+
+    utils.stat_with_one_year('cvs', ['git', 'SVN', 'Subversion', 'Mercurial'],
+                             year, cur, update)
+
+    utils.stat_with_one_year('ci_cd', ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
+                                       'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity'],
+                             year, cur, update)
+
+    schedule_types = ['fullDay', 'flexible', 'shift', 'remote']
+    utils.stat_with_one_year('schedule_type', schedule_types, year, cur, update)
+
+    schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0)
+    utils.types_stat_with_year(schedule_types, 'schedule_type', 'schedule', all_vacancies,
+                               cur, year, update)
+
+    experience_types = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
+    utils.types_stat_with_year(experience_types, 'experience', 'experience', all_vacancies,
+                               cur, year, update)
+
+    employment_types = dict(full=0, part=0, project=0, probation=0)
+    utils.types_stat_with_year(employment_types, 'employment_type', 'employment', all_vacancies,
+                               cur, year, update)
 
 utils.chart_with_category_filter('frameworks',
                                  [['pytest', 'Python'], ['py.test', 'Python'], ['Unittest', 'Python'],
@@ -83,57 +148,14 @@ utils.chart_with_category_filter('frameworks',
                                   ['CodeceptJS', 'JavaScript'],
                                   ['Robot_Framework', 'multiple_language']], cur)
 
-utils.wright_statistic_to_db('load_testing_tools',
-                             ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
-                              'Grinder', 'Performance Center', 'IBM Rational Performance'], cur)
 
+sql = "SELECT id, json FROM vacancies;"
+cur.execute(sql)
 
-utils.stat_with_year('bdd_frameworks',
-                     ['Cucumber', 'Robot_Framework', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
-                      'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Cucumber-JVM',
-                      'pytest-bdd', 'NSpec', 'Serenity BDD'],
-                     years_tuple, cur)
-
-
-utils.wright_statistic_to_db('web_ui_tools',
-                             ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene', 'Cypress', 'Splinter',
-                              'Puppeteer', 'WebDriverIO', 'Galen', 'Playwright', 'Protractor', 'TestCafe'], cur)
-
-utils.wright_statistic_to_db('mobile_testing_frameworks',
-                             ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
-                              'Calabash', 'UI Automation', 'UIAutomator', 'XCTest'], cur)
-
-utils.wright_statistic_to_db('bugtracking_n_tms',
-                             ['Youtrack', 'TestRail', 'TestLink', 'TestLodge', 'Jira',
-                              'Confluence', 'Redmine', 'TFS', 'Zephyr',
-                              'Hiptest', 'TestMonitor', 'Xray', 'PractiTest', 'Testpad',
-                              'Deviniti', 'Qase', 'Klaros-Testmanagement',
-                              'IBM Rational Quality Manager', 'HP Quality Center', 'HP ALM',
-                              'TestIt', 'XQual', 'Borland Silk Central', 'Testuff',
-                              'Gemini', 'BugZilla', 'Fitnesse', 'RTH-Turbo',
-                              'Stryka', 'Test Case Lab'], cur)
-
-utils.wright_statistic_to_db('cvs',
-                             ['git', 'SVN', 'Subversion', 'Mercurial'], cur)
-
-
-utils.wright_statistic_to_db('ci_cd',
-                             ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins', 'Cirlce CI',
-                              'Travis CI', 'Bamboo', 'TeamCity', 'Apache Gump'], cur)
-
-
-schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0)
-utils.types_stat_with_year(schedule_types, 'schedule_type', 'schedule', years_tuple, all_vacancies, cur)
-
-experience_types = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
-utils.types_stat_with_year(experience_types, 'experience', 'experience', years_tuple, all_vacancies, cur)
-
-employment_types = dict(full=0, part=0, project=0, probation=0)
-utils.types_stat_with_year(employment_types, 'employment_type', 'employment', years_tuple, all_vacancies, cur)
+all_vacancies = (cur.fetchall())
 
 with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
 utils.vacancy_with_salary(with_salary, 'with_salary', years_tuple, all_vacancies, cur)
-
 
 # Populate skills set
 key_skills = set()
@@ -168,7 +190,9 @@ for n in key_skills_dict:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
-    sql = f'UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = "{n}" AND chart_name = "key_skills";'
+    sql = f"""
+    UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = '{n}'
+    AND chart_name = 'key_skills';"""
     cur.executescript(sql)
 
 # Wright salary data to DB
@@ -181,6 +205,6 @@ for year in years_tuple:
               f'VALUES("salary", "{experience}", "{median}", {str(year)});'
         cur.executescript(sql)
 
-con.commit()
+conn.commit()
 # Close database connection
-con.close()
+conn.close()
