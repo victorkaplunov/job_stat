@@ -125,6 +125,30 @@ def stat_with_year(chart_name: str, param_list: list, years: tuple, cur):
     return
 
 
+def stat_with_one_year(chart_name: str, param_list: list, year: int, cur, update=True):
+    """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
+    types = {i: 0 for i in param_list}  # Convert list to dictionary
+    types = types.fromkeys(types, 0)  # Reset all values to zero
+    for t in types:
+        print(t)
+        sql = f"""SELECT COUNT(*), json
+                FROM temp_table
+                WHERE json LIKE '%{t}%';"""
+        cur.execute(sql)
+        type_count = cur.fetchall()[0][0]
+        if update is True:
+            sql = f"""
+            UPDATE charts
+            SET popularity = {type_count}
+            WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{t}'
+            AND charts.'year' = '{year}';"""
+        else:
+            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
+                  VALUES('{chart_name}', '{t}', {type_count}, {str(year)});"""
+        cur.executescript(sql)
+    return
+
+
 def wright_statistic_to_db(chart_name: str, param_list: list, cur):
     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
     for i in param_list:
@@ -143,26 +167,55 @@ def wright_statistic_to_db(chart_name: str, param_list: list, cur):
     return
 
 
-def types_stat_with_year(types: dict, chart_name: str, key_name: str, years: tuple, all_vacancies, cur):
-
+def types_stat_with_year(types: dict, chart_name: str, key_name: str, all_vacancies, cur, year, update):
+    # sql = f"""SELECT json FROM temp_table;"""
+    # cur.executescript(sql)
+    # all_vacancies = cur.fetchall()
     # Count types of schedule in all vacancies.
-    for y in years:
-        types = types.fromkeys(types, 0)  # set all values to zero
-        # Count vacancies with given type in current year.
-        for n in all_vacancies:
-            body = json.loads((n[1]))
-            if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
-                    (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300"):
-                types[(body[key_name]['id'])] += 1
-            else:
-                continue
-        # Write ready data to DB.
-        print(types)
-        for n in types:
-            sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
-                  f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
-            cur.executescript(sql)
+
+    # Count vacancies with given type in current year.
+    for i in all_vacancies:
+        # print(i[0])
+        body = json.loads(i[0])
+        # print((body[key_name]['id']))
+        types[(body[key_name]['id'])] += 1
+    # Write ready data to DB.
+    print(types)
+    for i in types:
+        if update is True:
+            sql = f"""UPDATE charts
+                      SET popularity = {types[i]}
+                      WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{i}'
+                      AND charts.'year' = '{year}';"""
+        else:
+            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
+                        VALUES('{chart_name}', '{i}', {types[i]}, {str(year)});"""
+        cur.execute(sql)
     return
+
+
+# def types_stat_with_year(types: dict, chart_name: str, year: int, cur, update=True):
+#     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
+#
+#     for t in types:
+#         print(t)
+#         sql = f"""SELECT COUNT(*), json
+#                 FROM temp_table
+#                 WHERE json LIKE '%{t}%';"""
+#         cur.execute(sql)
+#         type_count = cur.fetchall()[0][0]
+#         if update is True:
+#             sql = f"""
+#             UPDATE charts
+#             SET popularity = {type_count}
+#             WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{t}'
+#             AND charts.'year' = '{year}';"""
+#         else:
+#             sql = f"""INSERT INTO charts(chart_name, data, popularity, year) ' \
+#                   f'VALUES('{chart_name}', '{t}', {type_count}, {str(year)});"""
+#
+#         cur.executescript(sql)
+#     return
 
 
 def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancies, cur):

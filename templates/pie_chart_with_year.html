@@ -7,7 +7,7 @@
       // Load the Visualization API and the corechart package.
       google.charts.load('current', {'packages':['corechart']});
 
-          google.charts.setOnLoadCallback(Chart2021);
+    google.charts.setOnLoadCallback(Chart2021);
          function Chart2021() {
             var data = google.visualization.arrayToDataTable({{ chart2021 | safe }});
             var options = {'title':'Количество упоминаний {{ name }} в 2021 году.',

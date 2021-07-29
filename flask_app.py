@@ -324,79 +324,113 @@ def key_skills():
 
 @app.route('/programming_languages')
 def programming_languages():
-    """Schedule type popularity page"""
-    # print(get_data_with_year(cur(), 2019, 'languages'))
+    """Load testing tools page"""
+    chart = 'languages'
     return render_template(
-        '/programming_languages.html',
-        languages2019=get_data_with_year(cur(), 2019, 'languages'),
-        languages2020=get_data_with_year(cur(), 2020, 'languages'),
-        languages2021=get_data_with_year(cur(), 2021, 'languages'),
+        '/pie_chart_with_year.html',
+        name='языков программирования',
+        chart2019=get_data_with_year(cur(), 2019, chart),
+        chart2020=get_data_with_year(cur(), 2020, chart),
+        chart2021=get_data_with_year(cur(), 2021, chart),
     )
 
 
-@app.route('/load_testing_tool')
+@app.route('/load_testing_tools')
 def load_testing_tool():
-    """Schedule type popularity page"""
-    lt_frameworks_list = get_statistics_data('load_testing_tools', cur())
+    """Load testing tools page"""
+    chart = 'load_testing_tools'
     return render_template(
-        '/load_testing_tool.html',
-        lt_frameworks=sorted(lt_frameworks_list, key=itemgetter(1), reverse=True)
+        '/pie_chart_with_year.html',
+        name='инструментов тестирования производительности',
+        chart2019=get_data_with_year(cur(), 2019, chart),
+        chart2020=get_data_with_year(cur(), 2020, chart),
+        chart2021=get_data_with_year(cur(), 2021, chart),
     )
 
 
 @app.route('/bdd_frameworks')
 def bdd_frameworks():
-    """Schedule type popularity page"""
-    bdd_frameworks_list = get_statistics_data('bdd_frameworks', cur())
+    """BDD framework page"""
+    chart = 'bdd_frameworks'
     return render_template(
-        '/bdd_frameworks.html',
-        bdd_frameworks2019=get_data_with_year(cur(), 2019, 'bdd_frameworks'),
-        bdd_frameworks2020=get_data_with_year(cur(), 2020, 'bdd_frameworks'),
-        bdd_frameworks2021=get_data_with_year(cur(), 2021, 'bdd_frameworks'),
+        '/pie_chart_with_year.html',
+        name='фреймворков BDD',
+        chart2019=get_data_with_year(cur(), 2019, chart),
+        chart2020=get_data_with_year(cur(), 2020, chart),
+        chart2021=get_data_with_year(cur(), 2021, chart),
     )
 
 
 @app.route('/web_ui_tools')
 def web_ui_tools():
-    """Schedule type popularity page"""
-    web_ui_tools_list = get_statistics_data('web_ui_tools', cur())
+    """Web UI testing tools page"""
+    chart = 'web_ui_tools'
     return render_template(
-        '/web_ui_tools.html',
-        web_ui_tools=sorted(web_ui_tools_list, key=itemgetter(1), reverse=True)
+        '/pie_chart_with_year.html',
+        name='средства тестирования Web UI',
+        chart2019=get_data_with_year(cur(), 2019, chart),
+        chart2020=get_data_with_year(cur(), 2020, chart),
+        chart2021=get_data_with_year(cur(), 2021, chart),
     )
 
 
 @app.route('/mobile_testing_frameworks')
 def mobile_testing_frameworks():
-    """Schedule type popularity page"""
-    mobile_testing_frameworks_list = get_statistics_data('mobile_testing_frameworks', cur())
-    return render_template('/mobile_testing_frameworks.html',
-                           mobile_testing_frameworks=sorted(mobile_testing_frameworks_list,
-                                                            key=itemgetter(1), reverse=True))
+    """Mobile app testing tools page"""
+    chart = 'mobile_testing_frameworks'
+    return render_template(
+        '/pie_chart_with_year.html',
+        name='инструментов тестирования мобильных приложений',
+        chart2019=get_data_with_year(cur(), 2019, chart),
+        chart2020=get_data_with_year(cur(), 2020, chart),
+        chart2021=get_data_with_year(cur(), 2021, chart),
+    )
 
 
 @app.route('/bugtracking_n_tms')
 def bugtracking_n_tms():
-    """Schedule type popularity page"""
-    bugtracking_n_tms_list = get_statistics_data('bugtracking_n_tms', cur())
+    """Mobile app testing tools page"""
+    chart = 'bugtracking_n_tms'
     return render_template(
-        '/bugtracking_n_tms.html',
-        bugtracking_n_tms=sorted(bugtracking_n_tms_list,
-                                 key=itemgetter(1), reverse=True))
+        '/pie_chart_with_year.html',
+        name='cистем управления тестированием, bugtracking system и т.п.',
+        chart2019=get_data_with_year(cur(), 2019, chart),
+        chart2020=get_data_with_year(cur(), 2020, chart),
+        chart2021=get_data_with_year(cur(), 2021, chart),
+    )
 
 
 @app.route('/cvs')
 def cvs():
-    """CVS popularity page"""
-    cvs_list = get_statistics_data('cvs', cur())
-    return render_template('/cvs.html', cvs=sorted(cvs_list, key=itemgetter(1), reverse=True))
+    """Mobile app testing tools page"""
+    chart = 'cvs'
+    return render_template(
+        '/pie_chart_with_year.html',
+        name='систем управления версиями',
+        chart2019=get_data_with_year(cur(), 2019, chart),
+        chart2020=get_data_with_year(cur(), 2020, chart),
+        chart2021=get_data_with_year(cur(), 2021, chart),
+    )
 
 
 @app.route('/ci_cd')
 def ci_cd():
-    """CI/CD system popularity page"""
-    ci_cd = get_statistics_data('ci_cd', cur())
-    return render_template('/ci_cd.html', ci_cd=sorted(ci_cd, key=itemgetter(1), reverse=True))
+    """Mobile app testing tools page"""
+    chart = 'ci_cd'
+    return render_template(
+        '/pie_chart_with_year.html',
+        name='средств CI/CD',
+        chart2019=get_data_with_year(cur(), 2019, chart),
+        chart2020=get_data_with_year(cur(), 2020, chart),
+        chart2021=get_data_with_year(cur(), 2021, chart),
+    )
+
+
+# @app.route('/ci_cd')
+# def ci_cd():
+#     """CI/CD system popularity page"""
+#     ci_cd = get_statistics_data('ci_cd', cur())
+#     return render_template('/ci_cd.html', ci_cd=sorted(ci_cd, key=itemgetter(1), reverse=True))
 
 
 @app.route('/')
