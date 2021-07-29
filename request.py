@@ -87,9 +87,6 @@ utils.wright_statistic_to_db('load_testing_tools',
                              ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
                               'Grinder', 'Performance Center', 'IBM Rational Performance'], cur)
 
-utils.wright_statistic_to_db('monitoring_tools',
-                             ['Zabbix', 'nmon', 'Oracle EM', 'Grafana', 'ELK', 'Influxdb', 'Nagios', 'Cacti'], cur)
-
 
 utils.stat_with_year('bdd_frameworks',
                      ['Cucumber', 'Robot_Framework', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
