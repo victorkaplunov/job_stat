@@ -69,17 +69,24 @@ def id_list(response, base_url):
     return items
 
 
-def chart_with_category_filter(chart_name: str, param_list: list, cur):
+def chart_with_category_filter(chart_name: str, param_list: list, cur, update):
     """ Function count a number of entries of some string from param_list in all vacancies. """
-    # con = sqlite3.connect("testdb.db")  # Open database
-    # cur = con.cursor()
     for i in param_list:
         print(i[0], i[1])
         sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i[0]
         cur.execute(sql)
         vac = cur.fetchall()
-        sql = 'INSERT INTO charts(chart_name, data, popularity, parent) VALUES("%s", "%s", %i, "%s");' \
-                                                                    % (chart_name, i[0], len(vac), i[1])
+        if update is True:
+            sql = f"""
+            UPDATE charts
+            SET popularity = {len(vac)}
+            WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{i[0]}'
+            AND charts.'parent' = '{i[1]}';"""
+        else:
+            sql = f"""INSERT INTO charts(chart_name, data, popularity, parent)
+                  VALUES('{chart_name}', '{i[0]}', {len(vac)}, '{i[1]}');"""
+            # sql = 'INSERT INTO charts(chart_name, data, popularity, parent) VALUES("%s", "%s", %i, "%s");' \
+            #                                                         % (chart_name, i[0], len(vac), i[1])
         print(sql)
         try:
             cur.executescript(sql)
@@ -89,7 +96,13 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur):
     # Sum data for Py.test and Pytest and delete Py.test row
     sql = """SELECT popularity FROM charts WHERE data = 'py.test';"""
     cur.execute(sql)
-    py_test_popularity = cur.fetchall()[0][0]
+    py_test_popularity = cur.fetchall()
+    if py_test_popularity == []:
+        py_test_popularity = 0
+    else:
+        print(py_test_popularity)
+        py_test_popularity = py_test_popularity[0][0]
+
     print('py_test_popularity: ', py_test_popularity)
     sql = """SELECT popularity FROM charts WHERE data = 'pytest';"""
     cur.execute(sql)
@@ -218,15 +231,15 @@ def types_stat_with_year(types: dict, chart_name: str, key_name: str, all_vacanc
 #     return
 
 
-def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancies, cur):
+def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancies, cur, update):
     # Count types of schedule in all vacancies.
-    for y in years:
+    for year in years:
         types = types.fromkeys(types, 0)  # set all values to zero
         # Count vacancies with given type in current year.
         for n in all_vacancies:
             body = json.loads((n[1]))
-            if (f"{str(y-1)}-12-31T23:59:59+0300" < body['created_at']) and \
-                    (body['created_at'] < f"{str(y+1)}-01-01T00:00:00+0300"):
+            if (f"{str(year-1)}-12-31T23:59:59+0300" < body['created_at']) and \
+                    (body['created_at'] < f"{str(year+1)}-01-01T00:00:00+0300"):
                 if body['salary'] is None:
                     types['without_salary'] += 1
                 else:
@@ -242,8 +255,16 @@ def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancie
         # Write ready data to DB.
         print(types)
         for n in types:
-            sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
-                  f'VALUES("{chart_name}", "{n}", {types[n]}, {str(y)});'
+            if update is True:
+                sql = f"""UPDATE charts
+                          SET popularity = {types[n]}
+                          WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{n}'
+                          AND charts.'year' = '{year}';"""
+            else:
+                sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
+                            VALUES('{chart_name}', '{n}', {types[n]}, {str(year)});"""
+            # sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
+            #       f'VALUES("{chart_name}", "{n}", {types[n]}, {str(year)});'
             cur.executescript(sql)
     return
 
