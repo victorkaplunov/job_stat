@@ -42,9 +42,9 @@ def resp(n):
                         )
 
 
-for x in range(0, pages):  # Run request to HH.ru API
-    s = utils.id_list(resp(x), base_url)
-    print("Items on page: ", len(set(s)))
+# for x in range(0, pages):  # Run request to HH.ru API
+#     s = utils.id_list(resp(x), base_url)
+#     print("Items on page: ", len(set(s)))
 
 
 if update is False:

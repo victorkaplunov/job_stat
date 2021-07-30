@@ -436,12 +436,7 @@ def ci_cd():
 @app.route('/')
 def home_page():
     """Home page"""
-    con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
-    sql = 'SELECT COUNT(*) FROM vacancies;'
-    cur.execute(sql)
-    vacancies_qty = (cur.fetchone()[0])
-    return render_template('/index.html', vacancies_qty=vacancies_qty)
+    return render_template('/index.html')
 
 
 @app.route('/word_cloud')
