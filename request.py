@@ -4,10 +4,10 @@ import json
 import sqlite3
 import utils
 
-update = False
+update = True
 years_tuple = (
-    2019,
-    2020,
+    # 2019,
+    # 2020,
     2021,
 )
 exchange_rates = {'RUR': 1, 'EUR': 91, 'USD': 73, 'UAH': 2.58}
@@ -42,9 +42,9 @@ def resp(n):
                         )
 
 
-# for x in range(0, pages):  # Run request to HH.ru API
-#     s = utils.id_list(resp(x), base_url)
-#     print("Items on page: ", len(set(s)))
+for x in range(0, pages):  # Run request to HH.ru API
+    s = utils.id_list(resp(x), base_url)
+    print("Items on page: ", len(set(s)))
 
 
 if update is False:
