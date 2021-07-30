@@ -30,7 +30,7 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 # # http_proxy = "http://127.0.0.1:8888"
 # # https_proxy = "http://127.0.0.1:8888"
 # # proxies = {"http": http_proxy, "https": https_proxy}
-#
+
 # Get quantity of pages in responce
 pages = req.json()["pages"]
 
@@ -121,9 +121,6 @@ for year in years_tuple:
                                        'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity'],
                              year, cur, update)
 
-    schedule_types = ['fullDay', 'flexible', 'shift', 'remote']
-    utils.stat_with_one_year('schedule_type', schedule_types, year, cur, update)
-
     schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0)
     utils.types_stat_with_year(schedule_types, 'schedule_type', 'schedule', all_vacancies,
                                cur, year, update)
@@ -146,7 +143,7 @@ utils.chart_with_category_filter('frameworks',
                                   ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
                                   ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
                                   ['CodeceptJS', 'JavaScript'],
-                                  ['Robot_Framework', 'multiple_language']], cur)
+                                  ['Robot_Framework', 'multiple_language']], cur, update)
 
 
 sql = "SELECT id, json FROM vacancies;"
@@ -154,8 +151,9 @@ cur.execute(sql)
 
 all_vacancies = (cur.fetchall())
 
+# ToDo: перенести внутрь годового цикла
 with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
-utils.vacancy_with_salary(with_salary, 'with_salary', years_tuple, all_vacancies, cur)
+utils.vacancy_with_salary(with_salary, 'with_salary', years_tuple, all_vacancies, cur, update)
 
 # Populate skills set
 key_skills = set()
@@ -184,8 +182,16 @@ print(key_skills_dict)
 
 # Wright skills data to DB
 for n in key_skills_dict:
-    sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
-          f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
+    if update is True:
+        sql = f"""
+        UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = '{n}'
+        AND chart_name = 'key_skills';
+        """
+    else:
+        sql = f"""INSERT INTO charts(chart_name, data, popularity)
+              VALUES("key_skills", "{n}", {key_skills_dict[n]});"""
+    # sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
+    #       f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
@@ -196,13 +202,23 @@ for n in key_skills_dict:
     cur.executescript(sql)
 
 # Wright salary data to DB
+# ToDo перенести внутрь годового цикла
 for year in years_tuple:
     print("Год: ", year)
     for experience in experience_grades:
         print("Опыт: ", experience)
         median = utils.salary_to_db(year, experience, exchange_rates, cur)
-        sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
-              f'VALUES("salary", "{experience}", "{median}", {str(year)});'
+
+        if update is True:
+            sql = f"""
+            UPDATE charts SET popularity = {median} WHERE data = '{n}'
+            AND chart_name = 'salary';
+            """
+        else:
+            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
+                  VALUES("salary", "{experience}", "{median}", {str(year)});"""
+        # sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
+        #       f'VALUES("salary", "{experience}", "{median}", {str(year)});'
         cur.executescript(sql)
 
 conn.commit()
