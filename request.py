@@ -4,10 +4,10 @@ import json
 import sqlite3
 import utils
 
-update = True
+update = False
 years_tuple = (
-    # 2019,
-    # 2020,
+    2019,
+    2020,
     2021,
 )
 exchange_rates = {'RUR': 1, 'EUR': 91, 'USD': 73, 'UAH': 2.58}
@@ -62,12 +62,12 @@ if update is False:
     );
     """
     cur.execute(sql)
-#
-# #  Wright statistics data to database
+
+# Wright statistics data to database
 for year in years_tuple:
     sql = """DROP TABLE IF EXISTS temp_table;"""
     cur.execute(sql)
-    sql = f"""CREATE TABLE temp_table AS SELECT DISTINCT v.id, v.json 
+    sql = f"""CREATE TABLE temp_table AS SELECT DISTINCT v.id, v.json
                 FROM vacancies v
                 JOIN calendar c
                 ON v.id = c.id
@@ -133,6 +133,9 @@ for year in years_tuple:
     utils.types_stat_with_year(employment_types, 'employment_type', 'employment', all_vacancies,
                                cur, year, update)
 
+    with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
+    utils.vacancy_with_salary(with_salary, 'with_salary', year, all_vacancies, cur, update)
+
 utils.chart_with_category_filter('frameworks',
                                  [['pytest', 'Python'], ['py.test', 'Python'], ['Unittest', 'Python'],
                                   ['Nose', 'Python'],
@@ -146,14 +149,9 @@ utils.chart_with_category_filter('frameworks',
                                   ['Robot_Framework', 'multiple_language']], cur, update)
 
 
-sql = "SELECT id, json FROM vacancies;"
+sql = "SELECT id, json FROM temp_table;"
 cur.execute(sql)
-
 all_vacancies = (cur.fetchall())
-
-# ToDo: перенести внутрь годового цикла
-with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
-utils.vacancy_with_salary(with_salary, 'with_salary', years_tuple, all_vacancies, cur, update)
 
 # Populate skills set
 key_skills = set()
@@ -178,10 +176,16 @@ for i in all_vacancies:
         continue
     except KeyError:
         continue
-print(key_skills_dict)
 
-# Wright skills data to DB
+# Sort dict
+key_skills_dict = dict(sorted(key_skills_dict.items(),
+                              key=lambda item: item[1],
+                              reverse=True))
+
+# Wright first 50 skills data to DB
+counter = 51
 for n in key_skills_dict:
+    print(n, key_skills_dict[n])
     if update is True:
         sql = f"""
         UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = '{n}'
@@ -190,8 +194,6 @@ for n in key_skills_dict:
     else:
         sql = f"""INSERT INTO charts(chart_name, data, popularity)
               VALUES("key_skills", "{n}", {key_skills_dict[n]});"""
-    # sql = f'INSERT INTO charts(chart_name, data, popularity) ' \
-    #       f'VALUES("key_skills", "{n}", {key_skills_dict[n]});'
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
@@ -200,6 +202,9 @@ for n in key_skills_dict:
     UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = '{n}'
     AND chart_name = 'key_skills';"""
     cur.executescript(sql)
+    counter -= 1
+    if counter == 0:
+        break
 
 # Wright salary data to DB
 # ToDo перенести внутрь годового цикла
@@ -211,14 +216,12 @@ for year in years_tuple:
 
         if update is True:
             sql = f"""
-            UPDATE charts SET popularity = {median} WHERE data = '{n}'
+            UPDATE charts SET popularity = {median} WHERE data = '{experience}'
             AND chart_name = 'salary';
             """
         else:
             sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
                   VALUES("salary", "{experience}", "{median}", {str(year)});"""
-        # sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
-        #       f'VALUES("salary", "{experience}", "{median}", {str(year)});'
         cur.executescript(sql)
 
 conn.commit()

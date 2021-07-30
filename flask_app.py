@@ -185,13 +185,14 @@ def get_salary_data_with_year(cursor, chart_name):
 
 
 def get_data_with_year(cursor, year, chart_name, sort=True):
-    request = f'SELECT data, popularity ' \
-              f'FROM charts ' \
-              f'WHERE chart_name="{chart_name}" AND year={str(year)};'
+    request = f"""
+    SELECT data, popularity FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
+    """
     head = [['Type', 'Popularity']]
     cursor.execute(request)
     statistics_data = cursor.fetchall()
     data_list = []
+    print(request)
     for i in statistics_data:
         data_list.append(list(i))
     data_list.sort(reverse=sort

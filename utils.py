@@ -85,9 +85,6 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update):
         else:
             sql = f"""INSERT INTO charts(chart_name, data, popularity, parent)
                   VALUES('{chart_name}', '{i[0]}', {len(vac)}, '{i[1]}');"""
-            # sql = 'INSERT INTO charts(chart_name, data, popularity, parent) VALUES("%s", "%s", %i, "%s");' \
-            #                                                         % (chart_name, i[0], len(vac), i[1])
-        print(sql)
         try:
             cur.executescript(sql)
         except sqlite3.IntegrityError as error:
@@ -181,10 +178,6 @@ def wright_statistic_to_db(chart_name: str, param_list: list, cur):
 
 
 def types_stat_with_year(types: dict, chart_name: str, key_name: str, all_vacancies, cur, year, update):
-    # sql = f"""SELECT json FROM temp_table;"""
-    # cur.executescript(sql)
-    # all_vacancies = cur.fetchall()
-    # Count types of schedule in all vacancies.
 
     # Count vacancies with given type in current year.
     for i in all_vacancies:
@@ -207,65 +200,35 @@ def types_stat_with_year(types: dict, chart_name: str, key_name: str, all_vacanc
     return
 
 
-# def types_stat_with_year(types: dict, chart_name: str, year: int, cur, update=True):
-#     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
-#
-#     for t in types:
-#         print(t)
-#         sql = f"""SELECT COUNT(*), json
-#                 FROM temp_table
-#                 WHERE json LIKE '%{t}%';"""
-#         cur.execute(sql)
-#         type_count = cur.fetchall()[0][0]
-#         if update is True:
-#             sql = f"""
-#             UPDATE charts
-#             SET popularity = {type_count}
-#             WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{t}'
-#             AND charts.'year' = '{year}';"""
-#         else:
-#             sql = f"""INSERT INTO charts(chart_name, data, popularity, year) ' \
-#                   f'VALUES('{chart_name}', '{t}', {type_count}, {str(year)});"""
-#
-#         cur.executescript(sql)
-#     return
-
-
-def vacancy_with_salary(types: dict, chart_name: str, years: tuple, all_vacancies, cur, update):
+def vacancy_with_salary(types: dict, chart_name: str, year, all_vacancies, cur, update):
     # Count types of schedule in all vacancies.
-    for year in years:
-        types = types.fromkeys(types, 0)  # set all values to zero
-        # Count vacancies with given type in current year.
-        for n in all_vacancies:
-            body = json.loads((n[1]))
-            if (f"{str(year-1)}-12-31T23:59:59+0300" < body['created_at']) and \
-                    (body['created_at'] < f"{str(year+1)}-01-01T00:00:00+0300"):
-                if body['salary'] is None:
-                    types['without_salary'] += 1
-                else:
-                    if body['salary']['to'] is None:
-                        types['open_up'] += 1
-                    elif body['salary']['from'] is None:
-                        types['open_down'] += 1
-                    else:
-                        types['closed'] += 1
+    types = types.fromkeys(types, 0)  # set all values to zero
+    # Count vacancies with given type in current year.
+    for n in all_vacancies:
+        body = json.loads((n[0]))
 
+        if body['salary'] is None:
+            types['without_salary'] += 1
+        else:
+            if body['salary']['to'] is None:
+                types['open_up'] += 1
+            elif body['salary']['from'] is None:
+                types['open_down'] += 1
             else:
-                continue
-        # Write ready data to DB.
-        print(types)
-        for n in types:
-            if update is True:
-                sql = f"""UPDATE charts
-                          SET popularity = {types[n]}
-                          WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{n}'
-                          AND charts.'year' = '{year}';"""
-            else:
-                sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                            VALUES('{chart_name}', '{n}', {types[n]}, {str(year)});"""
-            # sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
-            #       f'VALUES("{chart_name}", "{n}", {types[n]}, {str(year)});'
-            cur.executescript(sql)
+                types['closed'] += 1
+
+    # Write ready data to DB.
+    print(types)
+    for n in types:
+        if update is True:
+            sql = f"""UPDATE charts
+                      SET popularity = {types[n]}
+                      WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{n}'
+                      AND charts.'year' = '{year}';"""
+        else:
+            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
+                        VALUES('{chart_name}', '{n}', {types[n]}, '{year}');"""
+        cur.execute(sql)
     return
 
 
