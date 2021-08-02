@@ -1,11 +1,13 @@
 import os
-
 import pytest
 from selenium import webdriver
 from applitools.selenium import Eyes, Target, BatchInfo, ClassicRunner
 from webdriver_manager.chrome import ChromeDriverManager
 
 RESOLUTION = {"width": 768, "height": 1024}
+# base_url = 'http://127.0.0.1:5000/'
+base_url = 'https://clingon.pythonanywhere.com/'
+
 
 @pytest.fixture(scope="module")
 def batch_info():
@@ -53,7 +55,7 @@ def eyes_setup(runner, batch_info):
 
 def test_home_page(eyes, driver):
     eyes.open(driver, "QA Job Stat", "First test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/")
+    driver.get(base_url)
     eyes.check(f"Home page test", Target.window())
     eyes.close(False)
 
@@ -61,7 +63,7 @@ def test_home_page(eyes, driver):
 def test_time_series(eyes, driver):
     name = 'time_series'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -69,7 +71,7 @@ def test_time_series(eyes, driver):
 def test_salary(eyes, driver):
     name = 'salary'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -77,7 +79,7 @@ def test_salary(eyes, driver):
 def test_schedule_type(eyes, driver):
     name = 'schedule_type'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -85,15 +87,15 @@ def test_schedule_type(eyes, driver):
 def test_employment_type(eyes, driver):
     name = 'employment_type'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
-
-
+#
+#
 def test_experience(eyes, driver):
     name = 'experience'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -101,7 +103,7 @@ def test_experience(eyes, driver):
 def test_with_salary(eyes, driver):
     name = 'with_salary'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -109,7 +111,7 @@ def test_with_salary(eyes, driver):
 def test_key_skills(eyes, driver):
     name = 'experience'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -117,7 +119,7 @@ def test_key_skills(eyes, driver):
 def test_programming_languages(eyes, driver):
     name = 'programming_languages'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -125,7 +127,7 @@ def test_programming_languages(eyes, driver):
 def test_unit_test_frameworks(eyes, driver):
     name = 'unit_test_frameworks'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -133,7 +135,7 @@ def test_unit_test_frameworks(eyes, driver):
 def test_load_testing_tools(eyes, driver):
     name = 'load_testing_tools'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -141,7 +143,7 @@ def test_load_testing_tools(eyes, driver):
 def test_bdd_frameworks(eyes, driver):
     name = 'bdd_frameworks'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -149,7 +151,7 @@ def test_bdd_frameworks(eyes, driver):
 def test_web_ui_tools(eyes, driver):
     name = 'web_ui_tools'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -157,7 +159,7 @@ def test_web_ui_tools(eyes, driver):
 def test_mobile_testing_frameworks(eyes, driver):
     name = 'web_ui_tools'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -165,7 +167,7 @@ def test_mobile_testing_frameworks(eyes, driver):
 def test_bugtracking_n_tms(eyes, driver):
     name = 'bugtracking_n_tms'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -173,7 +175,7 @@ def test_bugtracking_n_tms(eyes, driver):
 def test_cvs(eyes, driver):
     name = 'cvs'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -181,7 +183,7 @@ def test_cvs(eyes, driver):
 def test_ci_cd(eyes, driver):
     name = 'ci_cd'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
@@ -189,7 +191,7 @@ def test_ci_cd(eyes, driver):
 def test_word_cloud(eyes, driver):
     name = 'word_cloud'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
-    driver.get(f"https://clingon.pythonanywhere.com/{name}")
+    driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
 
