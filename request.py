@@ -4,10 +4,10 @@ import json
 import sqlite3
 import utils
 
-update = False
+update = True
 years_tuple = (
-    2019,
-    2020,
+    # 2019,
+    # 2020,
     2021,
 )
 exchange_rates = {'RUR': 1, 'EUR': 91, 'USD': 73, 'UAH': 2.58}
@@ -217,7 +217,7 @@ for year in years_tuple:
         if update is True:
             sql = f"""
             UPDATE charts SET popularity = {median} WHERE data = '{experience}'
-            AND chart_name = 'salary';
+            AND chart_name = 'salary' AND year = '{year}';
             """
         else:
             sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
