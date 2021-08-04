@@ -14,7 +14,7 @@ def batch_info():
     """
     Use one BatchInfo for all tests inside module
     """
-    return BatchInfo("Some general Test cases name")
+    return BatchInfo("Tests for QA Job Stat site")
 
 
 @pytest.fixture(name="driver", scope="function")
@@ -90,8 +90,8 @@ def test_employment_type(eyes, driver):
     driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
     eyes.close(False)
-#
-#
+
+
 def test_experience(eyes, driver):
     name = 'experience'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
