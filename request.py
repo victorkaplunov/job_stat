@@ -4,10 +4,10 @@ import json
 import sqlite3
 import utils
 
-update = True
+update = False
 years_tuple = (
-    # 2019,
-    # 2020,
+    2019,
+    2020,
     2021,
 )
 exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58}
@@ -25,14 +25,14 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
                 'page=0'
 
 
-req = requests.get((base_url + search_string).encode('utf-8'))
+# req = requests.get((base_url + search_string).encode('utf-8'))
 
 # http_proxy = "http://127.0.0.1:8888"
 # https_proxy = "http://127.0.0.1:8888"
 # proxies = {"http": http_proxy, "https": https_proxy}
 
 # Get quantity of pages in responce
-pages = 10  # req.json()["pages"]
+pages = 30  # req.json()["pages"]
 
 
 def resp(n):
@@ -42,9 +42,9 @@ def resp(n):
                         )
 
 
-for x in range(0, pages):  # Run request to HH.ru API
-    s = utils.id_list(resp(x), base_url)
-    print("Items on page: ", len(set(s)))
+# for x in range(0, pages):  # Run request to HH.ru API
+#     s = utils.id_list(resp(x), base_url)
+#     print("Items on page: ", len(set(s)))
 
 
 if update is False:
@@ -150,17 +150,17 @@ for year in years_tuple:
                       VALUES("salary", "{experience}", "{median}", {str(year)});"""
         cur.executescript(sql)
 
-utils.chart_with_category_filter('frameworks',
-                                 [['pytest', 'Python'], ['py.test', 'Python'], ['Unittest', 'Python'],
-                                  ['Nose', 'Python'],
-                                  ['JUnit', 'Java'], ['TestNG', 'Java'],
-                                  ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
-                                  ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
-                                  ['Spock', 'C#'], ['NUnit', 'C#'],
-                                  ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
-                                  ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
-                                  ['CodeceptJS', 'JavaScript'],
-                                  ['Robot_Framework', 'multiple_language']], cur, update)
+    utils.chart_with_category_filter('frameworks',
+                                     [['pytest', 'Python'], ['py.test', 'Python'], ['Unittest', 'Python'],
+                                      ['Nose', 'Python'],
+                                      ['JUnit', 'Java'], ['TestNG', 'Java'],
+                                      ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
+                                      ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
+                                      ['Spock', 'C#'], ['NUnit', 'C#'],
+                                      ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
+                                      ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
+                                      ['CodeceptJS', 'JavaScript'],
+                                      ['Robot_Framework', 'multiple_language']], cur, update, year)
 
 
 sql = "SELECT id, json FROM temp_table;"
@@ -220,6 +220,9 @@ for n in key_skills_dict:
     if counter == 0:
         break
 
+
+sql = """DROP TABLE IF EXISTS temp_table;"""
+cur.execute(sql)
 conn.commit()
 # Close database connection
 conn.close()
