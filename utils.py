@@ -28,7 +28,7 @@ def vac_id_list():
 
 
 def id_list(response, base_url):
-    """ Get list of vacancies from response and write "calendar" and "vacancies" tables."""
+    """ Get list of vacancies from response and write to "calendar" and "vacancies" tables."""
     con = sqlite3.connect("testdb.db")  # Open database
     cur = con.cursor()
     vac_list = response.json()["items"]
@@ -69,11 +69,11 @@ def id_list(response, base_url):
     return items
 
 
-def chart_with_category_filter(chart_name: str, param_list: list, cur, update):
+def chart_with_category_filter(chart_name: str, param_list: list, cur, update, year):
     """ Function count a number of entries of some string from param_list in all vacancies. """
     for i in param_list:
         print(i[0], i[1])
-        sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i[0]
+        sql = "SELECT json FROM temp_table WHERE json LIKE '%%%s%%';" % i[0]
         cur.execute(sql)
         vac = cur.fetchall()
         if update is True:
@@ -83,8 +83,8 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update):
             WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{i[0]}'
             AND charts.'parent' = '{i[1]}';"""
         else:
-            sql = f"""INSERT INTO charts(chart_name, data, popularity, parent)
-                  VALUES('{chart_name}', '{i[0]}', {len(vac)}, '{i[1]}');"""
+            sql = f"""INSERT INTO charts(chart_name, data, popularity, parent, year)
+                  VALUES('{chart_name}', '{i[0]}', {len(vac)}, '{i[1]}', {year});"""
         try:
             cur.executescript(sql)
         except sqlite3.IntegrityError as error:
@@ -115,26 +115,6 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update):
     return
 
 
-def stat_with_year(chart_name: str, param_list: list, years: tuple, cur):
-    """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
-    types = {i: 0 for i in param_list}  # Convert list to dictionary
-    for y in years:
-        types = types.fromkeys(types, 0)  # Reset all values to zero
-        for t in types:
-            # Count vacancies with given type in current year.
-            sql = f"""SELECT COUNT(*),v.json
-                    FROM vacancies v
-                    INNER JOIN calendar c
-                    ON v.id = c.id
-                    WHERE c.data LIKE "{y}%" AND json LIKE '%{t}%';"""
-            cur.execute(sql)
-            type_count = cur.fetchall()
-            sql = f'INSERT INTO charts(chart_name, data, popularity, year) ' \
-                  f'VALUES("{chart_name}", "{t}", {type_count[0][0]}, {str(y)});'
-            cur.executescript(sql)
-    return
-
-
 def stat_with_one_year(chart_name: str, param_list: list, year: int, cur, update=True):
     """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
     types = {i: 0 for i in param_list}  # Convert list to dictionary
@@ -159,31 +139,11 @@ def stat_with_one_year(chart_name: str, param_list: list, year: int, cur, update
     return
 
 
-def wright_statistic_to_db(chart_name: str, param_list: list, cur):
-    """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
-    for i in param_list:
-        sql = "SELECT json FROM vacancies WHERE json LIKE '%%%s%%';" % i
-        cur.execute(sql)
-        vac = cur.fetchall()
-        sql = 'INSERT INTO charts(chart_name, data, popularity) VALUES("%s", "%s",%i);' % (chart_name, i, len(vac))
-        try:
-            cur.executescript(sql)
-        except sqlite3.IntegrityError as error:
-            print("Error: ", error)
-
-        sql = 'UPDATE charts SET popularity = "%i" WHERE data = "%s";' % (len(vac), i)
-        print(sql)
-        cur.executescript(sql)
-    return
-
-
 def types_stat_with_year(types: dict, chart_name: str, key_name: str, all_vacancies, cur, year, update):
 
     # Count vacancies with given type in current year.
     for i in all_vacancies:
-        # print(i[0])
         body = json.loads(i[0])
-        # print((body[key_name]['id']))
         types[(body[key_name]['id'])] += 1
     # Write ready data to DB.
     print(types)
