@@ -200,15 +200,39 @@ def get_data_with_year(cursor, year, chart_name, sort=True):
     return head + data_list
 
 
+def get_framework_data_with_year(cursor, year, chart_name, sort=True):
+    request = f"""
+    SELECT data, popularity, parent FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
+    """
+    head = [['Framework', 'Popularity', 'Language']]
+    cursor.execute(request)
+    statistics_data = cursor.fetchall()
+    data_list = []
+    print(request)
+    for i in statistics_data:
+        data_list.append(list(i))
+    data_list.sort(reverse=sort
+                   , key=itemgetter(1))
+    return head + data_list
+
+
 @app.route('/unit_test_frameworks')
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
-    frameworks_list = get_statistics_data('frameworks', cur())
-    frameworks_list = sorted(frameworks_list, key=itemgetter(1), reverse=True)
-    frameworks_list.insert(0, ['Framework', 'Popularity', 'Language'])
+    # frameworks_list = get_statistics_data('frameworks', cur())
+    # frameworks_list = sorted(frameworks_list, key=itemgetter(1), reverse=True)
+    # frameworks_list.insert(0, ['Framework', 'Popularity', 'Language'])
+    # return render_template(
+    #     '/unit_test_frameworks.html',
+    #     frameworks=frameworks_list
+    # )
+    chart = 'frameworks'
     return render_template(
         '/unit_test_frameworks.html',
-        frameworks=frameworks_list
+        name='языков программирования',
+        chart2019=get_framework_data_with_year(cur(), 2019, chart),
+        chart2020=get_framework_data_with_year(cur(), 2020, chart),
+        chart2021=get_framework_data_with_year(cur(), 2021, chart),
     )
 
 
