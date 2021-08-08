@@ -81,7 +81,7 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update, y
             UPDATE charts
             SET popularity = {len(vac)}
             WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{i[0]}'
-            AND charts.'parent' = '{i[1]}';"""
+            AND charts.'parent' = '{i[1]}' AND year = {year};"""
         else:
             sql = f"""INSERT INTO charts(chart_name, data, popularity, parent, year)
                   VALUES('{chart_name}', '{i[0]}', {len(vac)}, '{i[1]}', {year});"""
@@ -91,7 +91,7 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update, y
             print("Error: ", error)
 
     # Sum data for Py.test and Pytest and delete Py.test row
-    sql = """SELECT popularity FROM charts WHERE data = 'py.test';"""
+    sql = f"""SELECT popularity FROM charts WHERE data = 'py.test' AND year = {year};"""
     cur.execute(sql)
     py_test_popularity = cur.fetchall()
     if py_test_popularity == []:
@@ -101,14 +101,14 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update, y
         py_test_popularity = py_test_popularity[0][0]
 
     print('py_test_popularity: ', py_test_popularity)
-    sql = """SELECT popularity FROM charts WHERE data = 'pytest';"""
+    sql = f"""SELECT popularity FROM charts WHERE data = 'pytest' AND year = {year};"""
     cur.execute(sql)
     pytest_popularity = cur.fetchall()[0][0]
     print('pytest_popularity: ', pytest_popularity)
-    sql = """UPDATE charts SET popularity = "%i" WHERE data = 'pytest';""" \
+    sql = f"""UPDATE charts SET popularity = "%i" WHERE data = 'pytest' AND year = {year};""" \
                                     % (py_test_popularity + pytest_popularity)
     cur.execute(sql)
-    sql = """DELETE FROM charts WHERE data = 'py.test';"""
+    sql = f"""DELETE FROM charts WHERE data = 'py.test' AND year = {year};"""
     cur.execute(sql)
 
     # con.close()
