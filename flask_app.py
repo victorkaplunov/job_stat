@@ -19,16 +19,13 @@ def cur():
 
 @app.route('/api')
 def api():
-    return "<html> \
-    <a href=" + url_for('show_vac_calendar', vac_id='14658327') + ">" + url_for('show_vac_calendar',
-                                                                                vac_id='14658327') + "</a><br> \
-    <a href = " + url_for('show_vac_description', vac_id='14658327') + " > " + url_for('show_vac_description',
-                                                                                       vac_id='14658327') + "</a><br>\
-    <a href = " + url_for('show_vac_top_new_by_id') + " > " + url_for('show_vac_top_new_by_id') + "</a><br>\
-    <a href = " + url_for('show_vac_top_new_by_data') + " > " + url_for('show_vac_top_new_by_data') + "</a><br>\
-    <a href=" + url_for('search_vac', search_phrase='Python') + ">" + url_for('search_vac',
-                                                                              search_phrase='Python') + "</a><br> \
-    </html>"
+    return f"""<html>
+    <a href="{url_for('show_vac_calendar', vac_id='14658327')}">{url_for('show_vac_calendar', vac_id='14658327')}</a><br>
+    <a href="{url_for('show_vac_description', vac_id='14658327')}">{url_for('show_vac_description', vac_id='14658327')}</a><br>
+    <a href="{url_for('show_vac_top_new_by_id')}">{url_for('show_vac_top_new_by_id')}"</a><br>
+    <a href="{url_for('show_vac_top_new_by_data')}">{url_for('show_vac_top_new_by_data')}"</a><br>
+    <a href="{url_for('search_vac', search_phrase='Python')}">{url_for('search_vac', search_phrase='Python')}"</a><br>
+    </html>"""
 
 
 @app.route('/favicon.ico')
@@ -213,23 +210,17 @@ def get_framework_data_with_year(cursor, year, chart_name, sort=True):
         data_list.append(list(i))
     data_list.sort(reverse=sort
                    , key=itemgetter(1))
+    print(head + data_list)
     return head + data_list
 
 
 @app.route('/unit_test_frameworks')
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
-    # frameworks_list = get_statistics_data('frameworks', cur())
-    # frameworks_list = sorted(frameworks_list, key=itemgetter(1), reverse=True)
-    # frameworks_list.insert(0, ['Framework', 'Popularity', 'Language'])
-    # return render_template(
-    #     '/unit_test_frameworks.html',
-    #     frameworks=frameworks_list
-    # )
     chart = 'frameworks'
     return render_template(
         '/unit_test_frameworks.html',
-        name='языков программирования',
+        # name='языков программирования',
         chart2019=get_framework_data_with_year(cur(), 2019, chart),
         chart2020=get_framework_data_with_year(cur(), 2020, chart),
         chart2021=get_framework_data_with_year(cur(), 2021, chart),
