@@ -21,7 +21,7 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
                 u' OR SDET OR test* OR Test* OR TEST* OR Quality OR quality&' \
                 'no_magic=true&order_by=publication_time&' \
                 'area=1&specialization=1.117&' \
-                'search_field=name&search_period=7' \
+                'search_field=name&' \
                 'page=0'
 
 
@@ -32,7 +32,7 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 # proxies = {"http": http_proxy, "https": https_proxy}
 
 # Get quantity of pages in responce
-pages = 30  # req.json()["pages"]
+pages = 40  # req.json()["pages"]
 
 
 def resp(n):
@@ -136,20 +136,6 @@ for year in years_tuple:
     with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
     utils.vacancy_with_salary(with_salary, 'with_salary', year, all_vacancies, cur, update)
 
-    for experience in experience_grades:
-        print("Опыт: ", experience)
-        median = utils.salary_to_db(year, experience, exchange_rates, cur)
-
-        if update is True:
-            sql = f"""
-                UPDATE charts SET popularity = {median} WHERE data = '{experience}'
-                AND chart_name = 'salary' AND year = '{year}';
-                """
-        else:
-            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                      VALUES("salary", "{experience}", "{median}", {str(year)});"""
-        cur.executescript(sql)
-
     utils.chart_with_category_filter('frameworks',
                                      [['pytest', 'Python'], ['py.test', 'Python'], ['Unittest', 'Python'],
                                       ['Nose', 'Python'],
@@ -162,6 +148,19 @@ for year in years_tuple:
                                       ['CodeceptJS', 'JavaScript'],
                                       ['Robot_Framework', 'multiple_language']], cur, update, year)
 
+    for experience in experience_grades:
+        print("Опыт: ", experience)
+        median = utils.salary_to_db(year, experience, exchange_rates, cur)
+
+        if update is True:
+            sql = f"""
+                    UPDATE charts SET popularity = {median} WHERE data = '{experience}'
+                    AND chart_name = 'salary' AND year = '{year}';
+                    """
+        else:
+            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
+                          VALUES("salary", "{experience}", "{median}", {str(year)});"""
+        cur.executescript(sql)
 
 sql = "SELECT id, json FROM temp_table;"
 cur.execute(sql)
