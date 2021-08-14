@@ -1,4 +1,7 @@
 # -*- encoding=utf8 -*-
+import asyncio
+
+import httpx
 import requests
 import json
 import sqlite3
@@ -35,16 +38,17 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 pages = 40  # req.json()["pages"]
 
 
-def resp(n):
-    """Make search request of given page"""
-    return requests.get(base_url + search_string.replace("page=0", "page=" + str(n))
-                        # , proxies=proxies
-                        )
+async def main():
 
+    async with httpx.AsyncClient() as client:
 
-for x in range(0, pages):  # Run request to HH.ru API
-    s = utils.id_list(resp(x), base_url)
-    print("Items on page: ", len(set(s)))
+        for page_num in range(0, pages):
+            search_url = base_url + search_string.replace("page=0", "page=" + str(page_num))
+            resp = await client.get(search_url)
+            s = utils.id_list(resp, base_url)
+            print("Items on page: ", len(set(s)))
+
+asyncio.run(main())
 
 
 if update is False:
