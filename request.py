@@ -1,11 +1,13 @@
 # -*- encoding=utf8 -*-
 import asyncio
-
+import os
 import httpx
 import requests
 import json
 import sqlite3
 import utils
+
+print("Current Working Directory ", os.getcwd())
 
 update = True
 years_tuple = (
