@@ -109,7 +109,7 @@ for year in years_tuple:
 
     utils.stat_with_one_year('mobile_testing_frameworks',
                              ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
-                              'Calabash', 'UI Automation', 'UIAutomator', 'XCTest'],
+                              'Calabash', 'UI Automation', 'UIAutomator', 'XCTest', 'Kobiton'],
                              year, cur, update)
 
     utils.stat_with_one_year('bugtracking_n_tms',
