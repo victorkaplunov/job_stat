@@ -1,3 +1,1 @@
-/home/clingon/.virtualenvs/myvirtualenv/bin/activate
-cd /home/clingon/job_stat/
-python3 request.py
+/home/clingon/.virtualenvs/myvirtualenv/bin/python /home/clingon/job_stat/run.sh
