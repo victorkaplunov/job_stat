@@ -37,7 +37,7 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 # proxies = {"http": http_proxy, "https": https_proxy}
 
 # Get quantity of pages in responce
-pages = 15  # req.json()["pages"]
+pages = 40  # req.json()["pages"]
 
 
 async def main():
