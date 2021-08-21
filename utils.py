@@ -1,6 +1,8 @@
 import sqlite3
 import re
 import statistics
+
+import httpx
 import requests
 import json
 import unicodedata
@@ -27,44 +29,46 @@ def vac_id_list():
     return id_list
 
 
-def id_list(response, base_url):
+async def id_list(response, base_url):
     """ Get list of vacancies from response and write to "calendar" and "vacancies" tables."""
     con = sqlite3.connect("testdb.db")  # Open database
     cur = con.cursor()
     vac_list = response.json()["items"]
     items = []
-    for i in vac_list:
-        items.append(i["id"])
-        sql = 'INSERT INTO calendar (id, data) VALUES (%d, "%s");' % (int(i["id"]), i["published_at"])
-        # print(sql)
-        try:
-            cur.executescript(sql)
-        except sqlite3.IntegrityError as err:
-            print("Error: ", err)
-            break
 
-        # If vacancy is new, write description to "vacancies" table.
-        if int(i["id"]) not in vac_id_list():
-            # Get vacancies by ID
-            r = requests.get(base_url + (i["id"])
-                             # , proxies=proxies
-                             )
-            vac = r.json()
-            del vac["branded_description"]  # Remove description in HTML format
-            json_dump = json.dumps(vac, indent=None, ensure_ascii=False, separators=(', ', ': ', ))
-            json_dump = re.sub(r"'", '', json_dump)  # Remove apostrophes from JSON for SQL request safety
-            json_dump = re.sub(r"’", '', json_dump)  # Remove apostrophes from JSON for SQL request safety
-            json_dump = re.sub(r"&#39;", '', json_dump)  # Remove apostrophes from JSON for SQL request safety, again
-            json_dump = unicodedata.normalize("NFKD", json_dump)  # Return the normal form for the Unicode string
-
-            cleaner = re.compile('<.*?>')  # Remove HTML tags
-            json_dump = re.sub(cleaner, '', json_dump)
-
-            sql_in = "INSERT INTO vacancies (id, json) VALUES (%d, '%s');" % (int(i["id"]), json_dump)
+    async with httpx.AsyncClient() as client:
+        for i in vac_list:
+            items.append(i["id"])
+            sql = 'INSERT INTO calendar (id, data) VALUES (%d, "%s");' % (int(i["id"]), i["published_at"])
+            # print(sql)
             try:
-                cur.executescript(sql_in)
-            except sqlite3.IntegrityError as error:
-                print("Error: ", error)
+                cur.executescript(sql)
+            except sqlite3.IntegrityError as err:
+                print("Error: ", err)
+                break
+
+            # If vacancy is new, write description to "vacancies" table.
+            if int(i["id"]) not in vac_id_list():
+                # Get vacancies by ID
+                r = await client.get(base_url + (i["id"])
+                                 # , proxies=proxies
+                                 )
+                vac = r.json()
+                del vac["branded_description"]  # Remove description in HTML format
+                json_dump = json.dumps(vac, indent=None, ensure_ascii=False, separators=(', ', ': ', ))
+                json_dump = re.sub(r"'", '', json_dump)  # Remove apostrophes from JSON for SQL request safety
+                json_dump = re.sub(r"’", '', json_dump)  # Remove apostrophes from JSON for SQL request safety
+                json_dump = re.sub(r"&#39;", '', json_dump)  # Remove apostrophes from JSON for SQL request safety, again
+                json_dump = unicodedata.normalize("NFKD", json_dump)  # Return the normal form for the Unicode string
+
+                cleaner = re.compile('<.*?>')  # Remove HTML tags
+                json_dump = re.sub(cleaner, '', json_dump)
+
+                sql_in = "INSERT INTO vacancies (id, json) VALUES (%d, '%s');" % (int(i["id"]), json_dump)
+                try:
+                    cur.executescript(sql_in)
+                except sqlite3.IntegrityError as error:
+                    print("Error: ", error)
     con.close()
     return items
 

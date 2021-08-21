@@ -30,7 +30,6 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
                 'page=0'
 """https://hh.ru/search/vacancy?clusters=true&area=1&specialization=1.117&no_magic=true&ored_clusters=true&order_by=publication_time&enable_snippets=true&search_period=30&salary=&st=searchVacancy&text=QA+OR+Qa+OR+Q%D0%90+OR+Q%D0%B0+Q.A.+%D1%82%D0%B5%D1%81%D1%82*+OR+%D0%A2%D0%B5%D1%81%D1%82*+OR+%D0%A2%D0%95%D0%A1%D0%A2*+OR+SDET+OR+test*+OR+Test*+OR+TEST*+OR+Quality+OR+quality"""
 
-print((base_url + search_string))
 req = requests.get((base_url + search_string).encode('utf-8'))
 
 # http_proxy = "http://127.0.0.1:8888"
@@ -38,7 +37,7 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 # proxies = {"http": http_proxy, "https": https_proxy}
 
 # Get quantity of pages in responce
-pages = 20  # req.json()["pages"]
+pages = 60  # req.json()["pages"]
 
 
 async def main():
@@ -48,8 +47,7 @@ async def main():
         for page_num in range(0, pages):
             search_url = base_url + search_string.replace("page=0", "page=" + str(page_num))
             resp = await client.get(search_url)
-            print(search_url)
-            s = utils.id_list(resp, base_url)
+            s = await utils.id_list(resp, base_url)
             print("Items on page: ", len(set(s)))
 
 asyncio.run(main())
