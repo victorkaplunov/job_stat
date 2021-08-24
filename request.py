@@ -40,18 +40,11 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 pages = 30  # req.json()["pages"]
 
 
-async def main():
-
-    async with httpx.AsyncClient() as client:
-
-        for page_num in range(0, pages):
-            search_url = base_url + search_string.replace("page=0", "page=" + str(page_num))
-            resp = await client.get(search_url)
-            s = utils.id_list(resp, base_url)
-            print("Items on page: ", len(set(s)))
-
-asyncio.run(main())
-
+for page_num in range(0, pages):
+    search_url = base_url + search_string.replace("page=0", "page=" + str(page_num))
+    resp = requests.get(search_url)
+    s = utils.id_list(resp, base_url)
+    print("Items on page: ", len(set(s)))
 
 if update is False:
     # Drop table with statistics and recreate it
