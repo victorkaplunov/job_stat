@@ -1,7 +1,5 @@
 # -*- encoding=utf8 -*-
-import asyncio
 import os
-import httpx
 import requests
 import json
 import sqlite3
