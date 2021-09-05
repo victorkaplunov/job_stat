@@ -136,21 +136,22 @@ def get_time_series_data(cursor):
                     ('07', 'июль', '31'), ('08', 'август', '31'), ('09', 'сентябрь', '30'),
                     ('10', 'октябрь', '31'), ('11', 'ноябрь', '30'), ('12', 'декабрь', '31'))
 
-    year_tuple = ('2019', '2020', '2021')
-
+    year_tuple = utils.years_tuple()
+    print(year_tuple)
     head_time_series = [['Месяц']]
     output_list = []
     for y in year_tuple:
-        head_time_series[0].append(y)
+        head_time_series[0].append(str(y))
         for n, month in enumerate(month_tuples):
             # Запрашиваем количество вакансий за месяц
             sql = f'SELECT DISTINCT id ' \
                   f'FROM calendar ' \
                   f'WHERE data ' \
-                  f'BETWEEN "{y}-{month[0]}-01T00:00:00+03:00" and "{y}-{month[0]}-{month[2]}T23:59:59+03:00";'
+                  f'BETWEEN "{str(y)}-{month[0]}-01T00:00:00+03:00" and "{str(y)}-{month[0]}-{month[2]}T23:59:59+03:00";'
             cursor.execute(sql)
             vacancies_tuple = (cursor.fetchall())
-            if y == '2019':
+            print(vacancies_tuple)
+            if str(y) == '2019':
                 # Данные за февраль неполные, поэтому вместо них пишем ноль
                 if month[1] == 'февраль':
                     output_list.append([month[1], 0])

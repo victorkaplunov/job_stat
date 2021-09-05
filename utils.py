@@ -194,11 +194,14 @@ def vacancy_with_salary(types: dict, chart_name: str, year, all_vacancies, cur, 
 
 def salary_to_db(year, experience, exchange_rate, cur):
     # Загружаем вакансии из БД
-    sql = f"""SELECT v.json
-    FROM vacancies v
-    INNER JOIN calendar c
-    ON v.id = c.id
-    WHERE c.data LIKE "{year}%";"""
+    # sql = f"""SELECT v.json
+    # FROM vacancies v
+    # INNER JOIN calendar c
+    # ON v.id = c.id
+    # WHERE c.data LIKE "{year}%";"""
+
+    sql = f"""SELECT json FROM temp_table"""
+
     cur.execute(sql)
     vac = cur.fetchall()
 

@@ -1,11 +1,8 @@
 # -*- encoding=utf8 -*-
-import os
 import requests
 import json
 import sqlite3
 import utils
-
-print("Current Working Directory ", os.getcwd())
 
 update = True
 years_tuple = (
@@ -25,8 +22,7 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
                 'no_magic=true&order_by=publication_time&' \
                 'area=1&specialization=1.117&' \
                 'search_field=name&' \
-                'page=0'
-"""https://hh.ru/search/vacancy?clusters=true&area=1&specialization=1.117&no_magic=true&ored_clusters=true&order_by=publication_time&enable_snippets=true&search_period=30&salary=&st=searchVacancy&text=QA+OR+Qa+OR+Q%D0%90+OR+Q%D0%B0+Q.A.+%D1%82%D0%B5%D1%81%D1%82*+OR+%D0%A2%D0%B5%D1%81%D1%82*+OR+%D0%A2%D0%95%D0%A1%D0%A2*+OR+SDET+OR+test*+OR+Test*+OR+TEST*+OR+Quality+OR+quality"""
+                'page=0'  # &per_page=100
 
 req = requests.get((base_url + search_string).encode('utf-8'))
 
@@ -35,7 +31,7 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 # proxies = {"http": http_proxy, "https": https_proxy}
 
 # Get quantity of pages in responce
-pages = 30  # req.json()["pages"]
+pages = 20  # req.json()["pages"]
 
 
 for page_num in range(0, pages):
