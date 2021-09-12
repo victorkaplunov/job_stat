@@ -4,10 +4,10 @@ import json
 import sqlite3
 import utils
 
-update = True
+update = False
 years_tuple = (
-    # 2019,
-    # 2020,
+    2019,
+    2020,
     2021,
 )
 exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58}
@@ -43,6 +43,7 @@ for page_num in range(0, pages):
 if update is False:
     # Drop table with statistics and recreate it
     cur.execute("DROP TABLE IF EXISTS charts;")
+    conn.commit()
     sql = """
     CREATE TABLE IF NOT EXISTS charts
     (
@@ -55,16 +56,42 @@ if update is False:
     );
     """
     cur.execute(sql)
+    conn.commit()
+
+sql = """DROP TABLE IF EXISTS vac_with_salary;"""
+cur.execute(sql)
+conn.commit()
+sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
+(
+  id INTEGER,
+  published_at TEXT, 
+  calc_salary NUMERIC
+);"""
+cur.execute(sql)
+
+sql = """DROP TABLE IF EXISTS vac_with_salary;"""
+cur.execute(sql)
+sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
+(
+  id INTEGER,
+  published_at TEXT, 
+  calc_salary NUMERIC,
+  experience TEXT,
+  url TEXT
+);"""
+cur.execute(sql)
+
+conn.commit()
 
 # Wright statistics data to database
 for year in years_tuple:
     sql = """DROP TABLE IF EXISTS temp_table;"""
     cur.execute(sql)
-    sql = f"""CREATE TABLE temp_table AS SELECT DISTINCT v.id, v.json
+    sql = f"""CREATE TABLE temp_table AS SELECT DISTINCT v.id, v.json, c.data
                 FROM vacancies v
                 JOIN calendar c
                 ON v.id = c.id
-                WHERE c.data LIKE "{year}%";"""
+                WHERE c.data LIKE "{year}-%";"""
     cur.execute(sql)
     sql = f"""SELECT json FROM temp_table;"""
     cur.execute(sql)
@@ -143,7 +170,7 @@ for year in years_tuple:
 
     for experience in experience_grades:
         print("Опыт: ", experience)
-        median = utils.salary_to_db(year, experience, exchange_rates, cur)
+        median = utils.salary_to_db(experience, exchange_rates, conn)
 
         if update is True:
             sql = f"""

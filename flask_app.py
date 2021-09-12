@@ -1,3 +1,4 @@
+import datetime
 from operator import itemgetter
 from flask import Flask, send_from_directory, url_for, render_template
 from flask_bootstrap import Bootstrap
@@ -5,6 +6,8 @@ import os
 import sqlite3
 import json
 import utils
+from datetime import date, timedelta
+
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -182,6 +185,26 @@ def get_salary_data_with_year(cursor, chart_name):
     return data
 
 
+def get_vac_with_salary(cursor, exp):
+    today = date.today()
+    delta = timedelta(days=30)
+    last_month = today - delta
+    sql = f"SELECT * FROM vac_with_salary WHERE experience = '{exp}' AND" \
+          f" published_at BETWEEN '{last_month}' AND '{today}' ORDER BY published_at ASC;"
+    print(sql)
+    cursor.execute(sql)
+    response = cursor.fetchall()
+    chart_data_list = []
+    # Подставляем зарплату в соответствующую колонку данных графика.
+    # <a href="https://habr.com/ru/article/569026/">первое полугодие 2021 г., </a>
+    for i in response:
+        template = f"[new Date('{i[1]}'),{i[2]},'<a href=\"{i[4]}\">{i[2]}</a>'],\n"
+        chart_data_list.append(template)
+    chart_data = ''.join(chart_data_list)
+    print(chart_data)
+    return chart_data
+
+
 def get_data_with_year(cursor, year, chart_name, sort=True):
     request = f"""
     SELECT data, popularity FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
@@ -323,6 +346,10 @@ def salary():
     return render_template(
         '/salary.html',
         salary=get_salary_data_with_year(cur(), 'salary'),
+        no_experience_salary=get_vac_with_salary(cur(), 'noExperience'),
+        between1And3_salary=get_vac_with_salary(cur(), 'between1And3'),
+        between3And6_salary=get_vac_with_salary(cur(), 'between3And6'),
+        moreThan6e_salary=get_vac_with_salary(cur(), 'moreThan6'),
     )
 
 
@@ -441,13 +468,6 @@ def ci_cd():
         chart2020=get_data_with_year(cur(), 2020, chart),
         chart2021=get_data_with_year(cur(), 2021, chart),
     )
-
-
-# @app.route('/ci_cd')
-# def ci_cd():
-#     """CI/CD system popularity page"""
-#     ci_cd = get_statistics_data('ci_cd', cur())
-#     return render_template('/ci_cd.html', ci_cd=sorted(ci_cd, key=itemgetter(1), reverse=True))
 
 
 @app.route('/')

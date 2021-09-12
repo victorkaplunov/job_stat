@@ -192,7 +192,7 @@ def vacancy_with_salary(types: dict, chart_name: str, year, all_vacancies, cur, 
     return
 
 
-def salary_to_db(year, experience, exchange_rate, cur):
+def salary_to_db(experience, exchange_rate, conn):
     # Загружаем вакансии из БД
     # sql = f"""SELECT v.json
     # FROM vacancies v
@@ -200,10 +200,12 @@ def salary_to_db(year, experience, exchange_rate, cur):
     # ON v.id = c.id
     # WHERE c.data LIKE "{year}%";"""
 
-    sql = f"""SELECT json FROM temp_table"""
-
+    sql = """SELECT DISTINCT json FROM temp_table"""
+    cur = conn.cursor()
     cur.execute(sql)
     vac = cur.fetchall()
+
+
 
     # Отбираем вакансии с нужным опытом и собираем зарплаты в список
     salary_list = []
@@ -211,18 +213,20 @@ def salary_to_db(year, experience, exchange_rate, cur):
         if json.loads(i[0])['experience']['id'] == experience and json.loads(i[0])['salary'] is not None:
             salary_obj = json.loads(i[0])['salary']
             salary_obj.update({'id': json.loads(i[0])['id']})
+            salary_obj.update({'published_at': json.loads(i[0])['published_at']})
+            salary_obj.update({'alternate_url': json.loads(i[0])['alternate_url']})
+            salary_obj.update({'experience': json.loads(i[0])['experience']['id']})
             salary_list.append(salary_obj)
-
-    # Подсчет зарплат с "чистой" и "грязной" зарплатой
-    net_list = []
-    gross_list = []
-    for i in salary_list:
-        if i['gross'] is True:
-            gross_list.append(i)
-        else:
-            net_list.append(i)
-    # print('net: ', len(net_list))
-    # print('gross: ', len(gross_list))
+    # # Подсчет зарплат с "чистой" и "грязной" зарплатой
+    # net_list = []
+    # gross_list = []
+    # for i in salary_list:
+    #     if i['gross'] is True:
+    #         gross_list.append(i)
+    #     else:
+    #         net_list.append(i)
+    # # print('net: ', len(net_list))
+    # # print('gross: ', len(gross_list))
 
     # Считаем средний разброс для вакансий с закрытым диапазоном
     closed_salary = []
@@ -237,6 +241,13 @@ def salary_to_db(year, experience, exchange_rate, cur):
         closed_salary_sum += i
 
     average_delta_for_closed_salary = closed_salary_sum/len(closed_salary)
+    print('average_delta_for_closed_salary: ', average_delta_for_closed_salary)
+
+    def write_to_vac_with_salary(item, salary):
+        cur.execute(f"""INSERT INTO vac_with_salary(id, published_at, calc_salary, experience, url)
+                  VALUES(?,?,?,?,?);""", (item['id'], str(item['published_at']),
+                                        salary, item['experience'], item['alternate_url']))
+        conn.commit()
 
     # Считаем среднюю предполагаемую зарплату с учетом открытых диапазонов и НДФЛ.
     all_salary = []
@@ -245,28 +256,52 @@ def salary_to_db(year, experience, exchange_rate, cur):
         if i['gross'] is False:
             # закрытый диапазон
             if (i['from'] is not None) and (i['to'] is not None):
-                all_salary.append((i['to'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']])
+                calc_salary = (i['from'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']]
+                if calc_salary < 12792:   # Пишем в базу МРОТ если расчетная ЗП меньше минимальной.
+                    calc_salary = 12792
+                all_salary.append(calc_salary)
+                write_to_vac_with_salary(i, calc_salary)
             # открытый вверх
             elif i['to'] is None:
-                all_salary.append(i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary/2)
+                calc_salary = i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary/2
+                if calc_salary < 12792:
+                    calc_salary = 12792
+                all_salary.append(calc_salary)
+                write_to_vac_with_salary(i, calc_salary)
             # открытый вниз
             elif i['from'] is None:
-                all_salary.append(i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary/2)
+                calc_salary = i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary/2
+                if calc_salary < 12792:
+                    calc_salary = 12792
+                all_salary.append(calc_salary)
+                write_to_vac_with_salary(i, calc_salary)
 
         # "Грязная" зарплата
         elif i['gross'] is True:
             # закрытый диапазон
             if (i['from'] is not None) and (i['to'] is not None):
-                gross_salary = (i['to'] + (i['to'] - i['from']) / 2) * exchange_rate[i['currency']]
-                all_salary.append(gross_salary - gross_salary * 0.13)
+                gross_salary = (i['from'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']]
+                calc_salary = gross_salary - gross_salary * 0.13
+                if calc_salary < 12792:
+                    calc_salary = 12792
+                all_salary.append(calc_salary)
+                write_to_vac_with_salary(i, calc_salary)
             # открытый вверх
             elif i['to'] is None:
-                gross_salary = (i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary / 2)
-                all_salary.append(gross_salary - gross_salary * 0.13)
+                gross_salary = (i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary/2)
+                calc_salary = gross_salary - gross_salary * 0.13
+                if calc_salary < 12792:
+                    calc_salary = 12792
+                all_salary.append(calc_salary)
+                write_to_vac_with_salary(i, calc_salary)
             # открытый вниз
             elif i['from'] is None:
-                gross_salary = (i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary / 2)
-                all_salary.append(gross_salary - gross_salary * 0.13)
+                gross_salary = (i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary/2)
+                calc_salary = gross_salary - gross_salary * 0.13
+                if calc_salary < 12792:
+                    calc_salary = 12792
+                all_salary.append(calc_salary)
+                write_to_vac_with_salary(i, calc_salary)
 
     salary_sum = 0
     for i in all_salary:
@@ -278,4 +313,5 @@ def salary_to_db(year, experience, exchange_rate, cur):
     # Rounding salary to roubles
     median_salary = int(statistics.median(all_salary))
     print("median: ", median_salary)
+    print()
     return median_salary

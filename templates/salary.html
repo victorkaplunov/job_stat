@@ -5,8 +5,20 @@
   <script type="text/javascript">
     google.charts.load("current", {packages:["corechart"]});
     google.charts.setOnLoadCallback(salary);
-    function salary() {
 
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(scatter_noExperience);
+
+        google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(scatter_between1And3);
+
+        google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(scatter_between3And6);
+
+        google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(scatter_moreThan6);
+
+    function salary() {
       var data = new google.visualization.arrayToDataTable({{salary | safe }});
       var view = new google.visualization.DataView(data);
       view.setColumns([0, 1,
@@ -24,7 +36,6 @@
                          sourceColumn: 3,
                          type: "string",
                          role: "annotation" },
-
                        ]);
 
       var options = {
@@ -37,6 +48,90 @@
       var chart = new google.visualization.BarChart(document.getElementById("chart"));
       chart.draw(view, options);
   }
+
+  function scatter_noExperience() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', 'Сентябрь 2021 г.');
+        data.addColumn('number', 'Без опыта');
+        data.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}})
+        data.addRows([{{no_experience_salary | safe }}]);
+
+        var options = {
+            title: "Вакансии для кандидатов без опыта работы за последние 30 дней.",
+          height: 800,
+          tooltip: {isHtml: true, trigger: 'selection' },
+          orientation: "vertical",
+          chartArea:{left:'30%'},
+          vAxis: {format: 'd.MM.yyyy г.'},
+          hAxis: {title: 'Расчетная зарплата, р.', format: '# ### р.'},
+          legend: 'none'
+        };
+        var chart_scatter = new google.visualization.ScatterChart(document.getElementById("noExperience"));
+        chart_scatter.draw(data, options);
+      }
+
+  function scatter_between1And3() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', 'Сентябрь 2021 г.');
+        data.addColumn('number', 'Без опыта');
+        data.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}})
+        data.addRows([{{between1And3_salary | safe }}]);
+
+        var options = {
+            title: "Вакансии для кандидатов с опытом работы от года до трех лет за последние 30 дней.",
+          height: 800,
+          tooltip: {isHtml: true, trigger: 'selection' },
+          orientation: "vertical",
+          chartArea:{left:'30%'},
+          vAxis: {format: 'd.MM.yyyy г.'},
+          hAxis: {title: 'Расчетная зарплата, р.', format: '# ### р.'},
+          legend: 'none'
+        };
+        var chart_scatter = new google.visualization.ScatterChart(document.getElementById("between1And3"));
+        chart_scatter.draw(data, options);
+      }
+
+    function scatter_between3And6() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', 'Сентябрь 2021 г.');
+        data.addColumn('number', 'Без опыта');
+        data.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}})
+        data.addRows([{{between3And6_salary | safe }}]);
+
+        var options = {
+            title: "Вакансии для кандидатов с опытом работы от трех до шести лет за последние 30 дней.",
+          height: 800,
+          tooltip: {isHtml: true, trigger: 'selection' },
+          orientation: "vertical",
+          chartArea:{left:'30%'},
+          vAxis: {format: 'd.MM.yyyy г.'},
+          hAxis: {title: 'Расчетная зарплата, р.', format: '# ### р.'},
+          legend: 'none'
+        };
+        var chart_scatter = new google.visualization.ScatterChart(document.getElementById("between3And6"));
+        chart_scatter.draw(data, options);
+      }
+
+   function scatter_moreThan6() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', 'Сентябрь 2021 г.');
+        data.addColumn('number', 'Без опыта');
+        data.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}})
+        data.addRows([{{moreThan6e_salary | safe }}]);
+
+        var options = {
+            title: "Вакансии для кандидатов с опытом работы более шести лет за последние 30 дней.",
+          height: 800,
+          tooltip: {isHtml: true, trigger: 'selection' },
+          orientation: "vertical",
+          chartArea:{left:'30%'},
+          vAxis: {format: 'd.MM.yyyy г.'},
+          hAxis: {title: 'Расчетная зарплата, р.', format: '# ### р.'},
+          legend: 'none'
+        };
+        var chart_scatter = new google.visualization.ScatterChart(document.getElementById("moreThan6"));
+        chart_scatter.draw(data, options);
+      }
  </script>
 
 {% endblock %}
@@ -54,5 +149,13 @@
     </div>
     <hr>
     <div id="chart"></div>
+    <hr>
+    <div id="noExperience"></div>
+    <hr>
+    <div id="between1And3"></div>
+    <hr>
+    <div id="between3And6"></div>
+    <hr>
+    <div id="moreThan6"></div>
   {% endblock %}
 </html>
