@@ -4,10 +4,10 @@ import json
 import sqlite3
 import utils
 
-update = True
+update = False
 years_tuple = (
-#     2019,
-#     2020,
+    2019,
+    2020,
     2021,
 )
 exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58}
@@ -240,7 +240,8 @@ for n in key_skills_dict:
         break
 
 
-sql = """DROP TABLE IF EXISTS temp_table;"""
+sql = """DROP TABLE IF EXISTS temp_table;
+         VACUUM;"""
 cur.execute(sql)
 conn.commit()
 # Close database connection
