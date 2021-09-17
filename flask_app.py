@@ -191,7 +191,6 @@ def get_vac_with_salary(cursor, exp):
     last_month = today - delta
     sql = f"SELECT * FROM vac_with_salary WHERE experience = '{exp}' AND" \
           f" published_at BETWEEN '{last_month}' AND '{today}' ORDER BY published_at ASC;"
-    print(sql)
     cursor.execute(sql)
     response = cursor.fetchall()
     chart_data_list = []
@@ -201,7 +200,6 @@ def get_vac_with_salary(cursor, exp):
         template = f"[new Date('{i[1]}'),{i[2]},'<a href=\"{i[4]}\">{i[2]}</a>'],\n"
         chart_data_list.append(template)
     chart_data = ''.join(chart_data_list)
-    print(chart_data)
     return chart_data
 
 

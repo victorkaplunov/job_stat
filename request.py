@@ -3,6 +3,7 @@ import requests
 import json
 import sqlite3
 import utils
+from datetime import date
 
 update = True
 years_tuple = (
@@ -12,7 +13,8 @@ years_tuple = (
 )
 exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58}
 experience_grades = ('noExperience', 'between1And3', 'between3And6', 'moreThan6')
-
+today = date.today()
+first_day_of_current_year = date(date.today().year, 1, 1)
 conn = sqlite3.connect("testdb.db")  # Open database
 cur = conn.cursor()  # Create cursor
 
@@ -31,7 +33,7 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 # proxies = {"http": http_proxy, "https": https_proxy}
 
 # Get quantity of pages in responce
-pages = 20  # req.json()["pages"]
+pages = 15  # req.json()["pages"]
 
 
 for page_num in range(0, pages):
@@ -42,7 +44,7 @@ for page_num in range(0, pages):
 
 if update is False:
     # Drop table with statistics and recreate it
-    cur.execute("DROP TABLE IF EXISTS charts;")
+    cur.execute("""DROP TABLE IF EXISTS charts;""")
     conn.commit()
     sql = """
     CREATE TABLE IF NOT EXISTS charts
@@ -58,42 +60,12 @@ if update is False:
     cur.execute(sql)
     conn.commit()
 
-sql = """DROP TABLE IF EXISTS vac_with_salary;"""
-cur.execute(sql)
-conn.commit()
-sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
-(
-  id INTEGER,
-  published_at TEXT, 
-  calc_salary NUMERIC
-);"""
-cur.execute(sql)
 
-sql = """DROP TABLE IF EXISTS vac_with_salary;"""
-cur.execute(sql)
-sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
-(
-  id INTEGER,
-  published_at TEXT, 
-  calc_salary NUMERIC,
-  experience TEXT,
-  url TEXT
-);"""
-cur.execute(sql)
-
-conn.commit()
 
 # Wright statistics data to database
 for year in years_tuple:
-    sql = """DROP TABLE IF EXISTS temp_table;"""
-    cur.execute(sql)
-    sql = f"""CREATE TABLE temp_table AS SELECT DISTINCT v.id, v.json, c.data
-                FROM vacancies v
-                JOIN calendar c
-                ON v.id = c.id
-                WHERE c.data LIKE "{year}-%";"""
-    cur.execute(sql)
-    sql = f"""SELECT json FROM temp_table;"""
+    sql = f"""SELECT json FROM vacancies WHERE published_at
+              BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
     cur.execute(sql)
     all_vacancies = cur.fetchall()
 
@@ -167,22 +139,24 @@ for year in years_tuple:
                                       ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
                                       ['CodeceptJS', 'JavaScript'],
                                       ['Robot_Framework', 'multiple_language']], cur, update, year)
-
+    # Count salary
     for experience in experience_grades:
         print("Опыт: ", experience)
-        median = utils.salary_to_db(experience, exchange_rates, conn)
+        median = utils.salary_to_db(experience, exchange_rates, conn, year)
 
         if update is True:
             sql = f"""
                     UPDATE charts SET popularity = {median} WHERE data = '{experience}'
-                    AND chart_name = 'salary' AND year = '{year}';
+                    AND chart_name = 'salary' AND year = {str(year)};
                     """
         else:
             sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
                           VALUES("salary", "{experience}", "{median}", {str(year)});"""
+
         cur.executescript(sql)
 
-sql = "SELECT id, json FROM temp_table;"
+sql = f"""SELECT id, json FROM vacancies WHERE published_at
+          BETWEEN '{first_day_of_current_year}' AND '{today}';"""
 cur.execute(sql)
 all_vacancies = (cur.fetchall())
 
@@ -239,9 +213,7 @@ for n in key_skills_dict:
     if counter == 0:
         break
 
-
-sql = """DROP TABLE IF EXISTS temp_table;
-         VACUUM;"""
+sql = "VACUUM;"
 cur.execute(sql)
 conn.commit()
 # Close database connection

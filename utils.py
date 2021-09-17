@@ -4,7 +4,10 @@ import statistics
 import requests
 import json
 import unicodedata
+from datetime import date
 
+today = date.today()
+first_day_of_current_year = date(date.today().year, 1, 1)
 
 def years_tuple():
     return 2019, 2020, 2021
@@ -41,7 +44,7 @@ def id_list(response, base_url):
             cur.executescript(sql)
         except sqlite3.IntegrityError as err:
             print("Error: ", err)
-            break
+            # break
 
         # If vacancy is new, write description to "vacancies" table.
         if int(i["id"]) not in vac_id_list():
@@ -59,8 +62,9 @@ def id_list(response, base_url):
 
             cleaner = re.compile('<.*?>')  # Remove HTML tags
             json_dump = re.sub(cleaner, '', json_dump)
-
-            sql_in = "INSERT INTO vacancies (id, json) VALUES (%d, '%s');" % (int(i["id"]), json_dump)
+            published_at = json.loads(json_dump)['published_at']
+            sql_in = f"""INSERT INTO vacancies (id, json, published_at)
+                         VALUES ({int(i['id'])}, '{json_dump}', '{published_at}');"""
             try:
                 cur.executescript(sql_in)
             except sqlite3.IntegrityError as error:
@@ -73,7 +77,8 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update, y
     """ Function count a number of entries of some string from param_list in all vacancies. """
     for i in param_list:
         print(i[0], i[1])
-        sql = "SELECT json FROM temp_table WHERE json LIKE '%%%s%%';" % i[0]
+        sql = f"""SELECT json FROM vacancies WHERE json LIKE '%%%{i[0]}%%' AND
+                 published_at BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
         cur.execute(sql)
         vac = cur.fetchall()
         if update is True:
@@ -121,9 +126,11 @@ def stat_with_one_year(chart_name: str, param_list: list, year: int, cur, update
     types = types.fromkeys(types, 0)  # Reset all values to zero
     for t in types:
         print(t)
+
         sql = f"""SELECT COUNT(*), json
-                FROM temp_table
-                WHERE json LIKE '%{t}%';"""
+                FROM vacancies
+                WHERE json LIKE '%{t}%' AND
+                published_at BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
         cur.execute(sql)
         type_count = cur.fetchall()[0][0]
         if update is True:
@@ -192,7 +199,7 @@ def vacancy_with_salary(types: dict, chart_name: str, year, all_vacancies, cur, 
     return
 
 
-def salary_to_db(experience, exchange_rate, conn):
+def salary_to_db(experience, exchange_rate, conn, year):
     # Загружаем вакансии из БД
     # sql = f"""SELECT v.json
     # FROM vacancies v
@@ -200,16 +207,15 @@ def salary_to_db(experience, exchange_rate, conn):
     # ON v.id = c.id
     # WHERE c.data LIKE "{year}%";"""
 
-    sql = """SELECT DISTINCT json FROM temp_table"""
+    sql = f"""SELECT DISTINCT json FROM vacancies WHERE published_at
+              BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
     cur = conn.cursor()
     cur.execute(sql)
-    vac = cur.fetchall()
-
-
+    vacancies = cur.fetchall()
 
     # Отбираем вакансии с нужным опытом и собираем зарплаты в список
     salary_list = []
-    for i in vac:
+    for i in vacancies:
         if json.loads(i[0])['experience']['id'] == experience and json.loads(i[0])['salary'] is not None:
             salary_obj = json.loads(i[0])['salary']
             salary_obj.update({'id': json.loads(i[0])['id']})
@@ -217,16 +223,6 @@ def salary_to_db(experience, exchange_rate, conn):
             salary_obj.update({'alternate_url': json.loads(i[0])['alternate_url']})
             salary_obj.update({'experience': json.loads(i[0])['experience']['id']})
             salary_list.append(salary_obj)
-    # # Подсчет зарплат с "чистой" и "грязной" зарплатой
-    # net_list = []
-    # gross_list = []
-    # for i in salary_list:
-    #     if i['gross'] is True:
-    #         gross_list.append(i)
-    #     else:
-    #         net_list.append(i)
-    # # print('net: ', len(net_list))
-    # # print('gross: ', len(gross_list))
 
     # Считаем средний разброс для вакансий с закрытым диапазоном
     closed_salary = []

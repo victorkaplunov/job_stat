@@ -63,7 +63,7 @@
           orientation: "vertical",
           chartArea:{left:'30%'},
           vAxis: {format: 'd.MM.yyyy г.'},
-          hAxis: {title: 'Расчетная зарплата, р.', format: '# ### р.'},
+          hAxis: {title: 'Расчетная зарплата, р.', format: '# ### р.', textPosition: 'top'},
           legend: 'none'
         };
         var chart_scatter = new google.visualization.ScatterChart(document.getElementById("noExperience"));
@@ -79,7 +79,7 @@
 
         var options = {
             title: "Вакансии для кандидатов с опытом работы от года до трех лет за последние 30 дней.",
-          height: 800,
+          height: 600,
           tooltip: {isHtml: true, trigger: 'selection' },
           orientation: "vertical",
           chartArea:{left:'30%'},
@@ -100,7 +100,7 @@
 
         var options = {
             title: "Вакансии для кандидатов с опытом работы от трех до шести лет за последние 30 дней.",
-          height: 800,
+          height: 600,
           tooltip: {isHtml: true, trigger: 'selection' },
           orientation: "vertical",
           chartArea:{left:'30%'},
@@ -121,7 +121,7 @@
 
         var options = {
             title: "Вакансии для кандидатов с опытом работы более шести лет за последние 30 дней.",
-          height: 800,
+          height: 600,
           tooltip: {isHtml: true, trigger: 'selection' },
           orientation: "vertical",
           chartArea:{left:'30%'},
