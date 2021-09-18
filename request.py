@@ -42,8 +42,21 @@ for page_num in range(0, pages):
     s = utils.id_list(resp, base_url)
     print("Items on page: ", len(set(s)))
 
+# Drop table 'vac_with_salary' and recreate it
+sql = """DROP TABLE IF EXISTS vac_with_salary;"""
+cur.execute(sql)
+sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
+(
+  id INTEGER,
+  published_at TEXT, 
+  calc_salary NUMERIC,
+  experience TEXT,
+  url TEXT
+);"""
+cur.execute(sql)
+
 if update is False:
-    # Drop table with statistics and recreate it
+    # Drop table 'charts' with statistics and recreate it
     cur.execute("""DROP TABLE IF EXISTS charts;""")
     conn.commit()
     sql = """
@@ -59,7 +72,6 @@ if update is False:
     """
     cur.execute(sql)
     conn.commit()
-
 
 
 # Wright statistics data to database

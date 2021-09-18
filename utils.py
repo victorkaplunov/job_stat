@@ -1,6 +1,7 @@
 import sqlite3
 import re
 import statistics
+from datetime import datetime, timedelta
 import requests
 import json
 import unicodedata
@@ -200,16 +201,9 @@ def vacancy_with_salary(types: dict, chart_name: str, year, all_vacancies, cur, 
 
 
 def salary_to_db(experience, exchange_rate, conn, year):
-    # Загружаем вакансии из БД
-    # sql = f"""SELECT v.json
-    # FROM vacancies v
-    # INNER JOIN calendar c
-    # ON v.id = c.id
-    # WHERE c.data LIKE "{year}%";"""
-
+    cur = conn.cursor()
     sql = f"""SELECT DISTINCT json FROM vacancies WHERE published_at
               BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
-    cur = conn.cursor()
     cur.execute(sql)
     vacancies = cur.fetchall()
 
@@ -240,10 +234,15 @@ def salary_to_db(experience, exchange_rate, conn, year):
     print('average_delta_for_closed_salary: ', average_delta_for_closed_salary)
 
     def write_to_vac_with_salary(item, salary):
-        cur.execute(f"""INSERT INTO vac_with_salary(id, published_at, calc_salary, experience, url)
-                  VALUES(?,?,?,?,?);""", (item['id'], str(item['published_at']),
-                                        salary, item['experience'], item['alternate_url']))
-        conn.commit()
+        today = datetime.today()
+        delta = timedelta(days=30)
+        last_month = today - delta
+        vac_date = datetime.strptime(item['published_at'][:-5], "%Y-%m-%dT%H:%M:%S")
+        if (vac_date <= today) and (vac_date >= last_month):
+            cur.execute(f"""INSERT INTO vac_with_salary(id, published_at, calc_salary, experience, url)
+                            VALUES(?,?,?,?,?);""", (item['id'], str(item['published_at']),
+                                                    salary, item['experience'], item['alternate_url']))
+            conn.commit()
 
     # Считаем среднюю предполагаемую зарплату с учетом открытых диапазонов и НДФЛ.
     all_salary = []

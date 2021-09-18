@@ -140,7 +140,6 @@ def get_time_series_data(cursor):
                     ('10', 'октябрь', '31'), ('11', 'ноябрь', '30'), ('12', 'декабрь', '31'))
 
     year_tuple = utils.years_tuple()
-    print(year_tuple)
     head_time_series = [['Месяц']]
     output_list = []
     for y in year_tuple:
@@ -153,7 +152,6 @@ def get_time_series_data(cursor):
                   f'BETWEEN "{str(y)}-{month[0]}-01T00:00:00+03:00" and "{str(y)}-{month[0]}-{month[2]}T23:59:59+03:00";'
             cursor.execute(sql)
             vacancies_tuple = (cursor.fetchall())
-            print(vacancies_tuple)
             if str(y) == '2019':
                 # Данные за февраль неполные, поэтому вместо них пишем ноль
                 if month[1] == 'февраль':
@@ -194,10 +192,8 @@ def get_vac_with_salary(cursor, exp):
     cursor.execute(sql)
     response = cursor.fetchall()
     chart_data_list = []
-    # Подставляем зарплату в соответствующую колонку данных графика.
-    # <a href="https://habr.com/ru/article/569026/">первое полугодие 2021 г., </a>
     for i in response:
-        template = f"[new Date('{i[1]}'),{i[2]},'<a href=\"{i[4]}\">{i[2]}</a>'],\n"
+        template = f"[new Date('{i[1]}'),{i[2]},'<a href=\"{i[4]}\">{int(i[2])}</a>'],\n"
         chart_data_list.append(template)
     chart_data = ''.join(chart_data_list)
     return chart_data
@@ -211,7 +207,6 @@ def get_data_with_year(cursor, year, chart_name, sort=True):
     cursor.execute(request)
     statistics_data = cursor.fetchall()
     data_list = []
-    print(request)
     for i in statistics_data:
         data_list.append(list(i))
     data_list.sort(reverse=sort
@@ -227,12 +222,10 @@ def get_framework_data_with_year(cursor, year, chart_name, sort=True):
     cursor.execute(request)
     statistics_data = cursor.fetchall()
     data_list = []
-    print(request)
     for i in statistics_data:
         data_list.append(list(i))
     data_list.sort(reverse=sort
                    , key=itemgetter(1))
-    print(head + data_list)
     return head + data_list
 
 
