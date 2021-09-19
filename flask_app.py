@@ -13,7 +13,14 @@ app = Flask(__name__)
 bootstrap = Bootstrap(app)
 id_list = []
 l_host = "http://127.0.0.1:5000"
-
+translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
+                        between3And6="От трех до шести лет", moreThan6="Более шести лет",
+                        fullDay='Полный день', flexible='Гибкий график',
+                        shift='Сменный график', remote='Удаленная работа',
+                        full='Полная занятость', part='Частичная занятость',
+                        project="Проектная работа", probation='Стажировка',
+                        without_salary='Зарплата не указана', closed='Закрытый диапазон',
+                        open_up='Зарплата от...', open_down='Зарплата до...')
 
 def cur():
     con = sqlite3.connect("testdb.db")
@@ -166,8 +173,7 @@ def get_time_series_data(cursor):
 
 def get_salary_data_with_year(cursor):
     experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
-    translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
-                            between3And6="От трех до шести лет", moreThan6="Более шести лет")
+
     data = [['Range']]
     for year in utils.years_tuple():
         data[0].append(str(year))
@@ -210,7 +216,11 @@ def get_data_with_year(cursor, year, chart_name, sort=True):
     statistics_data = cursor.fetchall()
     data_list = []
     for i in statistics_data:
-        data_list.append(list(i))
+        if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
+            row = [translation_dict[i[0]], i[1]]
+            data_list.append(row)
+        else:
+            data_list.append(list(i))
     data_list.sort(reverse=sort
                    , key=itemgetter(1))
     return head + data_list
