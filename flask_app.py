@@ -164,21 +164,23 @@ def get_time_series_data(cursor):
     return output_list
 
 
-def get_salary_data_with_year(cursor, chart_name):
+def get_salary_data_with_year(cursor):
     experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
+    translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
+                            between3And6="От трех до шести лет", moreThan6="Более шести лет")
     data = [['Range']]
     for year in utils.years_tuple():
         data[0].append(str(year))
         request = f'SELECT data, popularity ' \
                   f'FROM charts ' \
-                  f'WHERE chart_name="{chart_name}" AND year={str(year)};'
+                  f'WHERE chart_name="salary" AND year={str(year)};'
         cursor.execute(request)
         statistics_data = cursor.fetchall()
         for i in statistics_data:
             experience_ranges[i[0]].append(i[1])
     for i in experience_ranges:
         rang_data = experience_ranges[i]
-        rang_data.insert(0, i)
+        rang_data.insert(0, translation_dict[i])
         data.append(rang_data)
     return data
 
@@ -336,7 +338,7 @@ def salary():
     """Time series page"""
     return render_template(
         '/salary.html',
-        salary=get_salary_data_with_year(cur(), 'salary'),
+        salary=get_salary_data_with_year(cur()),
         no_experience_salary=get_vac_with_salary(cur(), 'noExperience'),
         between1And3_salary=get_vac_with_salary(cur(), 'between1And3'),
         between3And6_salary=get_vac_with_salary(cur(), 'between3And6'),
