@@ -9,7 +9,8 @@ update = True
 years_tuple = (
     # 2019,
     # 2020,
-    2021,
+    # 2021,
+    2022,
 )
 exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58}
 experience_grades = ('noExperience', 'between1And3', 'between3And6', 'moreThan6')
@@ -154,18 +155,21 @@ for year in years_tuple:
     # Count salary
     for experience in experience_grades:
         print("Опыт: ", experience)
-        median = utils.salary_to_db(experience, exchange_rates, conn, year)
+        try:
+            median = utils.salary_to_db(experience, exchange_rates, conn, year)
 
-        if update is True:
-            sql = f"""
-                    UPDATE charts SET popularity = {median} WHERE data = '{experience}'
-                    AND chart_name = 'salary' AND year = {str(year)};
-                    """
-        else:
-            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                          VALUES("salary", "{experience}", "{median}", {str(year)});"""
+            if update is True:
+                sql = f"""
+                        UPDATE charts SET popularity = {median} WHERE data = '{experience}'
+                        AND chart_name = 'salary' AND year = {str(year)};
+                        """
+            else:
+                sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
+                              VALUES("salary", "{experience}", "{median}", {str(year)});"""
 
-        cur.executescript(sql)
+            cur.executescript(sql)
+        except sqlite3.OperationalError:
+            print('Some sqlite3.OperationalError')
 
 sql = f"""SELECT id, json FROM vacancies WHERE published_at
           BETWEEN '{first_day_of_current_year}' AND '{today}';"""
