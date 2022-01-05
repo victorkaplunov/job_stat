@@ -29,10 +29,6 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
 
 req = requests.get((base_url + search_string).encode('utf-8'))
 
-# http_proxy = "http://127.0.0.1:8888"
-# https_proxy = "http://127.0.0.1:8888"
-# proxies = {"http": http_proxy, "https": https_proxy}
-
 # Get quantity of pages in responce
 pages = 15  # req.json()["pages"]
 

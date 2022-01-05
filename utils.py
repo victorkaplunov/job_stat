@@ -10,8 +10,14 @@ from datetime import date
 today = date.today()
 first_day_of_current_year = date(date.today().year, 1, 1)
 
+
 def years_tuple():
-    return 2019, 2020, 2021
+    return 2019, 2020, 2021, 2022
+
+
+def reversed_years():
+    years = years_tuple()
+    return years[::-1]
 
 
 def vac_id_list():
@@ -100,19 +106,25 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update, y
     sql = f"""SELECT popularity FROM charts WHERE data = 'py.test' AND year = {year};"""
     cur.execute(sql)
     py_test_popularity = cur.fetchall()
-    if py_test_popularity == []:
+    if not py_test_popularity:
         py_test_popularity = 0
     else:
         print(py_test_popularity)
         py_test_popularity = py_test_popularity[0][0]
+    print('py.test popularity: ', py_test_popularity)
 
-    print('py_test_popularity: ', py_test_popularity)
     sql = f"""SELECT popularity FROM charts WHERE data = 'pytest' AND year = {year};"""
     cur.execute(sql)
-    pytest_popularity = cur.fetchall()[0][0]
-    print('pytest_popularity: ', pytest_popularity)
-    sql = f"""UPDATE charts SET popularity = "%i" WHERE data = 'pytest' AND year = {year};""" \
-                                    % (py_test_popularity + pytest_popularity)
+    pytest_popularity = cur.fetchall()
+    if not pytest_popularity:
+        pytest_popularity = 0
+    else:
+        print(pytest_popularity)
+        pytest_popularity = pytest_popularity[0][0]
+    print('pytest popularity: ', pytest_popularity)
+
+    sum_pop = py_test_popularity + pytest_popularity
+    sql = f"""UPDATE charts SET popularity = "{sum_pop}" WHERE data = 'pytest' AND year = {year};"""
     cur.execute(sql)
     sql = f"""DELETE FROM charts WHERE data = 'py.test' AND year = {year};"""
     cur.execute(sql)
@@ -201,6 +213,8 @@ def vacancy_with_salary(types: dict, chart_name: str, year, all_vacancies, cur, 
 
 
 def salary_to_db(experience, exchange_rate, conn, year):
+    """Приводит зарплаты к общему виду (нетто, руб.) и записывает в отдельную таблицу для быстрого
+    отображения на графике."""
     cur = conn.cursor()
     sql = f"""SELECT DISTINCT json FROM vacancies WHERE published_at
               BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
@@ -230,10 +244,16 @@ def salary_to_db(experience, exchange_rate, conn, year):
     for i in closed_salary:
         closed_salary_sum += i
 
-    average_delta_for_closed_salary = closed_salary_sum/len(closed_salary)
-    print('average_delta_for_closed_salary: ', average_delta_for_closed_salary)
+    average_delta_for_closed_salary = 0
+
+    try:
+        average_delta_for_closed_salary = closed_salary_sum/len(closed_salary)
+        print('average_delta_for_closed_salary: ', average_delta_for_closed_salary)
+    except ZeroDivisionError:
+        print('closed salary list is empty!')
 
     def write_to_vac_with_salary(item, salary):
+        """ Записываем вакансии с указанной зарплатой в промежуточную таблицу vac_with_salary."""
         today = datetime.today()
         delta = timedelta(days=30)
         last_month = today - delta
@@ -252,7 +272,7 @@ def salary_to_db(experience, exchange_rate, conn, year):
             # закрытый диапазон
             if (i['from'] is not None) and (i['to'] is not None):
                 calc_salary = (i['from'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']]
-                if calc_salary < 12792:   # Пишем в базу МРОТ если расчетная ЗП меньше минимальной.
+                if calc_salary < 12792:   # Пишем в базу МРОТ, если расчетная ЗП меньше минимальной.
                     calc_salary = 12792
                 all_salary.append(calc_salary)
                 write_to_vac_with_salary(i, calc_salary)
@@ -299,14 +319,12 @@ def salary_to_db(experience, exchange_rate, conn, year):
                 write_to_vac_with_salary(i, calc_salary)
 
     salary_sum = 0
-    for i in all_salary:
-        salary_sum += i
-
-    average_salary = salary_sum/len(all_salary)
     print('salary qty: ', len(all_salary))
-    print("average_salary: ", average_salary)
-    # Rounding salary to roubles
-    median_salary = int(statistics.median(all_salary))
-    print("median: ", median_salary)
-    print()
-    return median_salary
+    if len(all_salary) == 0:
+        return 0
+    else:
+        for i in all_salary:
+            salary_sum += i
+        median_salary = int(statistics.median(all_salary))
+        print("median: ", median_salary)
+        return median_salary

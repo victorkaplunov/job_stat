@@ -7,7 +7,7 @@ import sqlite3
 import json
 import utils
 from datetime import date, timedelta
-
+import copy
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -176,7 +176,7 @@ def get_salary_data_with_year(cursor):
 
     data = [['Range']]
     for year in utils.years_tuple():
-        data[0].append(str(year))
+        data[0].append(str(year))  # Добавляем года в колонку легенды.
         request = f'SELECT data, popularity ' \
                   f'FROM charts ' \
                   f'WHERE chart_name="salary" AND year={str(year)};'
@@ -226,111 +226,236 @@ def get_data_with_year(cursor, year, chart_name, sort=True):
     return head + data_list
 
 
-def get_framework_data_with_year(cursor, year, chart_name, sort=True):
-    request = f"""
-    SELECT data, popularity, parent FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
-    """
+def get_frameworks_data(cursor, year, chart_name):
     head = [['Framework', 'Popularity', 'Language']]
+    request = f"""
+        SELECT data, popularity, parent FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
+            """
     cursor.execute(request)
     statistics_data = cursor.fetchall()
     data_list = []
     for i in statistics_data:
         data_list.append(list(i))
-    data_list.sort(reverse=sort
-                   , key=itemgetter(1))
+    data_list.sort(reverse=True, key=itemgetter(1))
     return head + data_list
+
+
+def render_framework_charts(title, chart):
+    charts = ''
+    divs = ''
+    for year in utils.reversed_years():
+        data = get_frameworks_data(cur(), year, chart)
+        charts = charts + f"""
+        google.charts.setOnLoadCallback(Chart{year});
+        function Chart{year}() {{
+        var data = google.visualization.arrayToDataTable({data});
+        
+        var dashboard{year} = new google.visualization.Dashboard(
+            document.getElementById('dashboard{year}_div'));
+            
+        var donutRangeSlider{year} = new google.visualization.ControlWrapper({{
+          'controlType': 'CategoryFilter',
+          'containerId': 'filter_div{year}',
+          'options': {{
+            'filterColumnLabel': 'Language',
+            'ui': {{
+                'caption': 'Выберите язык',
+                'selectedValuesLayout': 'belowStacked',
+                'labelStacking': 'vertical',
+                'label': 'Языки программирования',
+                'labelStacking': 'vertical'
+            }},
+            'useFormattedValue': true
+          }}
+        }});
+        
+        // Create a pie chart, passing some options
+        var pieChart{year} = new google.visualization.ChartWrapper({{
+          'chartType': 'PieChart',
+          'containerId': 'chart_div{year}',
+          'options': {{
+            'title':'Популярность фреймворков для юнит-тестирования',
+            chartArea:{{width:'100%',height:'75%'}},
+            'height':500,
+            'pieSliceText': 'value',
+            'legend': 'right'
+          }}
+        }});
+
+        dashboard{year}.bind(donutRangeSlider{year}, pieChart{year});
+        dashboard{year}.draw(data);
+      }}"""
+        # Генерация разделов в которые будут вставляться графики.
+        divs = divs + f'''
+        <div id="chart_div{year}"></div>
+        <div id="filter_div{year}"></div>'''
+    return charts, divs
+
+
+def render_pie_charts(years, title, chart):
+    charts = ''
+    divs = ''
+    for year in years:
+        data = get_data_with_year(cur(), year, chart)
+        # Генерация функция JavaScript для отдельных графиков
+        charts = charts + f'''
+
+            google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
+            function drawScheduleTypeChart{year}() {{
+            var data = google.visualization.arrayToDataTable({data});
+            var options = {{'title':'{title} в {year} году.',
+            chartArea:{{width:'90%',height:'80%'}},
+            pieSliceTextStyle: {{fontSize: 11}}
+            }};
+            var chart = new google.visualization.PieChart(document.getElementById('chart_for_{year}'));
+            chart.draw(data, options);
+            }}'''
+        # Генерация разделов в которые будут вставляться графики.
+        divs = divs + f'<div id="chart_for_{year}" style="height: 300px;"></div>'
+    return charts, divs
 
 
 @app.route('/unit_test_frameworks')
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
     chart = 'frameworks'
+    title = 'Популярность фреймворков для юнит-тестирования '
+    result = render_framework_charts(title, chart)
     return render_template(
-        '/unit_test_frameworks.html',
-        # name='языков программирования',
-        chart2019=get_framework_data_with_year(cur(), 2019, chart),
-        chart2020=get_framework_data_with_year(cur(), 2020, chart),
-        chart2021=get_framework_data_with_year(cur(), 2021, chart),
+        '/unittesting_frameworks_chart.html',
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
 @app.route('/schedule_type')
 def schedule_type():
     """Schedule type popularity page"""
-
+    chart = 'schedule_type'
+    title = 'Популярность режимов работы'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
-        '/schedule_type.html',
-        schedule_type2019=get_data_with_year(cur(), 2019, 'schedule_type'),
-        schedule_type2020=get_data_with_year(cur(), 2020, 'schedule_type'),
-        schedule_type2021=get_data_with_year(cur(), 2021, 'schedule_type')
+        '/pie_chart_with_year.html',
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
 @app.route('/employment_type')
 def employment_type():
     """Employment type popularity page"""
-    employment_type2019 = get_data_with_year(cur(), 2019, 'employment_type')
-    import copy
-    employment_table2019 = copy.deepcopy(employment_type2019)
-    employment_table2019.remove(['Type', 'Popularity'])
-    sum_vac = 0
-    for i in employment_table2019:
-        sum_vac += i[1]
-    for i in employment_table2019:
-        percent = str(round(i[1]/sum_vac * 100, 1))
-        i.append(percent)
+    title = 'Популярность видов найма '
+    charts = ''
+    divs = ''
+    for year in utils.reversed_years():
+        data = get_data_with_year(cur(), year, 'employment_type') # Данные для графика
 
-    employment_type2020 = get_data_with_year(cur(), 2020, 'employment_type')
-    employment_table2020 = copy.deepcopy(employment_type2020)
-    employment_table2020.remove(['Type', 'Popularity'])
-    sum_vac = 0
-    for i in employment_table2020:
-        sum_vac += i[1]
-    for i in employment_table2020:
-        percent = str(round(i[1] / sum_vac * 100, 1))
-        i.append(percent)
+        # Данные для таблицы
+        table_data = copy.deepcopy(data)
+        table_data.remove(['Type', 'Popularity'])
+        sum_vac = 0
+        for i in table_data:
+            sum_vac += i[1]
+        for i in table_data:
+            percent = str(round(i[1] / sum_vac * 100, 1))
+            i.append(percent)
 
-    employment_type2021 = get_data_with_year(cur(), 2021, 'employment_type')
-    employment_table2021 = copy.deepcopy(employment_type2021)
-    employment_table2021.remove(['Type', 'Popularity'])
-    sum_vac = 0
-    for i in employment_table2021:
-        sum_vac += i[1]
-    for i in employment_table2021:
-        percent = str(round(i[1] / sum_vac * 100, 1))
-        i.append(percent)
+        # Генерация функция JavaScript для отдельных графиков
+        charts = charts + f'''
+
+        google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
+        function drawScheduleTypeChart{year}() {{
+        var data = google.visualization.arrayToDataTable({data});
+        var options = {{'title':'{title} в {year} году.',
+        chartArea:{{width:'90%',height:'80%'}},
+        pieSliceTextStyle: {{fontSize: 11}}
+        }};
+        var chart = new google.visualization.PieChart(document.getElementById('chart_for_{year}'));
+        chart.draw(data, options);
+        }}
+        
+        google.charts.setOnLoadCallback(draw{year}Table);
+        function draw{year}Table() {{
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Вид');
+            data.addColumn('number', 'Количество вакансий');
+            data.addColumn('string', 'Доля, %');
+            data.addRows({ table_data });
+
+            var table = new google.visualization.Table(document.getElementById('table{year}div'));
+
+            table.draw(data, {{width: '100%', height: '100%'}});
+          }}
+        '''
+        # Генерация разделов в которые будут вставляться графики.
+        divs = divs + f'''
+        
+        <div id="chart_for_{year}" style="height: 300px;"></div>
+        <div id="table{year}div"></div>
+        <p>
+        <hr>
+        <p>
+        '''
+
+        # employment_type2019 = get_data_with_year(cur(), 2019, 'employment_type')
+        # import copy
+        # table_data = copy.deepcopy(employment_type2019)
+        # table_data.remove(['Type', 'Popularity'])
+        # sum_vac = 0
+        # for i in table_data:
+        #     sum_vac += i[1]
+        # for i in table_data:
+        #     percent = str(round(i[1]/sum_vac * 100, 1))
+        #     i.append(percent)
+        #
+        # employment_type2020 = get_data_with_year(cur(), 2020, 'employment_type')
+        # employment_table2020 = copy.deepcopy(employment_type2020)
+        # employment_table2020.remove(['Type', 'Popularity'])
+        # sum_vac = 0
+        # for i in employment_table2020:
+        #     sum_vac += i[1]
+        # for i in employment_table2020:
+        #     percent = str(round(i[1] / sum_vac * 100, 1))
+        #     i.append(percent)
+        #
+        # employment_type2021 = get_data_with_year(cur(), 2021, 'employment_type')
+        # employment_table2021 = copy.deepcopy(employment_type2021)
+        # employment_table2021.remove(['Type', 'Popularity'])
+        # sum_vac = 0
+        # for i in employment_table2021:
+        #     sum_vac += i[1]
+        # for i in employment_table2021:
+        #     percent = str(round(i[1] / sum_vac * 100, 1))
+        #     i.append(percent)
     return render_template(
         '/employment_type.html',
-        employment_type_chart_2019=employment_type2019,
-        employment_type_table_2019=employment_table2019,
-        employment_type_chart_2020=employment_type2020,
-        employment_type_table_2020=employment_table2020,
-        employment_type_chart_2021=employment_type2021,
-        employment_type_table_2021=employment_table2021
+        charts_function=charts,
+        divs=divs
     )
 
 
 @app.route('/experience')
 def experience():
-    """Schedule type popularity page"""
-    experience_list = get_statistics_data('experience', cur())
+    """Experience popularity page"""
+    chart = 'experience'
+    title = 'Требования к опыту '
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
-        '/experience.html',
-        # experience=sorted(experience_list, key=itemgetter(1), reverse=True)
-        experience2019=get_data_with_year(cur(), 2019, 'experience'),
-        experience2020=get_data_with_year(cur(), 2020, 'experience'),
-        experience2021=get_data_with_year(cur(), 2021, 'experience')
+        '/pie_chart_with_year.html',
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
 @app.route('/with_salary')
 def with_salary():
-    """Schedule type popularity page"""
+    chart = 'with_salary'
+    title = 'Количество вакансий с указанной зарплатой '
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
-        '/with_salary.html',
-        with_salary2019=get_data_with_year(cur(), 2019, 'with_salary'),
-        with_salary2020=get_data_with_year(cur(), 2020, 'with_salary'),
-        with_salary2021=get_data_with_year(cur(), 2021, 'with_salary')
+        '/pie_chart_with_year.html',
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
@@ -371,14 +496,14 @@ def key_skills():
 
 @app.route('/programming_languages')
 def programming_languages():
-    """Load testing tools page"""
+    """Programming languages page"""
     chart = 'languages'
+    title = 'Популярность языков программирования'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
-        name='языков программирования',
-        chart2019=get_data_with_year(cur(), 2019, chart),
-        chart2020=get_data_with_year(cur(), 2020, chart),
-        chart2021=get_data_with_year(cur(), 2021, chart),
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
@@ -386,12 +511,12 @@ def programming_languages():
 def load_testing_tool():
     """Load testing tools page"""
     chart = 'load_testing_tools'
+    title = 'Популярность инструментов тестирования производительности'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
-        name='инструментов тестирования производительности',
-        chart2019=get_data_with_year(cur(), 2019, chart),
-        chart2020=get_data_with_year(cur(), 2020, chart),
-        chart2021=get_data_with_year(cur(), 2021, chart),
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
@@ -399,12 +524,12 @@ def load_testing_tool():
 def bdd_frameworks():
     """BDD framework page"""
     chart = 'bdd_frameworks'
+    title = 'Популярность фреймворков BDD'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
-        name='фреймворков BDD',
-        chart2019=get_data_with_year(cur(), 2019, chart),
-        chart2020=get_data_with_year(cur(), 2020, chart),
-        chart2021=get_data_with_year(cur(), 2021, chart),
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
@@ -412,12 +537,12 @@ def bdd_frameworks():
 def web_ui_tools():
     """Web UI testing tools page"""
     chart = 'web_ui_tools'
+    title = 'Популярность средства тестирования Web UI'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
-        name='средства тестирования Web UI',
-        chart2019=get_data_with_year(cur(), 2019, chart),
-        chart2020=get_data_with_year(cur(), 2020, chart),
-        chart2021=get_data_with_year(cur(), 2021, chart),
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
@@ -425,12 +550,12 @@ def web_ui_tools():
 def mobile_testing_frameworks():
     """Mobile app testing tools page"""
     chart = 'mobile_testing_frameworks'
+    title = 'Популярность инструментов тестирования мобильных приложений'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
-        name='инструментов тестирования мобильных приложений',
-        chart2019=get_data_with_year(cur(), 2019, chart),
-        chart2020=get_data_with_year(cur(), 2020, chart),
-        chart2021=get_data_with_year(cur(), 2021, chart),
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
@@ -438,12 +563,12 @@ def mobile_testing_frameworks():
 def bugtracking_n_tms():
     """Mobile app testing tools page"""
     chart = 'bugtracking_n_tms'
+    title = 'Популярность систем управления тестированием, bugtracking system и т.п.'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
-        name='cистем управления тестированием, bugtracking system и т.п.',
-        chart2019=get_data_with_year(cur(), 2019, chart),
-        chart2020=get_data_with_year(cur(), 2020, chart),
-        chart2021=get_data_with_year(cur(), 2021, chart),
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
@@ -451,12 +576,12 @@ def bugtracking_n_tms():
 def cvs():
     """Mobile app testing tools page"""
     chart = 'cvs'
+    title = 'Популярность систем управления версиями'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
-        name='систем управления версиями',
-        chart2019=get_data_with_year(cur(), 2019, chart),
-        chart2020=get_data_with_year(cur(), 2020, chart),
-        chart2021=get_data_with_year(cur(), 2021, chart),
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
@@ -464,12 +589,12 @@ def cvs():
 def ci_cd():
     """Mobile app testing tools page"""
     chart = 'ci_cd'
+    title = 'Популярность средств CI/CD'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
-        name='средств CI/CD',
-        chart2019=get_data_with_year(cur(), 2019, chart),
-        chart2020=get_data_with_year(cur(), 2020, chart),
-        chart2021=get_data_with_year(cur(), 2021, chart),
+        charts_function=result[0],
+        divs=result[1]
     )
 
 
