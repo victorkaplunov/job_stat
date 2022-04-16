@@ -101,7 +101,7 @@ for year in years_tuple:
                                        'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity'],
                              year, cur, update)
 
-    utils.stat_with_one_year('monitoring', ['CloudWatch', 'Grafana',
+    utils.stat_with_one_year('monitoring', ['CloudWatch', 'Grafana', 'Zabbix',
                                             'Prometheus', 'VictoriaMetrics',
                                             'InfluxDB', 'Graphite', 'ClickHouse'],
                              year, cur, update)
@@ -127,7 +127,6 @@ for year in years_tuple:
 
     utils.stat_with_one_year('cvs', ['git', 'SVN', 'Subversion', 'Mercurial'],
                              year, cur, update)
-
 
     schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0)
     utils.types_stat_with_year(schedule_types, 'schedule_type', 'schedule', all_vacancies,
