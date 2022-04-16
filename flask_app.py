@@ -1,4 +1,5 @@
 import datetime
+import statistics
 from operator import itemgetter
 from flask import Flask, send_from_directory, url_for, render_template
 from flask_bootstrap import Bootstrap
@@ -253,7 +254,7 @@ def render_framework_charts(title, chart):
         var dashboard{year} = new google.visualization.Dashboard(
             document.getElementById('dashboard{year}_div'));
             
-        var donutRangeSlider{year} = new google.visualization.ControlWrapper({{
+        var CategoryFilter{year} = new google.visualization.ControlWrapper({{
           'controlType': 'CategoryFilter',
           'containerId': 'filter_div{year}',
           'options': {{
@@ -274,7 +275,7 @@ def render_framework_charts(title, chart):
           'chartType': 'PieChart',
           'containerId': 'chart_div{year}',
           'options': {{
-            'title':'Популярность фреймворков для юнит-тестирования',
+            'title':'{title}',
             chartArea:{{width:'100%',height:'75%'}},
             'height':500,
             'pieSliceText': 'value',
@@ -282,7 +283,7 @@ def render_framework_charts(title, chart):
           }}
         }});
 
-        dashboard{year}.bind(donutRangeSlider{year}, pieChart{year});
+        dashboard{year}.bind(CategoryFilter{year}, pieChart{year});
         dashboard{year}.draw(data);
       }}"""
         # Генерация разделов в которые будут вставляться графики.
@@ -323,6 +324,108 @@ def unit_test_frameworks():
     result = render_framework_charts(title, chart)
     return render_template(
         '/unittesting_frameworks_chart.html',
+        charts_function=result[0],
+        divs=result[1]
+    )
+
+
+def get_salary_by_category_data(cursor):
+
+    head = [['Language', 'Median salary']]
+
+    request = f"SELECT DISTINCT data FROM charts WHERE chart_name='languages';"
+    cursor.execute(request)
+    languages = cursor.fetchall()
+    today = date.today()
+    last_year = today - timedelta(days=36)
+    data_list = []
+    salary_list = []
+    for language in languages:
+        request = f"""
+        SELECT calc_salary FROM vac_with_salary 
+        WHERE description LIKE "%{language[0]}%"
+        ORDER BY published_at ASC;
+        """
+        cursor.execute(request)
+        salary = cursor.fetchall()
+        print(salary)
+        print(language)
+        for i in salary:
+            salary_list.append(i[0])
+        try:
+            median = statistics.median(salary_list)
+        except statistics.StatisticsError:
+            continue
+
+        data_list.append([language[0], median])
+        salary_list = []
+    return head + data_list
+
+
+def render_salary_by_category_charts(title, chart):
+    charts = ''
+    divs = ''
+    year = 'last'
+
+    data = get_salary_by_category_data(cur())
+    charts = charts + f"""
+    google.charts.setOnLoadCallback(Chart{year});
+    function Chart{year}() {{
+    var data = google.visualization.arrayToDataTable({data});
+
+    var dashboard{year} = new google.visualization.Dashboard(
+        document.getElementById('dashboard{year}_div'));
+
+    var CategoryFilter{year} = new google.visualization.ControlWrapper({{
+      'controlType': 'CategoryFilter',
+      'containerId': 'filter_div{year}',
+      'options': {{
+        'filterColumnLabel': 'Language',
+        'ui': {{
+            'caption': 'Выберите язык',
+            'selectedValuesLayout': 'belowStacked',
+            'labelStacking': 'vertical',
+            'label': 'Языки программирования',
+            'labelStacking': 'vertical'
+        }},
+        'useFormattedValue': true
+      }}
+    }});
+
+    // Create a column chart, passing some options
+    var ColumnChart{year} = new google.visualization.ChartWrapper({{
+      'chartType': 'ColumnChart',
+      'containerId': 'chart_div{year}',
+      'options': {{
+        'title':'{title}',
+        chartArea:{{width:'100%',height:'75%'}},
+        'height':500,
+        'pieSliceText': 'value',
+        'legend': 'right'
+    
+    
+    
+      }}
+    }});
+
+    dashboard{year}.bind(CategoryFilter{year}, ColumnChart{year});
+    dashboard{year}.draw(data);
+  }}"""
+    # Генерация разделов в которые будут вставляться графики.
+    divs = divs + f'''
+    <div id="chart_div{year}"></div>
+    <div id="filter_div{year}"></div>'''
+    return charts, divs
+
+
+@app.route('/salary_by_category')
+def salary_by_category():
+    """Salary by category"""
+    chart = 'frameworks'
+    title = 'Медианная зарплата в зависимости от упоминания языка.'
+    result = render_salary_by_category_charts(title, chart)
+    return render_template(
+        '/tmp.html',
         charts_function=result[0],
         divs=result[1]
     )
@@ -512,6 +615,19 @@ def load_testing_tool():
     """Load testing tools page"""
     chart = 'load_testing_tools'
     title = 'Популярность инструментов тестирования производительности'
+    result = render_pie_charts(utils.reversed_years(), title, chart)
+    return render_template(
+        '/pie_chart_with_year.html',
+        charts_function=result[0],
+        divs=result[1]
+    )
+
+
+@app.route('/monitoring_tools')
+def monitoring_tools():
+    """ Monitoring tools page"""
+    chart = 'monitoring'
+    title = 'Популярность различных средств мониторинга.'
     result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',

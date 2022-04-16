@@ -94,7 +94,16 @@ for year in years_tuple:
 
     utils.stat_with_one_year('load_testing_tools',
                              ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
-                              'Grinder', 'Performance Center', 'IBM Rational Performance'],
+                              'Grinder', 'Performance Center', 'IBM Rational Performance', 'K6'],
+                             year, cur, update)
+
+    utils.stat_with_one_year('ci_cd', ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
+                                       'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity'],
+                             year, cur, update)
+
+    utils.stat_with_one_year('monitoring', ['CloudWatch', 'Grafana',
+                                            'Prometheus', 'VictoriaMetrics',
+                                            'InfluxDB', 'Graphite', 'ClickHouse'],
                              year, cur, update)
 
     utils.stat_with_one_year('web_ui_tools',
@@ -119,9 +128,6 @@ for year in years_tuple:
     utils.stat_with_one_year('cvs', ['git', 'SVN', 'Subversion', 'Mercurial'],
                              year, cur, update)
 
-    utils.stat_with_one_year('ci_cd', ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
-                                       'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity'],
-                             year, cur, update)
 
     schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0)
     utils.types_stat_with_year(schedule_types, 'schedule_type', 'schedule', all_vacancies,
