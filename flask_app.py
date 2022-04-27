@@ -627,7 +627,7 @@ def load_testing_tool():
 def monitoring_tools():
     """ Monitoring tools page"""
     chart = 'monitoring'
-    title = 'Популярность различных средств мониторинга.'
+    title = 'Популярность различных средств мониторинга'
     result = render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
