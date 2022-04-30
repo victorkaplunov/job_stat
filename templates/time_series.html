@@ -4,32 +4,27 @@
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['bar']});
+      google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawStuff);
 
       function drawStuff() {
         var data = new google.visualization.arrayToDataTable({{time_series | safe }});
         var options = {
-          chart: { title: 'Количество вакансий по месяцам',
-                   subtitle: 'Уникальных ID в месяц' },
+          title: 'Количество вакансий по месяцам',
+          legend: {position: 'top', maxLines: 2 },
           bars: 'horizontal', // Required for Material Bar Charts.
+          chartArea: {left:55,top:50,width:'100%',height:'70%'}
         };
-
-        var chart = new google.charts.Bar(document.getElementById('chart'));
+        var view = new google.visualization.DataView(data);
+        var chart = new google.visualization.BarChart(document.getElementById("barchart_values"));
         chart.draw(data,
         options);
       };
-
-
     </script>
 {% endblock %}
 
-
-
   {% block title %}Home Page{% endblock %}
   {% block content %}
-
-            <div id="chart" style="height: 500px;"></div>
-
+            <div id="barchart_values" style="height: 600px;"></div>
   {% endblock %}
 </html>
