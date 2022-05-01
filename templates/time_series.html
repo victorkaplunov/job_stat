@@ -8,7 +8,7 @@
       google.charts.setOnLoadCallback(drawStuff);
 
       function drawStuff() {
-        var data = new google.visualization.arrayToDataTable({{time_series | safe }});
+        var data = new google.visualization.arrayToDataTable({{vacancy_rate_by_year | safe }});
         var options = {
           title: 'Количество вакансий по месяцам',
           legend: {position: 'top', maxLines: 2 },
