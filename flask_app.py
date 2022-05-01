@@ -21,13 +21,19 @@ def cur():
 
 @app.route('/api')
 def api():
-    return f"""<html>
-    <a href="{url_for('show_vac_calendar', vac_id='14658327')}">{url_for('show_vac_calendar', vac_id='14658327')}</a><br>
-    <a href="{url_for('show_vac_description', vac_id='14658327')}">{url_for('show_vac_description', vac_id='14658327')}</a><br>
-    <a href="{url_for('show_vac_top_new_by_id')}">{url_for('show_vac_top_new_by_id')}"</a><br>
-    <a href="{url_for('show_vac_top_new_by_data')}">{url_for('show_vac_top_new_by_data')}"</a><br>
-    <a href="{url_for('search_vac', search_phrase='Python')}">{url_for('search_vac', search_phrase='Python')}"</a><br>
-    </html>"""
+    return f"""
+<html>
+<a href="{url_for('show_vac_calendar', vac_id='14658327')}">{url_for('show_vac_calendar', vac_id='14658327')}</a>
+<br>
+<a href="{url_for('show_vac_description', vac_id='14658327')}">{url_for('show_vac_description', vac_id='14658327')}</a>
+<br>
+<a href="{url_for('show_vac_top_new_by_id')}">{url_for('show_vac_top_new_by_id')}"</a>
+<br>
+<a href="{url_for('show_vac_top_new_by_data')}">{url_for('show_vac_top_new_by_data')}"</a>
+<br>
+<a href="{url_for('search_vac', search_phrase='Python')}">{url_for('search_vac', search_phrase='Python')}"</a>
+<br>
+</html>"""
 
 
 @app.route('/favicon.ico')
@@ -46,10 +52,10 @@ def starter_template():
 def show_vac_calendar(vac_id):
     """Show the publication data of vacancy with the given id"""
     con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
+    cursor = cur()
     sql = "SELECT data FROM calendar WHERE id = " + str(vac_id)
-    cur.execute(sql)
-    vac = cur.fetchall()
+    cursor.execute(sql)
+    vac = cursor.fetchall()
     con.close()
     data_list = []
     for i in vac:
@@ -61,10 +67,10 @@ def show_vac_calendar(vac_id):
 def show_vac_description(vac_id):
     """Show the description of vacancy with the given id"""
     con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
+    cursor = con.cursor()
     sql = "SELECT * FROM vacancies WHERE id = " + str(vac_id)
-    cur.execute(sql)
-    vac = cur.fetchone()
+    cursor.execute(sql)
+    vac = cursor.fetchone()
     return str(
         json.loads(vac[1])['employer']["name"] + "\n" +
         json.loads(vac[1])["name"] + "\n" +
@@ -75,10 +81,10 @@ def show_vac_description(vac_id):
 def show_vac_top_new_by_id():
     """Get last 100 vacancies sorted by id"""
     con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
+    cursor = con.cursor()
     sql = "SELECT * FROM calendar ORDER BY id DESC LIMIT 100;"
-    cur.execute(sql)
-    vac = cur.fetchall()
+    cursor.execute(sql)
+    vac = cursor.fetchall()
     con.close()
     data_list = []
     for i in vac:
@@ -90,10 +96,10 @@ def show_vac_top_new_by_id():
 def show_vac_top_new_by_data():
     """Get last 100 vacancies sorted by last publication data"""
     con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
+    cursor = con.cursor()
     sql = "SELECT * FROM calendar ORDER BY data DESC LIMIT 100;"
-    cur.execute(sql)
-    vac = cur.fetchall()
+    cursor.execute(sql)
+    vac = cursor.fetchall()
     con.close()
     data_list = []
     for i in vac:
@@ -105,10 +111,10 @@ def show_vac_top_new_by_data():
 def search_vac(search_phrase):
     """Get vacancies with search phrase in JSON"""
     con = sqlite3.connect("testdb.db")
-    cur = con.cursor()
+    cursor = con.cursor()
     sql = 'SELECT * FROM vacancies WHERE json LIKE "%{}%" ORDER BY id DESC LIMIT 100;'.format(search_phrase)
-    cur.execute(sql)
-    vac = cur.fetchall()
+    cursor.execute(sql)
+    vac = cursor.fetchall()
     con.close()
     data_list = []
     for i in vac:
@@ -149,7 +155,7 @@ def employment_type():
     charts = ''
     divs = ''
     for year in utils.reversed_years():
-        data = utils.get_data_with_year(cur(), year, 'employment_type') # Данные для графика
+        data = utils.get_data_with_year(cur(), year, 'employment_type')  # Данные для графика
 
         # Данные для таблицы
         table_data = copy.deepcopy(data)
