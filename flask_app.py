@@ -19,6 +19,12 @@ def cur():
     return con.cursor()
 
 
+@app.route('/')
+def home_page():
+    """Home page"""
+    return render_template('/index.html')
+
+
 @app.route('/api')
 def api():
     return f"""
@@ -120,6 +126,28 @@ def search_vac(search_phrase):
     for i in vac:
         data_list.append('<a href="https://hh.ru/vacancy/' + str(i[0]) + '">' + str(i[0]) + '</a>')
     return str(data_list)
+
+
+@app.route('/time_series')
+def time_series():
+    """Time series page"""
+    return render_template(
+        '/time_series.html',
+        vacancy_rate_by_year=utils.get_time_series_data(cur())
+    )
+
+
+@app.route('/salary')
+def salary():
+    """Time series page"""
+    return render_template(
+        '/salary.html',
+        salary=utils.get_salary_data_with_year(cur()),
+        no_experience_salary=utils.get_vac_with_salary(cur(), 'noExperience'),
+        between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
+        between3And6_salary=utils.get_vac_with_salary(cur(), 'between3And6'),
+        moreThan6e_salary=utils.get_vac_with_salary(cur(), 'moreThan6'),
+    )
 
 
 @app.route('/salary_by_category')
@@ -266,28 +294,6 @@ def with_salary():
     )
 
 
-@app.route('/time_series')
-def time_series():
-    """Time series page"""
-    return render_template(
-        '/time_series.html',
-        vacancy_rate_by_year=utils.get_time_series_data(cur())
-    )
-
-
-@app.route('/salary')
-def salary():
-    """Time series page"""
-    return render_template(
-        '/salary.html',
-        salary=utils.get_salary_data_with_year(cur()),
-        no_experience_salary=utils.get_vac_with_salary(cur(), 'noExperience'),
-        between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
-        between3And6_salary=utils.get_vac_with_salary(cur(), 'between3And6'),
-        moreThan6e_salary=utils.get_vac_with_salary(cur(), 'moreThan6'),
-    )
-
-
 @app.route('/key_skills')
 def key_skills():
     """Key skills popularity page"""
@@ -429,12 +435,6 @@ def ci_cd():
         charts_function=result[0],
         divs=result[1]
     )
-
-
-@app.route('/')
-def home_page():
-    """Home page"""
-    return render_template('/index.html')
 
 
 @app.route('/word_cloud')
