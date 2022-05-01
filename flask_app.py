@@ -133,7 +133,7 @@ def time_series():
     """Time series page"""
     return render_template(
         '/time_series.html',
-        vacancy_rate_by_year=utils.get_time_series_data(cur())
+        vacancy_rate_by_year=utils.get_vacancy_count_by_year(cur())
     )
 
 
