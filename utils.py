@@ -1,16 +1,29 @@
 import sqlite3
 import re
 import statistics
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from operator import itemgetter
+
 import requests
 import json
 import unicodedata
 from datetime import date
 
+
+translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
+                        between3And6="От трех до шести лет", moreThan6="Более шести лет",
+                        fullDay='Полный день', flexible='Гибкий график',
+                        shift='Сменный график', remote='Удаленная работа',
+                        full='Полная занятость', part='Частичная занятость',
+                        project="Проектная работа", probation='Стажировка',
+                        without_salary='Зарплата не указана', closed='Закрытый диапазон',
+                        open_up='Зарплата от...', open_down='Зарплата до...')
+
 today = date.today()
 first_day_of_current_year = date(date.today().year, 1, 1)
 
 MROT = 13890
+
 
 def years_tuple():
     return 2019, 2020, 2021, 2022
@@ -256,15 +269,15 @@ def salary_to_db(experience, exchange_rate, conn, year):
 
     def write_to_vac_with_salary(item, salary):
         """ Записываем вакансии с указанной зарплатой в промежуточную таблицу vac_with_salary."""
-        today = datetime.today()
-        delta = timedelta(days=30)
-        last_month = today - delta
-        vac_date = datetime.strptime(item['published_at'][:-5], "%Y-%m-%dT%H:%M:%S")
-        if (vac_date <= today) and (vac_date >= last_month):
-            cur.execute(f"""INSERT INTO vac_with_salary(id, published_at, calc_salary, experience, url, description)
-                            VALUES(?,?,?,?,?,?);""", (item['id'], str(item['published_at']), salary,
-                                                      item['experience'], item['alternate_url'], item['description']))
-            conn.commit()
+        # today = datetime.today()
+        # delta = timedelta(days=30)
+        # last_month = today - delta
+        # vac_date = datetime.strptime(item['published_at'][:-5], "%Y-%m-%dT%H:%M:%S")
+        # if (vac_date <= today) and (vac_date >= last_month):
+        cur.execute(f"""INSERT INTO vac_with_salary(id, published_at, calc_salary, experience, url, description)
+                        VALUES(?,?,?,?,?,?);""", (item['id'], str(item['published_at']), salary,
+                                                  item['experience'], item['alternate_url'], item['description']))
+        conn.commit()
 
     # Считаем среднюю предполагаемую зарплату с учетом открытых диапазонов и НДФЛ.
     all_salary = []
@@ -462,3 +475,283 @@ def salary_to_db_new(year, experience, exchange_rate, conn):
         median_salary = int(statistics.median(all_salary))
         print("median: ", median_salary)
         return median_salary
+
+
+def get_time_series_data(cursor):
+    month_tuples = (('01', 'январь', '31'), ('02', 'февраль', "29"), ('03', 'март', '31'),
+                    ('04', 'апрель', '30'), ('05', 'май', '31'), ('06', 'июнь', '30'),
+                    ('07', 'июль', '31'), ('08', 'август', '31'), ('09', 'сентябрь', '30'),
+                    ('10', 'октябрь', '31'), ('11', 'ноябрь', '30'), ('12', 'декабрь', '31'))
+
+    year_tuple = years_tuple()
+    head_time_series = [['Месяц']]
+    output_list = []
+    for y in year_tuple:
+        head_time_series[0].append(str(y))
+        for n, month in enumerate(month_tuples):
+            # Запрашиваем количество вакансий за месяц
+            sql = f'SELECT DISTINCT id ' \
+                  f'FROM calendar ' \
+                  f'WHERE data ' \
+                  f'BETWEEN "{str(y)}-{month[0]}-01T00:00:00+03:00" and "{str(y)}-{month[0]}-{month[2]}T23:59:59+03:00";'
+            cursor.execute(sql)
+            vacancies_tuple = (cursor.fetchall())
+            if str(y) == '2019':
+                # Данные за февраль неполные, поэтому вместо них пишем ноль
+                if month[1] == 'февраль':
+                    output_list.append([month[1], 0])
+                else:
+                    output_list.append([month[1], len(vacancies_tuple)])
+            else:
+                output_list[n].append(len(vacancies_tuple))
+    output_list = head_time_series + output_list
+    return output_list
+
+
+def get_key_skills_data(chart_name, cursor):
+    """ Get data from 'charts' DB table for chart drawing"""
+    if chart_name == 'frameworks':
+        request = f'SELECT data, popularity, parent FROM charts WHERE chart_name="{chart_name}";'
+
+    else:
+        request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
+    cursor.execute(request)
+    statistics_data = cursor.fetchall()
+    # Convert list of tuples to list of lists
+    data_list = []
+    for i in statistics_data:
+        data_list.append(list(i))
+    return data_list
+
+
+def get_salary_data_with_year(cursor):
+    experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
+
+    data = [['Range']]
+    for year in years_tuple():
+        data[0].append(str(year))  # Добавляем года в колонку легенды.
+        request = f'SELECT data, popularity ' \
+                  f'FROM charts ' \
+                  f'WHERE chart_name="salary" AND year={str(year)};'
+        cursor.execute(request)
+        statistics_data = cursor.fetchall()
+        for i in statistics_data:
+            experience_ranges[i[0]].append(i[1])
+    for i in experience_ranges:
+        rang_data = experience_ranges[i]
+        rang_data.insert(0, translation_dict[i])
+        data.append(rang_data)
+    return data
+
+
+def get_data_with_year(cursor, year, chart_name, sort=True):
+    request = f"""
+    SELECT data, popularity FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
+    """
+    head = [['Type', 'Popularity']]
+    cursor.execute(request)
+    statistics_data = cursor.fetchall()
+    data_list = []
+    for i in statistics_data:
+        if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
+            row = [translation_dict[i[0]], i[1]]
+            data_list.append(row)
+        else:
+            data_list.append(list(i))
+    data_list.sort(reverse=sort
+                   , key=itemgetter(1))
+    return head + data_list
+
+
+def get_vac_with_salary(cursor, exp):
+    today = date.today()
+    delta = timedelta(days=30)
+    last_month = today - delta
+    sql = f"SELECT * FROM vac_with_salary WHERE experience = '{exp}' AND" \
+          f" published_at BETWEEN '{last_month}' AND '{today}' ORDER BY published_at ASC;"
+    cursor.execute(sql)
+    response = cursor.fetchall()
+    chart_data_list = []
+    for i in response:
+        template = f"[new Date('{i[1]}'),{i[2]},'<a href=\"{i[4]}\">{int(i[2])}</a>'],\n"
+        chart_data_list.append(template)
+    chart_data = ''.join(chart_data_list)
+    return chart_data
+
+
+def get_frameworks_data(cursor, year, chart_name):
+    head = [['Framework', 'Popularity', 'Language']]
+    request = f"""
+        SELECT data, popularity, parent FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
+            """
+    cursor.execute(request)
+    statistics_data = cursor.fetchall()
+    data_list = []
+    for i in statistics_data:
+        data_list.append(list(i))
+    data_list.sort(reverse=True, key=itemgetter(1))
+    return head + data_list
+
+
+def render_framework_charts(title, chart, cursor):
+    charts = ''
+    divs = ''
+    for year in reversed_years():
+        data = get_frameworks_data(cursor, year, chart)
+        charts = charts + f"""
+        google.charts.setOnLoadCallback(Chart{year});
+        function Chart{year}() {{
+        var data = google.visualization.arrayToDataTable({data});
+        
+        var dashboard{year} = new google.visualization.Dashboard(
+            document.getElementById('dashboard{year}_div'));
+            
+        var CategoryFilter{year} = new google.visualization.ControlWrapper({{
+          'controlType': 'CategoryFilter',
+          'containerId': 'filter_div{year}',
+          'options': {{
+            'filterColumnLabel': 'Language',
+            'ui': {{
+                'caption': 'Выберите язык',
+                'selectedValuesLayout': 'belowStacked',
+                'labelStacking': 'vertical',
+                'label': 'Языки программирования',
+                'labelStacking': 'vertical'
+            }},
+            'useFormattedValue': true
+          }}
+        }});
+        
+        // Create a pie chart, passing some options
+        var pieChart{year} = new google.visualization.ChartWrapper({{
+          'chartType': 'PieChart',
+          'containerId': 'chart_div{year}',
+          'options': {{
+            'title':'{title}',
+            chartArea:{{width:'100%',height:'75%'}},
+            'height':500,
+            'pieSliceText': 'value',
+            'legend': 'right'
+          }}
+        }});
+
+        dashboard{year}.bind(CategoryFilter{year}, pieChart{year});
+        dashboard{year}.draw(data);
+      }}"""
+        # Генерация разделов в которые будут вставляться графики.
+        divs = divs + f'''
+        <div id="chart_div{year}"></div>
+        <div id="filter_div{year}"></div>'''
+    return charts, divs
+
+
+def render_pie_charts(years, title, chart, cursor):
+    charts = ''
+    divs = ''
+    for year in years:
+        data = get_data_with_year(cursor, year, chart)
+        # Генерация функция JavaScript для отдельных графиков
+        charts = charts + f'''
+
+            google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
+            function drawScheduleTypeChart{year}() {{
+            var data = google.visualization.arrayToDataTable({data});
+            var options = {{'title':'{title} в {year} году.',
+            chartArea:{{width:'90%',height:'80%'}},
+            pieSliceTextStyle: {{fontSize: 11}}
+            }};
+            var chart = new google.visualization.PieChart(document.getElementById('chart_for_{year}'));
+            chart.draw(data, options);
+            }}'''
+        # Генерация разделов в которые будут вставляться графики.
+        divs = divs + f'<div id="chart_for_{year}" style="height: 300px;"></div>'
+    return charts, divs
+
+
+def get_salary_by_category_data(cursor):
+
+    head = [['Language', 'Median salary']]
+
+    request = f"SELECT DISTINCT data FROM charts WHERE chart_name='languages';"
+    cursor.execute(request)
+    languages = cursor.fetchall()
+    today = date.today()
+    last_year = today - timedelta(days=36)
+    data_list = []
+    salary_list = []
+    for language in languages:
+        request = f"""
+        SELECT calc_salary FROM vac_with_salary 
+        WHERE description LIKE "%{language[0]}%"
+        ORDER BY published_at ASC;
+        """
+        cursor.execute(request)
+        salary = cursor.fetchall()
+        # print(salary)
+        print(language)
+        for i in salary:
+            salary_list.append(i[0])
+        try:
+            median = statistics.median(salary_list)
+        except statistics.StatisticsError:
+            continue
+
+        data_list.append([language[0], median])
+        salary_list = []
+    return head + data_list
+
+
+def render_salary_by_category_charts(title, cursor):
+    charts = ''
+    divs = ''
+    year = 'last'
+
+    data = get_salary_by_category_data(cursor)
+    charts = charts + f"""
+    google.charts.setOnLoadCallback(Chart{year});
+    function Chart{year}() {{
+    var data = google.visualization.arrayToDataTable({data});
+
+    var dashboard{year} = new google.visualization.Dashboard(
+        document.getElementById('dashboard{year}_div'));
+
+    var CategoryFilter{year} = new google.visualization.ControlWrapper({{
+      'controlType': 'CategoryFilter',
+      'containerId': 'filter_div{year}',
+      'options': {{
+        'filterColumnLabel': 'Language',
+        'ui': {{
+            'caption': 'Выберите язык',
+            'selectedValuesLayout': 'belowStacked',
+            'labelStacking': 'vertical',
+            'label': 'Языки программирования',
+            'labelStacking': 'vertical'
+        }},
+        'useFormattedValue': true
+      }}
+    }});
+
+    // Create a column chart, passing some options
+    var ColumnChart{year} = new google.visualization.ChartWrapper({{
+      'chartType': 'ColumnChart',
+      'containerId': 'chart_div{year}',
+      'options': {{
+        'title':'{title}',
+        chartArea:{{width:'100%',height:'75%'}},
+        'height':500,
+        'pieSliceText': 'value',
+        'legend': 'right'
+    
+    
+    
+      }}
+    }});
+
+    dashboard{year}.bind(CategoryFilter{year}, ColumnChart{year});
+    dashboard{year}.draw(data);
+  }}"""
+    # Генерация разделов в которые будут вставляться графики.
+    divs = divs + f'''
+    <div id="chart_div{year}"></div>
+    <div id="filter_div{year}"></div>'''
+    return charts, divs

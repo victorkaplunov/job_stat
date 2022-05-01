@@ -1,5 +1,3 @@
-import datetime
-import statistics
 from operator import itemgetter
 from flask import Flask, send_from_directory, url_for, render_template
 from flask_bootstrap import Bootstrap
@@ -7,21 +5,14 @@ import os
 import sqlite3
 import json
 import utils
-from datetime import date, timedelta
 import copy
+
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
 id_list = []
 l_host = "http://127.0.0.1:5000"
-translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
-                        between3And6="От трех до шести лет", moreThan6="Более шести лет",
-                        fullDay='Полный день', flexible='Гибкий график',
-                        shift='Сменный график', remote='Удаленная работа',
-                        full='Полная занятость', part='Частичная занятость',
-                        project="Проектная работа", probation='Стажировка',
-                        without_salary='Зарплата не указана', closed='Закрытый диапазон',
-                        open_up='Зарплата от...', open_down='Зарплата до...')
+
 
 def cur():
     con = sqlite3.connect("testdb.db")
@@ -125,305 +116,12 @@ def search_vac(search_phrase):
     return str(data_list)
 
 
-def get_statistics_data(chart_name, cursor):
-    """ Get data from 'charts' DB table for chart drawing"""
-    if chart_name == 'frameworks':
-        request = f'SELECT data, popularity, parent FROM charts WHERE chart_name="{chart_name}";'
-
-    else:
-        request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
-    cursor.execute(request)
-    statistics_data = cursor.fetchall()
-    # Convert list of tuples to list of lists
-    data_list = []
-    for i in statistics_data:
-        data_list.append(list(i))
-    return data_list
-
-
-def get_time_series_data(cursor):
-    month_tuples = (('01', 'январь', '31'), ('02', 'февраль', "29"), ('03', 'март', '31'),
-                    ('04', 'апрель', '30'), ('05', 'май', '31'), ('06', 'июнь', '30'),
-                    ('07', 'июль', '31'), ('08', 'август', '31'), ('09', 'сентябрь', '30'),
-                    ('10', 'октябрь', '31'), ('11', 'ноябрь', '30'), ('12', 'декабрь', '31'))
-
-    year_tuple = utils.years_tuple()
-    head_time_series = [['Месяц']]
-    output_list = []
-    for y in year_tuple:
-        head_time_series[0].append(str(y))
-        for n, month in enumerate(month_tuples):
-            # Запрашиваем количество вакансий за месяц
-            sql = f'SELECT DISTINCT id ' \
-                  f'FROM calendar ' \
-                  f'WHERE data ' \
-                  f'BETWEEN "{str(y)}-{month[0]}-01T00:00:00+03:00" and "{str(y)}-{month[0]}-{month[2]}T23:59:59+03:00";'
-            cursor.execute(sql)
-            vacancies_tuple = (cursor.fetchall())
-            if str(y) == '2019':
-                # Данные за февраль неполные, поэтому вместо них пишем ноль
-                if month[1] == 'февраль':
-                    output_list.append([month[1], 0])
-                else:
-                    output_list.append([month[1], len(vacancies_tuple)])
-            else:
-                output_list[n].append(len(vacancies_tuple))
-    output_list = head_time_series + output_list
-    return output_list
-
-
-def get_salary_data_with_year(cursor):
-    experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
-
-    data = [['Range']]
-    for year in utils.years_tuple():
-        data[0].append(str(year))  # Добавляем года в колонку легенды.
-        request = f'SELECT data, popularity ' \
-                  f'FROM charts ' \
-                  f'WHERE chart_name="salary" AND year={str(year)};'
-        cursor.execute(request)
-        statistics_data = cursor.fetchall()
-        for i in statistics_data:
-            experience_ranges[i[0]].append(i[1])
-    for i in experience_ranges:
-        rang_data = experience_ranges[i]
-        rang_data.insert(0, translation_dict[i])
-        data.append(rang_data)
-    return data
-
-
-def get_vac_with_salary(cursor, exp):
-    today = date.today()
-    delta = timedelta(days=30)
-    last_month = today - delta
-    sql = f"SELECT * FROM vac_with_salary WHERE experience = '{exp}' AND" \
-          f" published_at BETWEEN '{last_month}' AND '{today}' ORDER BY published_at ASC;"
-    cursor.execute(sql)
-    response = cursor.fetchall()
-    chart_data_list = []
-    for i in response:
-        template = f"[new Date('{i[1]}'),{i[2]},'<a href=\"{i[4]}\">{int(i[2])}</a>'],\n"
-        chart_data_list.append(template)
-    chart_data = ''.join(chart_data_list)
-    return chart_data
-
-
-def get_data_with_year(cursor, year, chart_name, sort=True):
-    request = f"""
-    SELECT data, popularity FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
-    """
-    head = [['Type', 'Popularity']]
-    cursor.execute(request)
-    statistics_data = cursor.fetchall()
-    data_list = []
-    for i in statistics_data:
-        if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
-            row = [translation_dict[i[0]], i[1]]
-            data_list.append(row)
-        else:
-            data_list.append(list(i))
-    data_list.sort(reverse=sort
-                   , key=itemgetter(1))
-    return head + data_list
-
-
-def get_frameworks_data(cursor, year, chart_name):
-    head = [['Framework', 'Popularity', 'Language']]
-    request = f"""
-        SELECT data, popularity, parent FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
-            """
-    cursor.execute(request)
-    statistics_data = cursor.fetchall()
-    data_list = []
-    for i in statistics_data:
-        data_list.append(list(i))
-    data_list.sort(reverse=True, key=itemgetter(1))
-    return head + data_list
-
-
-def render_framework_charts(title, chart):
-    charts = ''
-    divs = ''
-    for year in utils.reversed_years():
-        data = get_frameworks_data(cur(), year, chart)
-        charts = charts + f"""
-        google.charts.setOnLoadCallback(Chart{year});
-        function Chart{year}() {{
-        var data = google.visualization.arrayToDataTable({data});
-        
-        var dashboard{year} = new google.visualization.Dashboard(
-            document.getElementById('dashboard{year}_div'));
-            
-        var CategoryFilter{year} = new google.visualization.ControlWrapper({{
-          'controlType': 'CategoryFilter',
-          'containerId': 'filter_div{year}',
-          'options': {{
-            'filterColumnLabel': 'Language',
-            'ui': {{
-                'caption': 'Выберите язык',
-                'selectedValuesLayout': 'belowStacked',
-                'labelStacking': 'vertical',
-                'label': 'Языки программирования',
-                'labelStacking': 'vertical'
-            }},
-            'useFormattedValue': true
-          }}
-        }});
-        
-        // Create a pie chart, passing some options
-        var pieChart{year} = new google.visualization.ChartWrapper({{
-          'chartType': 'PieChart',
-          'containerId': 'chart_div{year}',
-          'options': {{
-            'title':'{title}',
-            chartArea:{{width:'100%',height:'75%'}},
-            'height':500,
-            'pieSliceText': 'value',
-            'legend': 'right'
-          }}
-        }});
-
-        dashboard{year}.bind(CategoryFilter{year}, pieChart{year});
-        dashboard{year}.draw(data);
-      }}"""
-        # Генерация разделов в которые будут вставляться графики.
-        divs = divs + f'''
-        <div id="chart_div{year}"></div>
-        <div id="filter_div{year}"></div>'''
-    return charts, divs
-
-
-def render_pie_charts(years, title, chart):
-    charts = ''
-    divs = ''
-    for year in years:
-        data = get_data_with_year(cur(), year, chart)
-        # Генерация функция JavaScript для отдельных графиков
-        charts = charts + f'''
-
-            google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
-            function drawScheduleTypeChart{year}() {{
-            var data = google.visualization.arrayToDataTable({data});
-            var options = {{'title':'{title} в {year} году.',
-            chartArea:{{width:'90%',height:'80%'}},
-            pieSliceTextStyle: {{fontSize: 11}}
-            }};
-            var chart = new google.visualization.PieChart(document.getElementById('chart_for_{year}'));
-            chart.draw(data, options);
-            }}'''
-        # Генерация разделов в которые будут вставляться графики.
-        divs = divs + f'<div id="chart_for_{year}" style="height: 300px;"></div>'
-    return charts, divs
-
-
-@app.route('/unit_test_frameworks')
-def unit_test_frameworks():
-    """Unit test frameworks popularity page"""
-    chart = 'frameworks'
-    title = 'Популярность фреймворков для юнит-тестирования '
-    result = render_framework_charts(title, chart)
-    return render_template(
-        '/unittesting_frameworks_chart.html',
-        charts_function=result[0],
-        divs=result[1]
-    )
-
-
-def get_salary_by_category_data(cursor):
-
-    head = [['Language', 'Median salary']]
-
-    request = f"SELECT DISTINCT data FROM charts WHERE chart_name='languages';"
-    cursor.execute(request)
-    languages = cursor.fetchall()
-    today = date.today()
-    last_year = today - timedelta(days=36)
-    data_list = []
-    salary_list = []
-    for language in languages:
-        request = f"""
-        SELECT calc_salary FROM vac_with_salary 
-        WHERE description LIKE "%{language[0]}%"
-        ORDER BY published_at ASC;
-        """
-        cursor.execute(request)
-        salary = cursor.fetchall()
-        print(salary)
-        print(language)
-        for i in salary:
-            salary_list.append(i[0])
-        try:
-            median = statistics.median(salary_list)
-        except statistics.StatisticsError:
-            continue
-
-        data_list.append([language[0], median])
-        salary_list = []
-    return head + data_list
-
-
-def render_salary_by_category_charts(title, chart):
-    charts = ''
-    divs = ''
-    year = 'last'
-
-    data = get_salary_by_category_data(cur())
-    charts = charts + f"""
-    google.charts.setOnLoadCallback(Chart{year});
-    function Chart{year}() {{
-    var data = google.visualization.arrayToDataTable({data});
-
-    var dashboard{year} = new google.visualization.Dashboard(
-        document.getElementById('dashboard{year}_div'));
-
-    var CategoryFilter{year} = new google.visualization.ControlWrapper({{
-      'controlType': 'CategoryFilter',
-      'containerId': 'filter_div{year}',
-      'options': {{
-        'filterColumnLabel': 'Language',
-        'ui': {{
-            'caption': 'Выберите язык',
-            'selectedValuesLayout': 'belowStacked',
-            'labelStacking': 'vertical',
-            'label': 'Языки программирования',
-            'labelStacking': 'vertical'
-        }},
-        'useFormattedValue': true
-      }}
-    }});
-
-    // Create a column chart, passing some options
-    var ColumnChart{year} = new google.visualization.ChartWrapper({{
-      'chartType': 'ColumnChart',
-      'containerId': 'chart_div{year}',
-      'options': {{
-        'title':'{title}',
-        chartArea:{{width:'100%',height:'75%'}},
-        'height':500,
-        'pieSliceText': 'value',
-        'legend': 'right'
-    
-    
-    
-      }}
-    }});
-
-    dashboard{year}.bind(CategoryFilter{year}, ColumnChart{year});
-    dashboard{year}.draw(data);
-  }}"""
-    # Генерация разделов в которые будут вставляться графики.
-    divs = divs + f'''
-    <div id="chart_div{year}"></div>
-    <div id="filter_div{year}"></div>'''
-    return charts, divs
-
-
 @app.route('/salary_by_category')
 def salary_by_category():
     """Salary by category"""
     chart = 'frameworks'
     title = 'Медианная зарплата в зависимости от упоминания языка.'
-    result = render_salary_by_category_charts(title, chart)
+    result = utils.render_salary_by_category_charts(title, chart)
     return render_template(
         '/tmp.html',
         charts_function=result[0],
@@ -436,7 +134,7 @@ def schedule_type():
     """Schedule type popularity page"""
     chart = 'schedule_type'
     title = 'Популярность режимов работы'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -451,7 +149,7 @@ def employment_type():
     charts = ''
     divs = ''
     for year in utils.reversed_years():
-        data = get_data_with_year(cur(), year, 'employment_type') # Данные для графика
+        data = utils.get_data_with_year(cur(), year, 'employment_type') # Данные для графика
 
         # Данные для таблицы
         table_data = copy.deepcopy(data)
@@ -542,7 +240,7 @@ def experience():
     """Experience popularity page"""
     chart = 'experience'
     title = 'Требования к опыту '
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -554,7 +252,7 @@ def experience():
 def with_salary():
     chart = 'with_salary'
     title = 'Количество вакансий с указанной зарплатой '
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -567,7 +265,7 @@ def time_series():
     """Time series page"""
     return render_template(
         '/time_series.html',
-        time_series=get_time_series_data(cur())
+        vacancy_rate_by_year=utils.get_time_series_data(cur())
     )
 
 
@@ -576,18 +274,18 @@ def salary():
     """Time series page"""
     return render_template(
         '/salary.html',
-        salary=get_salary_data_with_year(cur()),
-        no_experience_salary=get_vac_with_salary(cur(), 'noExperience'),
-        between1And3_salary=get_vac_with_salary(cur(), 'between1And3'),
-        between3And6_salary=get_vac_with_salary(cur(), 'between3And6'),
-        moreThan6e_salary=get_vac_with_salary(cur(), 'moreThan6'),
+        salary=utils.get_salary_data_with_year(cur()),
+        no_experience_salary=utils.get_vac_with_salary(cur(), 'noExperience'),
+        between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
+        between3And6_salary=utils.get_vac_with_salary(cur(), 'between3And6'),
+        moreThan6e_salary=utils.get_vac_with_salary(cur(), 'moreThan6'),
     )
 
 
 @app.route('/key_skills')
 def key_skills():
     """Key skills popularity page"""
-    key_skills_list = get_statistics_data('key_skills', cur())
+    key_skills_list = utils.get_key_skills_data('key_skills', cur())
     for i in key_skills_list:
         i.append(i[0])
     sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
@@ -602,9 +300,22 @@ def programming_languages():
     """Programming languages page"""
     chart = 'languages'
     title = 'Популярность языков программирования'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        charts_function=result[0],
+        divs=result[1]
+    )
+
+
+@app.route('/unit_test_frameworks')
+def unit_test_frameworks():
+    """Unit test frameworks popularity page"""
+    chart = 'frameworks'
+    title = 'Популярность фреймворков для юнит-тестирования '
+    result = utils.render_framework_charts(title, chart, cur())
+    return render_template(
+        '/unittesting_frameworks_chart.html',
         charts_function=result[0],
         divs=result[1]
     )
@@ -615,7 +326,7 @@ def load_testing_tool():
     """Load testing tools page"""
     chart = 'load_testing_tools'
     title = 'Популярность инструментов тестирования производительности'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -628,7 +339,7 @@ def monitoring_tools():
     """ Monitoring tools page"""
     chart = 'monitoring'
     title = 'Популярность различных средств мониторинга'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -641,7 +352,7 @@ def bdd_frameworks():
     """BDD framework page"""
     chart = 'bdd_frameworks'
     title = 'Популярность фреймворков BDD'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -654,7 +365,7 @@ def web_ui_tools():
     """Web UI testing tools page"""
     chart = 'web_ui_tools'
     title = 'Популярность средства тестирования Web UI'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -667,7 +378,7 @@ def mobile_testing_frameworks():
     """Mobile app testing tools page"""
     chart = 'mobile_testing_frameworks'
     title = 'Популярность инструментов тестирования мобильных приложений'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -680,7 +391,7 @@ def bugtracking_n_tms():
     """Mobile app testing tools page"""
     chart = 'bugtracking_n_tms'
     title = 'Популярность систем управления тестированием, bugtracking system и т.п.'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -693,7 +404,7 @@ def cvs():
     """Mobile app testing tools page"""
     chart = 'cvs'
     title = 'Популярность систем управления версиями'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
@@ -706,7 +417,7 @@ def ci_cd():
     """Mobile app testing tools page"""
     chart = 'ci_cd'
     title = 'Популярность средств CI/CD'
-    result = render_pie_charts(utils.reversed_years(), title, chart)
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
         charts_function=result[0],
