@@ -507,24 +507,19 @@ def get_vacancy_count_by_year(cursor):
 
 def get_vacancy_count_week_by_week(cursor):
     yesterday = today - timedelta(days=1)
-    print(yesterday)
     start_weekday_num = yesterday.weekday()
-    print('start_weekday_num', start_weekday_num)
     weekday_name = ['пн.', 'вт.', 'ср.', 'чт', 'пт.', 'сб.', 'вс.']
     weekday_list = []
     for i in range(0, 7):
-        print(start_weekday_num)
         weekday_list.append(weekday_name[start_weekday_num])
         if start_weekday_num < 6:
             start_weekday_num += 1
         else:
             start_weekday_num = 0
-    print(weekday_list)
     output_list = [['Неделя', 'current week', 'last week', 'two weeks ago', 'three weeks ago']]
     for count, value in enumerate(weekday_list):
         print('count', count)
         day_list = [value]
-        print(value)
         for n in range(0, 28, 7):
             day = yesterday - timedelta(days=n-count)
             sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
