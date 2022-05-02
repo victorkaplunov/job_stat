@@ -33,4 +33,18 @@ CREATE TABLE IF NOT EXISTS charts
 cur.execute(sql)
 
 
+sql = """
+CREATE TABLE IF NOT EXISTS vac_with_salary
+(
+    id INTEGER PRIMARY KEY,
+    published_at TEXT,
+    calc_salary NUMERIC,
+    experience TEXT,
+    url TEXT,
+    from NUMERIC,
+    to NUMERIC
+);
+"""
+cur.execute(sql)
+
 con.close()  # Close database
