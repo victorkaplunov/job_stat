@@ -133,9 +133,9 @@ def time_series():
     """Time series page"""
     return render_template(
         '/time_series.html',
-        vacancy_rate_by_year=utils.get_vacancy_count_by_year(cur()),
-        vacancy_count_week_by_week=utils.get_vacancy_count_week_by_week(cur())
-    )
+        vacancy_count_day_by_week=utils.vacancy_count_day_by_week(cur()),
+        vacancy_count_week_by_week=utils.vacancy_count_week_by_week(cur()),
+        vacancy_rate_by_year=utils.get_vacancy_count_by_year(cur()))
 
 
 @app.route('/salary')
@@ -147,8 +147,7 @@ def salary():
         no_experience_salary=utils.get_vac_with_salary(cur(), 'noExperience'),
         between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
         between3And6_salary=utils.get_vac_with_salary(cur(), 'between3And6'),
-        moreThan6e_salary=utils.get_vac_with_salary(cur(), 'moreThan6'),
-    )
+        moreThan6e_salary=utils.get_vac_with_salary(cur(), 'moreThan6'))
 
 
 @app.route('/salary_by_category')

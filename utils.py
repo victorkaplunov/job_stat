@@ -475,6 +475,56 @@ def salary_to_db_new(year, experience, exchange_rate, conn):
         return median_salary
 
 
+# ToDo - add tooltips with date.
+def vacancy_count_day_by_week(cursor):
+    yesterday = today - timedelta(days=1)
+    start_weekday_num = yesterday.weekday()
+    weekday_name = ['пн.', 'вт.', 'ср.', 'чт', 'пт.', 'сб.', 'вс.']
+    weekday_list = []
+    for i in range(0, 7):
+        weekday_list.append(weekday_name[start_weekday_num])
+        if start_weekday_num < 6:
+            start_weekday_num += 1
+        else:
+            start_weekday_num = 0
+    output_list = [['Неделя', 'текущая неделя', 'прошлая неделя', 'две недели назад', 'три недели назад']]
+    for count, value in enumerate(weekday_list):
+        day_list = [value]
+        for n in range(0, 28, 7):
+            day = yesterday - timedelta(days=n-count)
+            sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
+                  BETWEEN "{day}T00:00:00+03:00" and "{day}T23:59:59+03:00";'''
+            cursor.execute(sql)
+            vacancies_tuple = (cursor.fetchall())
+            day_list.append(vacancies_tuple[0][0])
+        output_list.append(day_list)
+    return output_list
+
+
+def vacancy_count_week_by_week(cursor):
+    delta = date.today() - first_day_of_current_year
+    day = first_day_of_current_year
+    result = dict(Неделя="количество вакансий")
+    for i in range(0, delta.days):
+        sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
+                          BETWEEN "{day}T00:00:00+03:00" and "{day}T23:59:59+03:00";'''
+        cursor.execute(sql)
+        vacancies_tuple = (cursor.fetchall())
+        vacancy_qty = vacancies_tuple[0][0]
+        str_week_num = str(day.isocalendar()[1])
+        if str_week_num in result:
+            result[str_week_num] = result[str_week_num] + vacancy_qty
+        else:
+            result[str_week_num] = vacancy_qty
+        day = day + timedelta(days=1)
+    output_list = []
+    # Dict to list
+    for key, value in result.items():
+        temp = [key, value]
+        output_list.append(temp)
+    return output_list
+
+
 def get_vacancy_count_by_year(cursor):
     month_tuples = (('01', 'январь', '31'), ('02', 'февраль', "29"), ('03', 'март', '31'),
                     ('04', 'апрель', '30'), ('05', 'май', '31'), ('06', 'июнь', '30'),
@@ -502,33 +552,6 @@ def get_vacancy_count_by_year(cursor):
             else:
                 output_list[n].append(len(vacancies_tuple))
     output_list = head_time_series + output_list
-    return output_list
-
-
-def get_vacancy_count_week_by_week(cursor):
-    yesterday = today - timedelta(days=1)
-    start_weekday_num = yesterday.weekday()
-    weekday_name = ['пн.', 'вт.', 'ср.', 'чт', 'пт.', 'сб.', 'вс.']
-    weekday_list = []
-    for i in range(0, 7):
-        weekday_list.append(weekday_name[start_weekday_num])
-        if start_weekday_num < 6:
-            start_weekday_num += 1
-        else:
-            start_weekday_num = 0
-    output_list = [['Неделя', 'current week', 'last week', 'two weeks ago', 'three weeks ago']]
-    for count, value in enumerate(weekday_list):
-        print('count', count)
-        day_list = [value]
-        for n in range(0, 28, 7):
-            day = yesterday - timedelta(days=n-count)
-            sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
-                  BETWEEN "{day}T00:00:00+03:00" and "{day}T23:59:59+03:00";'''
-            cursor.execute(sql)
-            vacancies_tuple = (cursor.fetchall())
-            print(day, vacancies_tuple[0][0])
-            day_list.append(vacancies_tuple[0][0])
-        output_list.append(day_list)
     return output_list
 
 
