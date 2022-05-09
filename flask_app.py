@@ -51,7 +51,7 @@ def favicon():
 @app.route('/starter-template.css')
 def starter_template():
     return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'starter-template.css')  # , mimetype='image/vnd.microsoft.icon')
+                               'starter-template.css')
 
 
 @app.route('/api/vac/cal/<int:vac_id>')
@@ -133,6 +133,7 @@ def time_series():
     """Time series page"""
     return render_template(
         '/time_series.html',
+        title='Количество вакансий по месяцам и неделям.',
         vacancy_count_day_by_week=utils.vacancy_count_day_by_week(cur()),
         vacancy_count_week_by_week=utils.vacancy_count_week_by_week(cur()),
         vacancy_rate_by_year=utils.get_vacancy_count_by_year(cur()))
@@ -143,6 +144,7 @@ def salary():
     """Time series page"""
     return render_template(
         '/salary.html',
+        title='Заработная плата в зависимости от опыта.',
         salary=utils.get_salary_data_with_year(cur()),
         no_experience_salary=utils.get_vac_with_salary(cur(), 'noExperience'),
         between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
@@ -171,6 +173,7 @@ def schedule_type():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Режимы работы.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -231,39 +234,9 @@ def employment_type():
         <hr>
         <p>
         '''
-
-        # employment_type2019 = get_data_with_year(cur(), 2019, 'employment_type')
-        # import copy
-        # table_data = copy.deepcopy(employment_type2019)
-        # table_data.remove(['Type', 'Popularity'])
-        # sum_vac = 0
-        # for i in table_data:
-        #     sum_vac += i[1]
-        # for i in table_data:
-        #     percent = str(round(i[1]/sum_vac * 100, 1))
-        #     i.append(percent)
-        #
-        # employment_type2020 = get_data_with_year(cur(), 2020, 'employment_type')
-        # employment_table2020 = copy.deepcopy(employment_type2020)
-        # employment_table2020.remove(['Type', 'Popularity'])
-        # sum_vac = 0
-        # for i in employment_table2020:
-        #     sum_vac += i[1]
-        # for i in employment_table2020:
-        #     percent = str(round(i[1] / sum_vac * 100, 1))
-        #     i.append(percent)
-        #
-        # employment_type2021 = get_data_with_year(cur(), 2021, 'employment_type')
-        # employment_table2021 = copy.deepcopy(employment_type2021)
-        # employment_table2021.remove(['Type', 'Popularity'])
-        # sum_vac = 0
-        # for i in employment_table2021:
-        #     sum_vac += i[1]
-        # for i in employment_table2021:
-        #     percent = str(round(i[1] / sum_vac * 100, 1))
-        #     i.append(percent)
     return render_template(
         '/employment_type.html',
+        title='Виды занятости.',
         charts_function=charts,
         divs=divs
     )
@@ -277,6 +250,7 @@ def experience():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Требуемый опыт работы.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -289,6 +263,7 @@ def with_salary():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Количество вакансий с указанной зарплатой.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -303,6 +278,7 @@ def key_skills():
     sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
     return render_template(
         '/key_skills.html',
+        title='50 наиболее популярных тегов раздела "Ключевые навыки".',
         key_skills=sorted_key_skills_list[:50]
     )
 
@@ -315,6 +291,7 @@ def programming_languages():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Популярность языков программирования.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -324,10 +301,11 @@ def programming_languages():
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
     chart = 'frameworks'
-    title = 'Популярность фреймворков для юнит-тестирования '
+    title = 'Популярность фреймворков для юнит-тестирования'
     result = utils.render_framework_charts(title, chart, cur())
     return render_template(
         '/unittesting_frameworks_chart.html',
+        title='Популярность фреймворков для юнит-тестирования.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -341,6 +319,7 @@ def load_testing_tool():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Средства нагрузочного тестирования.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -354,6 +333,7 @@ def monitoring_tools():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Популярность различных средств мониторинга.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -367,6 +347,7 @@ def bdd_frameworks():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Популярность фреймворков BDD.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -380,6 +361,7 @@ def web_ui_tools():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Популярность средства тестирования Web UI.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -393,6 +375,7 @@ def mobile_testing_frameworks():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Популярность инструментов тестирования мобильных приложений.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -406,6 +389,7 @@ def bugtracking_n_tms():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Популярность систем управления тестированием, bugtracking system и т.п.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -419,6 +403,7 @@ def cvs():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Популярность систем управления версиями.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -432,6 +417,7 @@ def ci_cd():
     result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
     return render_template(
         '/pie_chart_with_year.html',
+        title='Популярность средств CI/CD.',
         charts_function=result[0],
         divs=result[1]
     )
@@ -440,4 +426,6 @@ def ci_cd():
 @app.route('/word_cloud')
 def word_cloud():
     """Chart page"""
-    return render_template('/word_cloud.html')
+    return render_template('/word_cloud.html',
+                           title='"Облако слов" на основе текстов вакансий.'
+                           )
