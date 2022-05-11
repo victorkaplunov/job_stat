@@ -47,7 +47,7 @@ wordcloud = WordCloud(background_color="white",
                       contour_width=3, contour_color='steelblue',
                       min_word_length=2,
                       # width=800, height=600, margin=0,
-                      width=300, height=500, margin=0
+                      width=400, height=600, margin=0
                       ).generate(text)
 
 image = wordcloud.to_image()
