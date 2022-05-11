@@ -13,21 +13,21 @@ year = '2020'
 sql = f"""SELECT json FROM vacancies WHERE published_at
               BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
 cur.execute(sql)
-vac = cur.fetchall()
+vacancies = cur.fetchall()
 cleaner = re.compile('<.*?>')  # This is RegExp for removing HTML tags
 text = ''
 f = open("word_cloud.txt", "a", encoding="utf-8")
 f.truncate(0)
 
 # Create a list of word and filter some content
-for i in vac:
+for i in vacancies:
     description = json.loads(i[0])['description']
     json_dump = re.sub(cleaner, '', description)  # Remove HTML tags
     json_dump = json_dump.replace('й', 'й')
     json_dump = json_dump.replace('Й', 'Й')
     json_dump = json_dump.replace('&quot;', '')
-    stop_list = ['o o ', 'O O ', 'o oa', 'c c', 'Mail.ru Group', 'Group IB'
-
+    stop_list = [
+        'Mail.ru Group', 'Group IB', 'looking',
     ]
     for word in stop_list:
         json_dump = json_dump.replace(word, '')
@@ -38,14 +38,15 @@ f.close()
 
 f = open("word_cloud.txt", "r", encoding="utf-8")
 text = f.read()
-# mask = np.array(Image.open("C:\\Users\\User\\PycharmProjects\\job_stat\\alpha_channel_1.png"))
+mask = np.array(Image.open("alfa_channel.png"))
 
 # Create the wordcloud object
 wordcloud = WordCloud(background_color="white",
                       max_words=100,
                       # mask=mask,
-                      # contour_width=3, contour_color='steelblue',
-                        min_word_length=2,
+                      contour_width=3, contour_color='steelblue',
+                      min_word_length=2,
+                      # width=800, height=600, margin=0,
                       width=300, height=500, margin=0
                       ).generate(text)
 
