@@ -26,6 +26,12 @@ for i in vac:
     json_dump = json_dump.replace('й', 'й')
     json_dump = json_dump.replace('Й', 'Й')
     json_dump = json_dump.replace('&quot;', '')
+    stop_list = ['o o ', 'O O ', 'o oa', 'c c', 'Mail.ru Group', 'Group IB'
+
+    ]
+    for word in stop_list:
+        json_dump = json_dump.replace(word, '')
+
     result = re.sub(u'[^\x00-\x7F\x80-\xFF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]', u'', json_dump)
     f.write(result)
 f.close()
@@ -36,10 +42,11 @@ text = f.read()
 
 # Create the wordcloud object
 wordcloud = WordCloud(background_color="white",
-                      max_words=150,
+                      max_words=100,
                       # mask=mask,
                       # contour_width=3, contour_color='steelblue',
-                      width=600, height=800, margin=0
+                        min_word_length=2,
+                      width=300, height=500, margin=0
                       ).generate(text)
 
 image = wordcloud.to_image()
