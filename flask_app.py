@@ -134,9 +134,10 @@ def time_series():
     return render_template(
         '/time_series.html',
         title='Количество вакансий по месяцам и неделям.',
-        vacancy_count_day_by_week=utils.vacancy_count_day_by_week(cur()),
         vacancy_count_week_by_week=utils.vacancy_count_week_by_week(cur()),
-        vacancy_rate_by_year=utils.get_vacancy_count_by_year(cur()))
+        vacancy_rate_by_year=utils.get_vacancy_count_by_year(cur()),
+        # vacancy_count_day_by_week=utils.vacancy_count_day_by_week(cur()),
+           )
 
 
 @app.route('/salary')
