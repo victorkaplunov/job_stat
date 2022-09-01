@@ -6,7 +6,7 @@ import sqlite3
 import json
 import utils
 import copy
-
+from functools import lru_cache
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -129,6 +129,7 @@ def search_vac(search_phrase):
 
 
 @app.route('/time_series')
+@lru_cache(maxsize=32)
 def time_series():
     """Time series page"""
     return render_template(
@@ -136,7 +137,7 @@ def time_series():
         title='Количество вакансий по месяцам и неделям.',
         vacancy_count_week_by_week=utils.vacancy_count_week_by_week(cur()),
         vacancy_rate_by_year=utils.get_vacancy_count_by_year(cur()),
-        # vacancy_count_day_by_week=utils.vacancy_count_day_by_week(cur()),
+        vacancy_count_day_by_week=utils.vacancy_count_day_by_week(cur()),
            )
 
 

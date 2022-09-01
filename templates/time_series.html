@@ -6,20 +6,6 @@
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
 
-      google.charts.setOnLoadCallback(drawDayByWeek);
-      function drawDayByWeek() {
-        var data = new google.visualization.arrayToDataTable({{vacancy_count_day_by_week | safe }});
-        var options = {
-          title: 'Количество вакансий по дням недели',
-          legend: {position: 'top', maxLines: 4 },
-          curveType: 'function',
-          chartArea: {left:55,top:50,width:'100%',height:'80%'}
-        };
-        var view = new google.visualization.DataView(data);
-        var chart = new google.visualization.LineChart(document.getElementById("linechart_values"));
-        chart.draw(data,
-        options);
-      };
 
       google.charts.setOnLoadCallback(drawWeekByWeek);
       function drawWeekByWeek() {
@@ -47,6 +33,21 @@
         };
         var view = new google.visualization.DataView(data);
         var chart = new google.visualization.BarChart(document.getElementById("barchart_years"));
+        chart.draw(data,
+        options);
+      };
+
+            google.charts.setOnLoadCallback(drawDayByWeek);
+      function drawDayByWeek() {
+        var data = new google.visualization.arrayToDataTable({{vacancy_count_day_by_week | safe }});
+        var options = {
+          title: 'Количество вакансий по дням недели',
+          legend: {position: 'top', maxLines: 4 },
+          curveType: 'function',
+          chartArea: {left:55,top:50,width:'100%',height:'80%'}
+        };
+        var view = new google.visualization.DataView(data);
+        var chart = new google.visualization.LineChart(document.getElementById("linechart_values"));
         chart.draw(data,
         options);
       };
