@@ -136,7 +136,7 @@ for year in years_tuple:
     utils.types_stat_with_year(experience_types, 'experience', 'experience', all_vacancies,
                                cur, year, update)
 
-    employment_types = dict(full=0, part=0, project=0, probation=0)
+    employment_types = dict(full=0, part=0, project=0, probation=0, volunteer=0)
     utils.types_stat_with_year(employment_types, 'employment_type', 'employment', all_vacancies,
                                cur, year, update)
 
