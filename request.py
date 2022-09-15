@@ -1,4 +1,6 @@
 # -*- encoding=utf8 -*-
+import os
+
 import requests
 import json
 import sqlite3
@@ -236,3 +238,17 @@ cur.execute(sql)
 conn.commit()
 # Close database connection
 conn.close()
+
+username = 'clingon'
+TOKEN = os.getenv('PA_TOKEN')
+headers = {'Authorization': f'Token {TOKEN}'}
+base_url = f'https://www.pythonanywhere.com/api/v0/user/{username}/'
+
+# Get first webapps name
+response = requests.get(base_url + 'webapps/', headers=headers)
+domain_name = response.json()[0]['domain_name']
+print(domain_name)
+
+# Reload first webapps
+response = requests.post(base_url + f'webapps/{domain_name}/reload/', headers=headers)
+print(response.status_code)
