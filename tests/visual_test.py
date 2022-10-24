@@ -20,7 +20,7 @@ def batch_info():
 @pytest.fixture(name="driver", scope="function")
 def driver_setup():
     """
-    New browser instance per test and quite.
+    New browser instance per test and quit.
     """
     driver = webdriver.Chrome(ChromeDriverManager().install())
     yield driver
@@ -157,7 +157,7 @@ def test_web_ui_tools(eyes, driver):
 
 
 def test_mobile_testing_frameworks(eyes, driver):
-    name = 'web_ui_tools'
+    name = 'mobile_testing_frameworks'
     eyes.open(driver, "QA Job Stat", f"{name} page test", RESOLUTION)
     driver.get(f"{base_url}{name}")
     eyes.check(f"{name} page test", Target.window())
