@@ -8,7 +8,7 @@
       google.charts.setOnLoadCallback(drawStuff);
 
       function drawStuff() {
-        var head = [['', 'key_skills', { role: 'annotation' }]]
+        var head = [['', 'количество', { role: 'annotation' }]]
         head = head.concat({{ chart_data | safe }});
         var data = new google.visualization.arrayToDataTable(head);
 
