@@ -4,7 +4,6 @@ import statistics
 from datetime import datetime, timedelta, date
 from operator import itemgetter
 import requests
-from requests_html import HTMLSession
 import json
 import unicodedata
 
