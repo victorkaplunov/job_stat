@@ -9,15 +9,15 @@
 
       function drawStuff() {
         var head = [['', 'key_skills', { role: 'annotation' }]]
-        head = head.concat({{ key_skills | safe }});
+        head = head.concat({{ chart_data | safe }});
         var data = new google.visualization.arrayToDataTable(head);
 
         var options = {
           title: 'Chess opening moves',
 <!--          width: '10%',-->
           legend: { position: 'none' },
-          chart: { title: 'Ключевые навыки',
-                   subtitle: 'Пятьдесят наиболее популярных тегов' },
+          chart: { title: '{{title}}',
+                   subtitle: '{{subtitle}}' },
           bars: 'horizontal', // Required for Material Bar Charts.
           hAxes: {textPosition: 'in' },
 <!--          bar: { groupWidth: "90%" }-->

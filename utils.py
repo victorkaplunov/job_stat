@@ -4,6 +4,7 @@ import statistics
 from datetime import datetime, timedelta, date
 from operator import itemgetter
 import requests
+from requests_html import HTMLSession
 import json
 import unicodedata
 
@@ -494,11 +495,36 @@ def vacancy_count_day_by_week(cursor):
             day = yesterday - timedelta(days=n-count)
             sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
                   BETWEEN "{day}T00:00:00+03:00" and "{day}T23:59:59+03:00";'''
+            # print(sql)
             cursor.execute(sql)
             vacancies_tuple = (cursor.fetchall())
             day_list.append(vacancies_tuple[0][0])
         output_list.append(day_list)
     return output_list
+
+
+# def vacancy_count_week_by_week(cursor):
+#     delta = date.today() - first_day_of_current_year
+#     day = first_day_of_current_year
+#     result = dict(Неделя="количество вакансий")
+#     for i in range(0, delta.days):
+#         sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
+#                           BETWEEN "{day}T00:00:00+03:00" and "{day}T23:59:59+03:00";'''
+#         cursor.execute(sql)
+#         vacancies_tuple = (cursor.fetchall())
+#         vacancy_qty = vacancies_tuple[0][0]
+#         str_week_num = str(day.isocalendar()[1])
+#         if str_week_num in result:
+#             result[str_week_num] = result[str_week_num] + vacancy_qty
+#         else:
+#             result[str_week_num] = vacancy_qty
+#         day = day + timedelta(days=1)
+#     output_list = []
+#     # Dict to list
+#     for key, value in result.items():
+#         temp = [key, value]
+#         output_list.append(temp)
+#     return output_list
 
 
 def vacancy_count_week_by_week(cursor):
@@ -555,13 +581,9 @@ def get_vacancy_count_by_year(cursor):
     return output_list
 
 
-def get_key_skills_data(chart_name, cursor):
+def get_data_for_horizontal_bar_chart(chart_name, cursor):
     """ Get data from 'charts' DB table for chart drawing"""
-    if chart_name == 'frameworks':
-        request = f'SELECT data, popularity, parent FROM charts WHERE chart_name="{chart_name}";'
-
-    else:
-        request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
+    request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
     cursor.execute(request)
     statistics_data = cursor.fetchall()
     # Convert list of tuples to list of lists
@@ -802,3 +824,28 @@ def render_salary_by_category_charts(title, cursor):
     <div id="chart_div{year}"></div>
     <div id="filter_div{year}"></div>'''
     return charts, divs
+
+
+def get_chart_data_from_route(url, script_num=2):
+    """Отдает результат запроса к заданному URL из которого выделяет данные
+     для построения графиков"""
+    try:
+        session = HTMLSession()
+        response = session.get(url)
+
+    except requests.exceptions.RequestException as e:
+        print(e)
+
+    script = response.html.find('script')[script_num].text
+
+    try:
+        finding_result = re.findall('arrayToDataTable\(((.+?))\);', script)
+    except AttributeError:
+        print('Data for chart not found.')
+
+    test_data_list = list()
+    for i in finding_result:
+        substitution_result = re.sub("'", "\"", i[0])
+        list_ = json.loads(substitution_result)
+        test_data_list.append(list_)
+    return test_data_list

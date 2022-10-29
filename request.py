@@ -178,11 +178,11 @@ for year in years_tuple:
 sql = f"""SELECT id, json FROM vacancies WHERE published_at
           BETWEEN '{first_day_of_current_year}' AND '{today}';"""
 cur.execute(sql)
-all_vacancies = (cur.fetchall())
+current_year_vacancies = (cur.fetchall())
 
 # Populate skills set
 key_skills = set()
-for n in all_vacancies:
+for n in current_year_vacancies:
     body = json.loads((n[1]))
     try:
         for m in body['key_skills']:
@@ -194,7 +194,7 @@ for n in all_vacancies:
 
 # Count skills
 key_skills_dict = dict.fromkeys(key_skills, 0)
-for i in all_vacancies:
+for i in current_year_vacancies:
     body = json.loads((i[1]))
     try:
         for x in body['key_skills']:
@@ -232,6 +232,59 @@ for n in key_skills_dict:
     counter -= 1
     if counter == 0:
         break
+
+# Populate employers set
+employers = set()
+for vacancy in current_year_vacancies:
+    # Convert JSON description to dict.
+    body = json.loads((vacancy[1]))
+    try:
+        employers.add(body['employer']['name'])
+    except IndexError:
+        continue
+    except KeyError:
+        continue
+
+# Count employers
+employers_dict = dict.fromkeys(employers, 0)  # Make dict from set
+for item in current_year_vacancies:
+    body = json.loads((item[1]))
+    employer = body['employer']['name']
+    if employer in employers_dict:
+        employers_dict[employer] += 1
+    else:
+        continue
+
+# Sort dict
+employers_dict = dict(sorted(employers_dict.items(),
+                             key=lambda item: item[1],
+                             reverse=True))
+
+# Wright first 50 employers data to DB
+counter = 50
+for n in employers_dict:
+    print(n, employers_dict[n])
+    if update is True:
+        sql = f"""
+        UPDATE charts SET popularity = {employers_dict[n]} WHERE data = '{n}'
+        AND chart_name = 'top_employers';
+        """
+    else:
+        sql = f"""INSERT INTO charts(chart_name, data, popularity)
+              VALUES("top_employers", "{n}", {employers_dict[n]});"""
+    try:
+        cur.executescript(sql)
+    except sqlite3.IntegrityError as error:
+        print("Error: ", error)
+    sql = f"""
+    UPDATE charts SET popularity = {employers_dict[n]} WHERE data = '{n}'
+    AND chart_name = 'top_employers';"""
+    cur.executescript(sql)
+    conn.commit()
+    counter -= 1
+    if counter == 0:
+        break
+
 
 sql = "VACUUM;"
 cur.execute(sql)

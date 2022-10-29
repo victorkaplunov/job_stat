@@ -8,10 +8,16 @@ import utils
 import copy
 from functools import lru_cache
 
-app = Flask(__name__)
-bootstrap = Bootstrap(app)
+
+def create_app():
+    app = Flask(__name__)
+    Bootstrap(app)
+    return app
+
+
+app = create_app()
 id_list = []
-l_host = "http://127.0.0.1:5000"
+# l_host = "http://127.0.0.1:5000"
 
 
 def cur():
@@ -129,7 +135,7 @@ def search_vac(search_phrase):
 
 
 @app.route('/time_series')
-@lru_cache(maxsize=32)
+@lru_cache(maxsize=None)
 def time_series():
     """Time series page"""
     return render_template(
@@ -152,6 +158,23 @@ def salary():
         between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
         between3And6_salary=utils.get_vac_with_salary(cur(), 'between3And6'),
         moreThan6e_salary=utils.get_vac_with_salary(cur(), 'moreThan6'))
+
+
+@app.route('/top_employers')
+def top_employers():
+    """Employers by vacancies quantity page"""
+    key_skills_list = utils.get_data_for_horizontal_bar_chart('top_employers', cur())
+    for i in key_skills_list:
+        i.append(i[0])
+    sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
+    current_year = utils.years_tuple()[-1]
+    return render_template(
+        '/horizontal_bar.html',
+        title='Топ 50 работодателей',
+        subtitle=f'по количеству вакансий в {current_year} году.',
+        chart_data=sorted_key_skills_list
+    )
+
 
 
 @app.route('/salary_by_category')
@@ -274,14 +297,15 @@ def with_salary():
 @app.route('/key_skills')
 def key_skills():
     """Key skills popularity page"""
-    key_skills_list = utils.get_key_skills_data('key_skills', cur())
+    key_skills_list = utils.get_data_for_horizontal_bar_chart('key_skills', cur())
     for i in key_skills_list:
         i.append(i[0])
     sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
     return render_template(
-        '/key_skills.html',
-        title='50 наиболее популярных тегов раздела "Ключевые навыки".',
-        key_skills=sorted_key_skills_list[:50]
+        '/horizontal_bar.html',
+        title='Ключевые навыки',
+        subtitle='Пятьдесят наиболее популярных тегов',
+        chart_data=sorted_key_skills_list[:50]
     )
 
 
