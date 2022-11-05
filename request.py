@@ -32,7 +32,7 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
 req = requests.get((base_url + search_string).encode('utf-8'))
 
 # Get quantity of pages in response
-pages = 15  # req.json()["pages"]
+pages = 10  # req.json()["pages"]
 
 
 for page_num in range(0, pages):
