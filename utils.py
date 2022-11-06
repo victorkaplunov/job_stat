@@ -6,7 +6,7 @@ from operator import itemgetter
 import requests
 import json
 import unicodedata
-
+from requests_html import HTMLSession
 
 translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
                         between3And6="От трех до шести лет", moreThan6="Более шести лет",
