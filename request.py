@@ -15,7 +15,8 @@ years_tuple = (
     2022,
 )
 exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58}
-experience_grades = ('noExperience', 'between1And3', 'between3And6', 'moreThan6')
+experience_grades = ('noExperience', 'between1And3',
+                     'between3And6', 'moreThan6')
 today = date.today()
 first_day_of_current_year = date(date.today().year, 1, 1)
 conn = sqlite3.connect("testdb.db")  # Open database
@@ -76,86 +77,110 @@ if update is False:
 
 # Wright statistics data to database
 for year in years_tuple:
-    sql = f"""SELECT json FROM vacancies WHERE published_at
-              BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
+    sql = f"""
+    SELECT json
+    FROM vacancies
+    WHERE published_at
+    BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
     cur.execute(sql)
     all_vacancies = cur.fetchall()
 
-    utils.stat_with_one_year('languages',
-                             ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-                              'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
-                              'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
-                              'AutoIT'
-                              ], year, cur, update)
+    utils.stat_with_one_year(
+        'languages',
+        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
+         'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
+         'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
+         'AutoIT'
+         ], year, cur, update)
 
-    utils.stat_with_one_year('bdd_frameworks',
-                             ['Cucumber', 'Robot_Framework', 'SpecFlow', 'TestLeft', 'RSpec', 'JBehave',
-                              'HipTest', "Jasmine", 'Behat', 'behave', 'Fitnesse', 'Cucumber-JVM',
-                              'pytest-bdd', 'NSpec', 'Serenity BDD'
-                              ], year, cur, update)
+    utils.stat_with_one_year(
+        'bdd_frameworks',
+        ['Cucumber', 'Robot_Framework', 'SpecFlow', 'TestLeft',
+         'RSpec', 'JBehave', 'HipTest', "Jasmine", 'Behat',
+         'behave', 'Fitnesse', 'Cucumber-JVM',
+         'pytest-bdd', 'NSpec', 'Serenity BDD'
+         ], year, cur, update)
 
-    utils.stat_with_one_year('load_testing_tools',
-                             ['JMeter', 'LoadRunner', 'Locust', 'Gatling', 'Yandex.Tank', 'ApacheBench',
-                              'Grinder', 'Performance Center', 'IBM Rational Performance', 'K6'],
-                             year, cur, update)
+    utils.stat_with_one_year(
+        'load_testing_tools',
+        ['JMeter', 'LoadRunner', 'Locust', 'Gatling',
+         'Yandex.Tank', 'ApacheBench', 'Grinder',
+         'Performance Center', 'IBM Rational Performance', 'K6'],
+        year, cur, update)
 
-    utils.stat_with_one_year('ci_cd', ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
-                                       'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity'],
-                             year, cur, update)
+    utils.stat_with_one_year(
+        'ci_cd', ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
+                  'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity'],
+        year, cur, update)
 
-    utils.stat_with_one_year('monitoring', ['CloudWatch', 'Grafana', 'Zabbix',
-                                            'Prometheus', 'VictoriaMetrics',
-                                            'InfluxDB', 'Graphite', 'ClickHouse'],
-                             year, cur, update)
+    utils.stat_with_one_year(
+        'monitoring',
+        ['CloudWatch', 'Grafana', 'Zabbix',
+         'Prometheus', 'VictoriaMetrics',
+         'InfluxDB', 'Graphite', 'ClickHouse'],
+        year, cur, update)
 
-    utils.stat_with_one_year('web_ui_tools',
-                             ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene',
-                              'Cypress', 'Splinter', 'Puppeteer', 'WebDriverIO', 'Galen',
-                              'Playwright', 'Protractor', 'TestCafe'],
-                             year, cur, update)
+    utils.stat_with_one_year(
+        'web_ui_tools',
+        ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene',
+         'Cypress', 'Splinter', 'Puppeteer', 'WebDriverIO', 'Galen',
+         'Playwright', 'Protractor', 'TestCafe'],
+        year, cur, update)
 
-    utils.stat_with_one_year('mobile_testing_frameworks',
-                             ['Appium', 'Selendroid', 'Espresso', 'Detox', 'robotium',
-                              'Calabash', 'UI Automation', 'UIAutomator', 'XCTest', 'Kobiton'],
-                             year, cur, update)
+    utils.stat_with_one_year(
+        'mobile_testing_frameworks',
+        ['Appium', 'Selendroid', 'Espresso', 'Detox',
+         'robotium', 'Calabash', 'UI Automation',
+         'UIAutomator', 'XCTest', 'Kobiton'],
+        year, cur, update)
 
-    utils.stat_with_one_year('bugtracking_n_tms',
-                             ['Youtrack', 'TestRail', 'TestLink', 'TestLodge',
-                              'Jira', 'Confluence', 'Redmine', 'TFS', 'Zephyr',
-                              'Hiptest', 'Xray', 'PractiTest', 'Testpad',
-                              'Deviniti', 'Qase', 'IBM Rational Quality Manager',
-                              'HP Quality Center', 'HP ALM', 'TestIt',
-                              'Gemini', 'BugZilla', 'Fitnesse'], year, cur, update)
+    utils.stat_with_one_year(
+        'bugtracking_n_tms',
+        ['Youtrack', 'TestRail', 'TestLink', 'TestLodge',
+         'Jira', 'Confluence', 'Redmine', 'TFS', 'Zephyr',
+         'Hiptest', 'Xray', 'PractiTest', 'Testpad',
+         'Deviniti', 'Qase', 'IBM Rational Quality Manager',
+         'HP Quality Center', 'HP ALM', 'TestIt',
+         'Gemini', 'BugZilla', 'Fitnesse'], year, cur, update)
 
-    utils.stat_with_one_year('cvs', ['git', 'SVN', 'Subversion', 'Mercurial'],
+    utils.stat_with_one_year('cvs',
+                             ['git', 'SVN', 'Subversion', 'Mercurial'],
                              year, cur, update)
 
     schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0)
-    utils.types_stat_with_year(schedule_types, 'schedule_type', 'schedule', all_vacancies,
+    utils.types_stat_with_year(schedule_types, 'schedule_type',
+                               'schedule', all_vacancies,
                                cur, year, update)
 
-    experience_types = dict(noExperience=0, between1And3=0, between3And6=0, moreThan6=0)
-    utils.types_stat_with_year(experience_types, 'experience', 'experience', all_vacancies,
+    experience_types = dict(noExperience=0, between1And3=0,
+                            between3And6=0, moreThan6=0)
+    utils.types_stat_with_year(experience_types, 'experience',
+                               'experience', all_vacancies,
                                cur, year, update)
 
-    employment_types = dict(full=0, part=0, project=0, probation=0, volunteer=0)
-    utils.types_stat_with_year(employment_types, 'employment_type', 'employment', all_vacancies,
-                               cur, year, update)
+    employment_types = dict(full=0, part=0, project=0,
+                            probation=0, volunteer=0)
+    utils.types_stat_with_year(employment_types, 'employment_type',
+                               'employment', all_vacancies, cur,
+                               year, update)
 
     with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
-    utils.vacancy_with_salary(with_salary, 'with_salary', year, all_vacancies, cur, update)
+    utils.vacancy_with_salary(with_salary, 'with_salary', year,
+                              all_vacancies, cur, update)
 
-    utils.chart_with_category_filter('frameworks',
-                                     [['pytest', 'Python'], ['py.test', 'Python'], ['Unittest', 'Python'],
-                                      ['Nose', 'Python'],
-                                      ['JUnit', 'Java'], ['TestNG', 'Java'],
-                                      ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
-                                      ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
-                                      ['Spock', 'C#'], ['NUnit', 'C#'],
-                                      ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'], ['Jest', 'JavaScript'],
-                                      ['Jasmine', 'JavaScript'], ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
-                                      ['CodeceptJS', 'JavaScript'],
-                                      ['Robot_Framework', 'multiple_language']], cur, update, year)
+    utils.chart_with_category_filter(
+        'frameworks',
+        [['pytest', 'Python'], ['py.test', 'Python'],
+         ['Unittest', 'Python'], ['Nose', 'Python'],
+         ['JUnit', 'Java'], ['TestNG', 'Java'],
+         ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
+         ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
+         ['Spock', 'C#'], ['NUnit', 'C#'],
+         ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'],
+         ['Jest', 'JavaScript'], ['Jasmine', 'JavaScript'],
+         ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
+         ['CodeceptJS', 'JavaScript'],
+         ['Robot_Framework', 'multiple_language']], cur, update, year)
     # Count salary
     for experience in experience_grades:
         print("Опыт: ", experience)
@@ -164,12 +189,14 @@ for year in years_tuple:
 
             if update is True:
                 sql = f"""
-                        UPDATE charts SET popularity = {median} WHERE data = '{experience}'
+                        UPDATE charts
+                        SET popularity = {median} WHERE data = '{experience}'
                         AND chart_name = 'salary' AND year = {str(year)};
                         """
             else:
-                sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                              VALUES("salary", "{experience}", "{median}", {str(year)});"""
+                sql = f"""
+                INSERT INTO charts(chart_name, data, popularity, year)
+                VALUES("salary", "{experience}", "{median}", {str(year)});"""
 
             cur.executescript(sql)
         except sqlite3.OperationalError:
@@ -215,19 +242,21 @@ for n in key_skills_dict:
     print(n, key_skills_dict[n])
     if update is True:
         sql = f"""
-        UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = '{n}'
-        AND chart_name = 'key_skills';
+        UPDATE charts SET popularity = {key_skills_dict[n]}
+        WHERE data = '{n}' AND chart_name = 'key_skills';
         """
     else:
-        sql = f"""INSERT INTO charts(chart_name, data, popularity)
-              VALUES("key_skills", "{n}", {key_skills_dict[n]});"""
+        sql = f"""
+        INSERT INTO charts(chart_name, data, popularity)
+        VALUES("key_skills", "{n}", {key_skills_dict[n]});"""
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
     sql = f"""
-    UPDATE charts SET popularity = {key_skills_dict[n]} WHERE data = '{n}'
-    AND chart_name = 'key_skills';"""
+    UPDATE charts
+    SET popularity = {key_skills_dict[n]}
+    WHERE data = '{n}' AND chart_name = 'key_skills';"""
     cur.executescript(sql)
     counter -= 1
     if counter == 0:
@@ -266,19 +295,22 @@ for n in employers_dict:
     print(n, employers_dict[n])
     if update is True:
         sql = f"""
-        UPDATE charts SET popularity = {employers_dict[n]} WHERE data = '{n}'
-        AND chart_name = 'top_employers';
+        UPDATE charts
+        SET popularity = {employers_dict[n]}
+        WHERE data = '{n}' AND chart_name = 'top_employers';
         """
     else:
-        sql = f"""INSERT INTO charts(chart_name, data, popularity)
-              VALUES("top_employers", "{n}", {employers_dict[n]});"""
+        sql = f"""
+        INSERT INTO charts(chart_name, data, popularity)
+        VALUES("top_employers", "{n}", {employers_dict[n]});"""
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
         print("Error: ", error)
     sql = f"""
-    UPDATE charts SET popularity = {employers_dict[n]} WHERE data = '{n}'
-    AND chart_name = 'top_employers';"""
+    UPDATE charts
+    SET popularity = {employers_dict[n]}
+    WHERE data = '{n}' AND chart_name = 'top_employers';"""
     cur.executescript(sql)
     conn.commit()
     counter -= 1
