@@ -695,7 +695,7 @@ def render_framework_charts(title, chart, cursor):
           'chartType': 'PieChart',
           'containerId': 'chart_div{year}',
           'options': {{
-            'title':'{title}',
+            'title':'{title} в {year} году.',
             chartArea:{{width:'100%',height:'75%'}},
             'height':500,
             'pieSliceText': 'value',
