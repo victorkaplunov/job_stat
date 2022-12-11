@@ -1,3 +1,5 @@
+"""Reload application script for GitHub Actions."""
+
 import requests
 import os
 
@@ -19,6 +21,7 @@ response = requests.post(base_url + f'consoles/{console_id}/send_input/',
                          json=command, headers=headers)
 print('send_input: ', response.status_code)
 print(response.text)
+
 # Get first webapps name
 response = requests.get(base_url + 'webapps/', headers=headers)
 domain_name = response.json()[0]['domain_name']
