@@ -3,7 +3,7 @@ Appium-Python-Client==1.2.0
 atomicwrites==1.4.0
 attrs==21.2.0
 Brotli==1.0.9
-certifi==2020.12.17
+certifi==2022.12.7
 chardet==3.0.4
 charset-normalizer==2.0.4
 click==7.1.1
