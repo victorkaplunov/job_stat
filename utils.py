@@ -96,7 +96,6 @@ def id_list(response, base_url):
 def chart_with_category_filter(chart_name: str, param_list: list, cur, update, year):
     """ Function count a number of entries of some string from param_list in all vacancies. """
     for i in param_list:
-        print(i[0], i[1])
         sql = f"""SELECT json FROM vacancies WHERE json LIKE '%%%{i[0]}%%' AND
                  published_at BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
         cur.execute(sql)
@@ -529,11 +528,7 @@ def vacancy_count_day_by_week(cursor):
 
 def vacancy_count_week_by_week(cursor):
     delta = date.today() - first_day_of_current_year
-    print(f'{date.today()=}')
-    print(f'{first_day_of_current_year=}')
-    print(f'{delta=}')
     day = first_day_of_current_year
-    print(f'{day=}')
     result = dict(Неделя="количество вакансий")
     for i in range(0, delta.days):
         sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
