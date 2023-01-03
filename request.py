@@ -12,7 +12,8 @@ years_tuple = (
     # 2019,
     # 2020,
     # 2021,
-    2022,
+    # 2022,
+    2023,
 )
 exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58}
 experience_grades = ('noExperience', 'between1And3',
