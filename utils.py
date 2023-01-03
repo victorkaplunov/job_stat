@@ -628,8 +628,6 @@ def get_data_with_year(cursor, year, chart_name, sort=True):
     data_list = []
     for i in statistics_data:
         if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
-            print(f'{translation_dict[i[0]]=}')
-            print(f'{i[0]=}')
             row = [translation_dict[i[0]], i[1]]
             data_list.append(row)
         else:
