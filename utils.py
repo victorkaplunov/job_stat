@@ -14,6 +14,7 @@ translation_dict = dict(noExperience="Без опыта", between1And3="От г�
                         shift='Сменный график', remote='Удаленная работа',
                         full='Полная занятость', part='Частичная занятость',
                         project="Проектная работа", probation='Стажировка',
+                        volunteer="Волонтер",
                         without_salary='Зарплата не указана', closed='Закрытый диапазон',
                         open_up='Зарплата от...', open_down='Зарплата до...')
 
@@ -528,7 +529,11 @@ def vacancy_count_day_by_week(cursor):
 
 def vacancy_count_week_by_week(cursor):
     delta = date.today() - first_day_of_current_year
+    print(f'{date.today()=}')
+    print(f'{first_day_of_current_year=}')
+    print(f'{delta=}')
     day = first_day_of_current_year
+    print(f'{day=}')
     result = dict(Неделя="количество вакансий")
     for i in range(0, delta.days):
         sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
@@ -547,6 +552,7 @@ def vacancy_count_week_by_week(cursor):
     for key, value in result.items():
         temp = [key, value]
         output_list.append(temp)
+    print(output_list)
     return output_list
 
 
@@ -622,6 +628,8 @@ def get_data_with_year(cursor, year, chart_name, sort=True):
     data_list = []
     for i in statistics_data:
         if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
+            print(f'{translation_dict[i[0]]=}')
+            print(f'{i[0]=}')
             row = [translation_dict[i[0]], i[1]]
             data_list.append(row)
         else:
