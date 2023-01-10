@@ -263,6 +263,11 @@ for n in key_skills_dict:
     if counter == 0:
         break
 
+# Delete employers data
+sql = f"""DELETE FROM charts WHERE chart_name = 'top_employers';"""
+cur.executescript(sql)
+conn.commit()
+
 # Populate employers set
 employers = set()
 for vacancy in current_year_vacancies:
@@ -294,16 +299,9 @@ employers_dict = dict(sorted(employers_dict.items(),
 counter = 50
 for n in employers_dict:
     print(n, employers_dict[n])
-    if update is True:
-        sql = f"""
-        UPDATE charts
-        SET popularity = {employers_dict[n]}
-        WHERE data = '{n}' AND chart_name = 'top_employers';
-        """
-    else:
-        sql = f"""
-        INSERT INTO charts(chart_name, data, popularity)
-        VALUES("top_employers", "{n}", {employers_dict[n]});"""
+    sql = f"""
+    INSERT INTO charts(chart_name, data, popularity)
+    VALUES("top_employers", "{n}", {employers_dict[n]});"""
     try:
         cur.executescript(sql)
     except sqlite3.IntegrityError as error:
