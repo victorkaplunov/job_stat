@@ -148,7 +148,7 @@ for year in years_tuple:
                              ['git', 'SVN', 'Subversion', 'Mercurial'],
                              year, cur, update)
 
-    schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0)
+    schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0, flyInFlyOut=0)
     utils.types_stat_with_year(schedule_types, 'schedule_type',
                                'schedule', all_vacancies,
                                cur, year, update)
