@@ -41,7 +41,7 @@ def api():
 <br>
 <a href="{url_for('show_vac_top_new_by_id')}">{url_for('show_vac_top_new_by_id')}"</a>
 <br>
-<a href="{url_for('show_vac_top_new_by_data')}">{url_for('show_vac_top_new_by_data')}"</a>
+<a href="{url_for('show_vac_top_new_by_date')}">{url_for('show_vac_top_new_by_date')}"</a>
 <br>
 <a href="{url_for('search_vac', search_phrase='Python')}">{url_for('search_vac', search_phrase='Python')}"</a>
 <br>
@@ -94,7 +94,7 @@ def show_vac_top_new_by_id():
     """Get last 100 vacancies sorted by id"""
     con = sqlite3.connect("testdb.db")
     cursor = con.cursor()
-    sql = "SELECT * FROM calendar ORDER BY id DESC LIMIT 100;"
+    sql = "SELECT * FROM vacancies ORDER BY published_at DESC LIMIT 100;"
     cursor.execute(sql)
     vac = cursor.fetchall()
     con.close()
@@ -104,8 +104,8 @@ def show_vac_top_new_by_id():
     return str(data_list)
 
 
-@app.route('/api/vac/last100data')
-def show_vac_top_new_by_data():
+@app.route('/api/vac/last100date')
+def show_vac_top_new_by_date():
     """Get last 100 vacancies sorted by last publication data"""
     con = sqlite3.connect("testdb.db")
     cursor = con.cursor()
