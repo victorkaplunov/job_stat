@@ -16,7 +16,8 @@ translation_dict = dict(noExperience="Без опыта", between1And3="От г�
                         project="Проектная работа", probation='Стажировка',
                         volunteer="Волонтер",
                         without_salary='Зарплата не указана', closed='Закрытый диапазон',
-                        open_up='Зарплата от...', open_down='Зарплата до...')
+                        open_up='Зарплата от...', open_down='Зарплата до...',
+                        flyInFlyOut='Вахтовый метод')
 
 today = date.today() - timedelta(days=6)
 first_day_of_current_year = date(date.today().year, 1, 1)
@@ -25,7 +26,7 @@ MROT = 13890
 
 
 def years_tuple():
-    return 2019, 2020, 2021, 2022, 2023
+    return 2019, 2020, 2021, 2022, 2023, 2024
 
 
 def reversed_years():
@@ -50,7 +51,7 @@ def vac_id_list():
     return id_list
 
 
-def id_list(response, base_url):
+def write_vacancies(response, base_url):
     """ Get list of vacancies from response and write to "calendar" and "vacancies" tables."""
     con = sqlite3.connect("testdb.db")  # Open database
     cur = con.cursor()
@@ -543,11 +544,10 @@ def vacancy_count_week_by_week(cursor):
             result[str_week_num] = vacancy_qty
         day = day + timedelta(days=1)
     output_list = []
-    # Dict to list
+    # Convert dictionary to list
     for key, value in result.items():
         temp = [key, value]
         output_list.append(temp)
-    print(output_list)
     return output_list
 
 
@@ -756,8 +756,6 @@ def get_salary_by_category_data(cursor):
         """
         cursor.execute(request)
         salary = cursor.fetchall()
-        # print(salary)
-        print(language)
         for i in salary:
             salary_list.append(i[0])
         try:
