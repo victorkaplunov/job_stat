@@ -13,9 +13,10 @@ years_tuple = (
     # 2020,
     # 2021,
     # 2022,
-    2023,
+    # 2023,
+    2024,
 )
-exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58}
+exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58, 'KZT': 0.2, 'AZN': 53.03}
 experience_grades = ('noExperience', 'between1And3',
                      'between3And6', 'moreThan6')
 today = date.today()
@@ -36,11 +37,11 @@ req = requests.get((base_url + search_string).encode('utf-8'))
 # Get quantity of pages in response
 pages = 12  # req.json()["pages"]
 
-
+# Put new vacancies to DB
 for page_num in range(0, pages):
     search_url = base_url + search_string.replace("page=0", "page=" + str(page_num))
     resp = requests.get(search_url)
-    s = utils.id_list(resp, base_url)
+    s = utils.write_vacancies(resp, base_url)
     print("Items on page: ", len(set(s)))
 
 # Drop table 'vac_with_salary' and recreate it
@@ -49,7 +50,7 @@ cur.execute(sql)
 sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
 (
   id INTEGER,
-  published_at TEXT, 
+  published_at TEXT,
   calc_salary NUMERIC,
   experience TEXT,
   url TEXT,
