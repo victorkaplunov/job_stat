@@ -11,7 +11,7 @@
       function drawWeekByWeek() {
         var data = new google.visualization.arrayToDataTable({{vacancy_count_week_by_week | safe }});
         var options = {
-          title: 'Количество вакансий по неделям года.',
+          title: 'Количество публикаций вакансий по неделям года.',
 <!--          legend: {position: 'top', maxLines: 2 },-->
           bars: 'horizontal', // Required for Material Bar Charts.
           chartArea: {left:55,top:90,width:'100%',height:'70%'}
