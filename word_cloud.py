@@ -9,7 +9,7 @@ con = sqlite3.connect("testdb.db")
 cur = con.cursor()
 
 # Get descriptions from all vacancies
-year = '2020'
+year = '2024'
 sql = f"""SELECT json FROM vacancies WHERE published_at
               BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
 cur.execute(sql)
@@ -38,7 +38,7 @@ f.close()
 
 f = open("word_cloud.txt", "r", encoding="utf-8")
 text = f.read()
-mask = np.array(Image.open("alfa_channel.png"))
+# mask = np.array(Image.open("alfa_channel.png"))
 
 # Create the wordcloud object
 wordcloud = WordCloud(background_color="white",
