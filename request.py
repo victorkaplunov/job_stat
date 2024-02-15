@@ -50,6 +50,7 @@ for word in config.STOP_LIST:
 sql = """DROP TABLE IF EXISTS vac_with_salary;"""
 cur.execute(sql)
 conn.commit()
+
 sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
 (
   id INTEGER,
@@ -60,6 +61,7 @@ sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
   description TEXT
 );"""
 cur.execute(sql)
+conn.commit()
 
 if update is False:
     # Drop table 'charts' with statistics and recreate it
