@@ -16,3 +16,5 @@ def config_dict():
 
 class ConfigObj:
     LOCAL_HOST_BASE_URL = config_dict()['local_host_base_url']
+    YEARS = config_dict()['years']
+    STOP_LIST = config_dict()['stop_list']

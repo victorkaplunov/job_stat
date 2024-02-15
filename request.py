@@ -1,11 +1,14 @@
 # -*- encoding=utf8 -*-
 import os
-
-import requests
+from datetime import date
 import json
 import sqlite3
+
+import requests
+
 import utils
-from datetime import date
+from config_obj import ConfigObj
+
 
 update = True
 years_tuple = (
@@ -43,6 +46,14 @@ for page_num in range(0, pages):
     resp = requests.get(search_url)
     s = utils.write_vacancies(resp, base_url)
     print("Items on page: ", len(set(s)))
+
+# Delete vacancies, which contain words from stop list.
+stop_list = ConfigObj().STOP_LIST
+
+for word in stop_list:
+    sql = f"""DELETE FROM vacancies WHERE json LIKE '%{word}%';"""
+    cur.execute(sql)
+    conn.commit()
 
 # Drop table 'vac_with_salary' and recreate it
 sql = """DROP TABLE IF EXISTS vac_with_salary;"""
