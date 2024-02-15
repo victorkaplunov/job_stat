@@ -9,25 +9,17 @@ import requests
 import utils
 from config_obj import ConfigObj
 
+config = ConfigObj()
+base_url = config.BASE_URL
 
 update = True
-years_tuple = (
-    # 2019,
-    # 2020,
-    # 2021,
-    # 2022,
-    # 2023,
-    2024,
-)
-exchange_rates = {'RUR': 1, 'EUR': 86, 'USD': 73, 'UAH': 2.58, 'KZT': 0.2, 'AZN': 53.03}
-experience_grades = ('noExperience', 'between1And3',
-                     'between3And6', 'moreThan6')
+years_tuple = (config.YEARS[-1],)
+
 today = date.today()
 first_day_of_current_year = date(date.today().year, 1, 1)
 conn = sqlite3.connect("testdb.db")  # Open database
 cur = conn.cursor()  # Create cursor
 
-base_url = 'http://api.hh.ru/vacancies/'
 search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR ТЕСТ* ' \
                 u' OR SDET OR test* OR Test* OR TEST* OR Quality OR quality&' \
                 'no_magic=true&order_by=publication_time&' \
@@ -48,9 +40,7 @@ for page_num in range(0, pages):
     print("Items on page: ", len(set(s)))
 
 # Delete vacancies, which contain words from stop list.
-stop_list = ConfigObj().STOP_LIST
-
-for word in stop_list:
+for word in config.STOP_LIST:
     sql = f"""DELETE FROM vacancies WHERE json LIKE '%{word}%';"""
     response = cur.execute(sql)
     print(f'Number of occurrences for substring "{word}": {response.rowcount}')
@@ -59,6 +49,7 @@ for word in stop_list:
 # Drop table 'vac_with_salary' and recreate it
 sql = """DROP TABLE IF EXISTS vac_with_salary;"""
 cur.execute(sql)
+conn.commit()
 sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
 (
   id INTEGER,
@@ -196,10 +187,12 @@ for year in years_tuple:
          ['CodeceptJS', 'JavaScript'],
          ['Robot_Framework', 'multiple_language']], cur, update, year)
     # Count salary
-    for experience in experience_grades:
+    for experience in config.EXPERIENCE_GRADES:
         print("Опыт: ", experience)
         try:
-            median = utils.salary_to_db(experience, exchange_rates, conn, year)
+            median = utils.salary_to_db(experience,
+                                        config.EXCHANGE_RATES,
+                                        conn, year)
 
             if update is True:
                 sql = f"""
