@@ -52,7 +52,8 @@ stop_list = ConfigObj().STOP_LIST
 
 for word in stop_list:
     sql = f"""DELETE FROM vacancies WHERE json LIKE '%{word}%';"""
-    cur.execute(sql)
+    response = cur.execute(sql)
+    print(f'Number of occurrences for substring "{word}": {response.rowcount}')
     conn.commit()
 
 # Drop table 'vac_with_salary' and recreate it
