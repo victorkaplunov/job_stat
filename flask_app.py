@@ -127,7 +127,7 @@ def search_vac(search_phrase):
     sql = f"""
     SELECT * FROM vacancies
     WHERE json LIKE "%{search_phrase}%"
-    ORDER BY published_at DESC LIMIT 150;"""
+    ORDER BY id DESC LIMIT 150;"""
     cursor.execute(sql)
     vac = cursor.fetchall()
     con.close()
@@ -184,11 +184,10 @@ def salary_by_category():
     """Salary by category"""
     chart = 'frameworks'
     title = 'Медианная зарплата в зависимости от упоминания языка.'
-    result = utils.render_salary_by_category_charts(title, chart)
+
     return render_template(
         '/tmp.html',
-        charts_function=result[0],
-        divs=result[1]
+        salary=utils.render_salary_by_category_charts(title, cur())
     )
 
 
@@ -225,7 +224,7 @@ def employment_type():
             percent = str(round(i[1] / sum_vac * 100, 1))
             i.append(percent)
 
-        # Генерация функция JavaScript для отдельных графиков
+        # Генерация функций JavaScript для отдельных графиков
         charts = charts + f'''
 
         google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
