@@ -124,7 +124,10 @@ def search_vac(search_phrase):
     """Get vacancies with search phrase in JSON"""
     con = sqlite3.connect("testdb.db")
     cursor = con.cursor()
-    sql = 'SELECT * FROM vacancies WHERE json LIKE "%{}%" ORDER BY id DESC LIMIT 100;'.format(search_phrase)
+    sql = f"""
+    SELECT * FROM vacancies
+    WHERE json LIKE "%{search_phrase}%"
+    ORDER BY published_at DESC LIMIT 150;"""
     cursor.execute(sql)
     vac = cursor.fetchall()
     con.close()
@@ -174,7 +177,6 @@ def top_employers():
         subtitle=f'по количеству вакансий в {current_year} году.',
         chart_data=sorted_key_skills_list
     )
-
 
 
 @app.route('/salary_by_category')
