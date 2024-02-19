@@ -6,7 +6,6 @@ from operator import itemgetter
 import requests
 import json
 import unicodedata
-from requests_html import HTMLSession
 
 translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
                         between3And6="От трех до шести лет", moreThan6="Более шести лет",
@@ -193,10 +192,10 @@ def types_stat_with_year(types: dict, chart_name: str, key_name: str, all_vacanc
     return
 
 
-def vacancy_with_salary(types: dict, chart_name: str, year, all_vacancies, cur, update):
+def count_schedule_types(types: dict, chart_name: str, year, all_vacancies, cur, update):
     # Count types of schedule in all vacancies.
     types = types.fromkeys(types, 0)  # set all values to zero
-    # Count vacancies with given type in current year.
+    # Count vacancies with given type in given year.
     for n in all_vacancies:
         body = json.loads((n[0]))
 
@@ -503,30 +502,6 @@ def vacancy_count_day_by_week(cursor):
     return output_list
 
 
-# def vacancy_count_week_by_week(cursor):
-#     delta = date.today() - first_day_of_current_year
-#     day = first_day_of_current_year
-#     result = dict(Неделя="количество вакансий")
-#     for i in range(0, delta.days):
-#         sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
-#                           BETWEEN "{day}T00:00:00+03:00" and "{day}T23:59:59+03:00";'''
-#         cursor.execute(sql)
-#         vacancies_tuple = (cursor.fetchall())
-#         vacancy_qty = vacancies_tuple[0][0]
-#         str_week_num = str(day.isocalendar()[1])
-#         if str_week_num in result:
-#             result[str_week_num] = result[str_week_num] + vacancy_qty
-#         else:
-#             result[str_week_num] = vacancy_qty
-#         day = day + timedelta(days=1)
-#     output_list = []
-#     # Dict to list
-#     for key, value in result.items():
-#         temp = [key, value]
-#         output_list.append(temp)
-#     return output_list
-
-
 def vacancy_count_week_by_week(cursor):
     delta = date.today() - first_day_of_current_year
     day = first_day_of_current_year
@@ -738,21 +713,15 @@ def render_pie_charts(years, title, chart, cursor):
 
 
 def get_salary_by_category_data(cursor):
-
-    head = [['Language', 'Median salary']]
-
     request = f"SELECT DISTINCT data FROM charts WHERE chart_name='languages';"
     cursor.execute(request)
     languages = cursor.fetchall()
-    today = date.today()
-    last_year = today - timedelta(days=36)
     data_list = []
     salary_list = []
     for language in languages:
         request = f"""
         SELECT calc_salary FROM vac_with_salary 
-        WHERE description LIKE "%{language[0]}%"
-        ORDER BY published_at ASC;
+        WHERE description LIKE "%{language[0]}%";
         """
         cursor.execute(request)
         salary = cursor.fetchall()
@@ -762,88 +731,13 @@ def get_salary_by_category_data(cursor):
             median = statistics.median(salary_list)
         except statistics.StatisticsError:
             continue
-
-        data_list.append([language[0], median])
+        if len(salary_list) < 10:
+            continue
+        print(f'{len(salary_list)=}')
+        data_list.append(
+            [language[0], min(salary_list), median, median,  max(salary_list)])
         salary_list = []
-    return head + data_list
+    # Sort by median value.
+    data_list.sort(key=lambda row: row[2], reverse=True)
+    return data_list
 
-
-def render_salary_by_category_charts(title, cursor):
-    charts = ''
-    divs = ''
-    year = 'last'
-
-    data = get_salary_by_category_data(cursor)
-    charts = charts + f"""
-    google.charts.setOnLoadCallback(Chart{year});
-    function Chart{year}() {{
-    var data = google.visualization.arrayToDataTable({data});
-
-    var dashboard{year} = new google.visualization.Dashboard(
-        document.getElementById('dashboard{year}_div'));
-
-    var CategoryFilter{year} = new google.visualization.ControlWrapper({{
-      'controlType': 'CategoryFilter',
-      'containerId': 'filter_div{year}',
-      'options': {{
-        'filterColumnLabel': 'Language',
-        'ui': {{
-            'caption': 'Выберите язык',
-            'selectedValuesLayout': 'belowStacked',
-            'labelStacking': 'vertical',
-            'label': 'Языки программирования',
-            'labelStacking': 'vertical'
-        }},
-        'useFormattedValue': true
-      }}
-    }});
-
-    // Create a column chart, passing some options
-    var ColumnChart{year} = new google.visualization.ChartWrapper({{
-      'chartType': 'ColumnChart',
-      'containerId': 'chart_div{year}',
-      'options': {{
-        'title':'{title}',
-        chartArea:{{width:'100%',height:'75%'}},
-        'height':500,
-        'pieSliceText': 'value',
-        'legend': 'right'
-    
-    
-    
-      }}
-    }});
-
-    dashboard{year}.bind(CategoryFilter{year}, ColumnChart{year});
-    dashboard{year}.draw(data);
-  }}"""
-    # Генерация разделов в которые будут вставляться графики.
-    divs = divs + f'''
-    <div id="chart_div{year}"></div>
-    <div id="filter_div{year}"></div>'''
-    return charts, divs
-
-
-def get_chart_data_from_route(url, script_num=2):
-    """Отдает результат запроса к заданному URL из которого выделяет данные
-     для построения графиков"""
-    try:
-        session = HTMLSession()
-        response = session.get(url)
-
-    except requests.exceptions.RequestException as e:
-        print(e)
-
-    script = response.html.find('script')[script_num].text
-
-    try:
-        finding_result = re.findall('arrayToDataTable\(((.+?))\);', script)
-    except AttributeError:
-        print('Data for chart not found.')
-
-    test_data_list = list()
-    for i in finding_result:
-        substitution_result = re.sub("'", "\"", i[0])
-        list_ = json.loads(substitution_result)
-        test_data_list.append(list_)
-    return test_data_list
