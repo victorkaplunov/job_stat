@@ -531,9 +531,6 @@ def get_vacancies_qty_week_by_week():
         week.append(f'{start_n_end[0].strftime("%Y.%m.%d")} - ' +
                     f'{start_n_end[1].strftime("%Y.%m.%d")}' +
                     f'\nКоличество вакансий: {week[1]}')
-        print(f'{week=}')
-    print(f'{output_list}=')
-
     return output_list
 
 
