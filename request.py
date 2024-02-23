@@ -172,8 +172,8 @@ for year in years_tuple:
                                year, update)
 
     with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
-    utils.vacancy_with_salary(with_salary, 'with_salary', year,
-                              all_vacancies, cur, update)
+    utils.count_schedule_types(with_salary, 'with_salary', year,
+                               all_vacancies, cur, update)
 
     utils.chart_with_category_filter(
         'frameworks',
