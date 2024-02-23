@@ -2,10 +2,21 @@ import sqlite3
 import re
 import statistics
 from datetime import datetime, timedelta, date
+from calendar import isleap
 from operator import itemgetter
-import requests
 import json
 import unicodedata
+import locale
+
+import requests
+from requests_html import HTMLSession
+
+from db_connect import Database
+from config_obj import ConfigObj
+
+locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+db = Database()
+config = ConfigObj()
 
 translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
                         between3And6="От трех до шести лет", moreThan6="Более шести лет",
@@ -24,13 +35,8 @@ first_day_of_current_year = date(date.today().year, 1, 1)
 MROT = 13890
 
 
-def years_tuple():
-    return 2019, 2020, 2021, 2022, 2023, 2024
-
-
 def reversed_years():
-    years = years_tuple()
-    return years[::-1]
+    return config.YEARS[::-1]
 
 
 def vac_id_list():
@@ -475,8 +481,7 @@ def salary_to_db_new(year, experience, exchange_rate, conn):
         return median_salary
 
 
-# ToDo - add tooltips with date.
-def vacancy_count_day_by_week(cursor):
+def get_vacancies_qty_by_day_of_week():
     yesterday = today - timedelta(days=1)
     start_weekday_num = yesterday.weekday()
     weekday_name = ['пн.', 'вт.', 'ср.', 'чт', 'пт.', 'сб.', 'вс.']
@@ -492,66 +497,76 @@ def vacancy_count_day_by_week(cursor):
         day_list = [value]
         for n in range(0, 28, 7):
             day = yesterday - timedelta(days=n-count)
-            sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
-                  BETWEEN "{day}T00:00:00+03:00" and "{day}T23:59:59+03:00";'''
-            # print(sql)
-            cursor.execute(sql)
-            vacancies_tuple = (cursor.fetchall())
-            day_list.append(vacancies_tuple[0][0])
+            day_list.append(db.get_vacancy_qty_by_day(day=day))
         output_list.append(day_list)
     return output_list
 
 
-def vacancy_count_week_by_week(cursor):
+def get_vacancies_qty_week_by_week():
     delta = date.today() - first_day_of_current_year
     day = first_day_of_current_year
-    result = dict(Неделя="количество вакансий")
+    weeks_dictionary = dict(Неделя="количество вакансий")
     for i in range(0, delta.days):
-        sql = f'''SELECT COUNT(DISTINCT id) FROM calendar WHERE data
-                          BETWEEN "{day}T00:00:00+03:00" and "{day}T23:59:59+03:00";'''
-        cursor.execute(sql)
-        vacancies_tuple = (cursor.fetchall())
-        vacancy_qty = vacancies_tuple[0][0]
-        str_week_num = str(day.isocalendar()[1])
-        if str_week_num in result:
-            result[str_week_num] = result[str_week_num] + vacancy_qty
+        vacancy_qty = db.get_vacancy_qty_by_day(day)
+        week_number = str(day.isocalendar()[1])
+        if week_number in weeks_dictionary:
+            weeks_dictionary[week_number] += vacancy_qty
         else:
-            result[str_week_num] = vacancy_qty
+            weeks_dictionary[week_number] = vacancy_qty
         day = day + timedelta(days=1)
+    # Convert dictionary to list of lists
     output_list = []
-    # Convert dictionary to list
-    for key, value in result.items():
-        temp = [key, value]
-        output_list.append(temp)
+    for key, value in weeks_dictionary.items():
+        output_list.append([key, value])
+
+    # Add 'tooltip' column to chart
+    output_list[0].append(dict(role='tooltip'))
+
+    def get_start_and_end_date_from_calendar_week(year: int, calendar_week: int):
+        monday = datetime.strptime(f'{year}.{calendar_week}.1', "%Y.%W.%w").date()
+        return monday, monday + timedelta(days=6.9)
+
+    for week in output_list[1:]:
+        start_n_end = get_start_and_end_date_from_calendar_week(config.YEARS[-1], int(week[0]))
+        week.append(f'{start_n_end[0].strftime("%Y.%m.%d")} - ' +
+                    f'{start_n_end[1].strftime("%Y.%m.%d")}' +
+                    f'\nКоличество вакансий: {week[1]}')
+        print(f'{week=}')
+    print(f'{output_list}=')
+
     return output_list
 
 
-def get_vacancy_count_by_year(cursor):
-    month_tuples = (('01', 'январь', '31'), ('02', 'февраль', "29"), ('03', 'март', '31'),
-                    ('04', 'апрель', '30'), ('05', 'май', '31'), ('06', 'июнь', '30'),
-                    ('07', 'июль', '31'), ('08', 'август', '31'), ('09', 'сентябрь', '30'),
-                    ('10', 'октябрь', '31'), ('11', 'ноябрь', '30'), ('12', 'декабрь', '31'))
+def get_vacancies_qty_by_month_of_year():
+    month_tuples = ((1, 'январь', 31), (2, 'февраль', 28), (3, 'март', 31),
+                    (4, 'апрель', 30), (5, 'май', 31), (6, 'июнь', 30),
+                    (7, 'июль', 31), (8, 'август', 31), (9, 'сентябрь', 30),
+                    (10, 'октябрь', 31), (11, 'ноябрь', 30), (12, 'декабрь', 31)
+    )
 
-    year_tuple = years_tuple()
+    year_tuple = config.YEARS
     head_time_series = [['Месяц']]
     output_list = []
     for y in year_tuple:
         head_time_series[0].append(str(y))
         for n, month in enumerate(month_tuples):
-            # Запрашиваем количество вакансий за месяц
-            sql = f'''
-            SELECT DISTINCT id FROM calendar WHERE data 
-            BETWEEN "{str(y)}-{month[0]}-01T00:00:00+03:00" and "{str(y)}-{month[0]}-{month[2]}T23:59:59+03:00";'''
-            cursor.execute(sql)
-            vacancies_tuple = (cursor.fetchall())
+            start_day = datetime(y, month[0], 1)
+            # Processing for leap years
+            if isleap(y) and (month[0] == 2):
+                end_day = datetime(y, month[0], 29)
+            else:
+                end_day = datetime(y, month[0], month[2])
+            vacancies_qty = db.get_vacancies_qty_by_period_of_time(start_day=start_day,
+                                                                   end_day=end_day)
+            # ToDo: Убрать январь 2024, июль 2023 гг.
             if str(y) == '2019':
                 # Данные за февраль неполные, поэтому вместо них пишем ноль
                 if month[1] == 'февраль':
                     output_list.append([month[1], 0])
                 else:
-                    output_list.append([month[1], len(vacancies_tuple)])
+                    output_list.append([month[1], vacancies_qty])
             else:
-                output_list[n].append(len(vacancies_tuple))
+                output_list[n].append(vacancies_qty)
     output_list = head_time_series + output_list
     return output_list
 
@@ -572,7 +587,7 @@ def get_salary_data_with_year(cursor):
     experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
 
     data = [['Range']]
-    for year in years_tuple():
+    for year in config.YEARS:
         data[0].append(str(year))  # Добавляем года в колонку легенды.
         request = f'SELECT data, popularity ' \
                   f'FROM charts ' \
@@ -733,7 +748,6 @@ def get_salary_by_category_data(cursor):
             continue
         if len(salary_list) < 10:
             continue
-        print(f'{len(salary_list)=}')
         data_list.append(
             [language[0], min(salary_list), median, median,  max(salary_list)])
         salary_list = []
@@ -741,3 +755,26 @@ def get_salary_by_category_data(cursor):
     data_list.sort(key=lambda row: row[2], reverse=True)
     return data_list
 
+def get_chart_data_from_route(url, script_num=2):
+    """Отдает результат запроса к заданному URL из которого выделяет данные
+     для построения графиков"""
+    try:
+        session = HTMLSession()
+        response = session.get(url)
+
+    except requests.exceptions.RequestException as e:
+        print(e)
+
+    script = response.html.find('script')[script_num].text
+
+    try:
+        finding_result = re.findall('arrayToDataTable\(((.+?))\);', script)
+    except AttributeError:
+        print('Data for chart not found.')
+
+    test_data_list = list()
+    for i in finding_result:
+        substitution_result = re.sub("'", "\"", i[0])
+        list_ = json.loads(substitution_result)
+        test_data_list.append(list_)
+    return test_data_list

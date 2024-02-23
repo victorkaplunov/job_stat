@@ -1,12 +1,19 @@
-from operator import itemgetter
-from flask import Flask, send_from_directory, url_for, render_template
-from flask_bootstrap import Bootstrap
 import os
 import sqlite3
-import json
-import utils
 import copy
+from operator import itemgetter
+import json
 from functools import lru_cache
+
+from flask import Flask, send_from_directory, url_for, render_template
+from flask_bootstrap import Bootstrap
+
+import utils
+from db_connect import Database
+from config_obj import ConfigObj
+
+db = Database()
+config = ConfigObj()
 
 
 def create_app():
@@ -17,7 +24,6 @@ def create_app():
 
 app = create_app()
 id_list = []
-# l_host = "http://127.0.0.1:5000"
 
 
 def cur():
@@ -35,9 +41,9 @@ def home_page():
 def api():
     return f"""
 <html>
-<a href="{url_for('show_vac_calendar', vac_id='14658327')}">{url_for('show_vac_calendar', vac_id='14658327')}</a>
+<a href="{url_for('show_vac_calendar', vacancie_id='14658327')}">{url_for('show_vac_calendar', vacancie_id='14658327')}</a>
 <br>
-<a href="{url_for('show_vac_description', vac_id='14658327')}">{url_for('show_vac_description', vac_id='14658327')}</a>
+<a href="{url_for('show_vac_description', vacancy_id='14658327')}">{url_for('show_vac_description', vacancy_id='14658327')}</a>
 <br>
 <a href="{url_for('show_vac_top_new_by_id')}">{url_for('show_vac_top_new_by_id')}"</a>
 <br>
@@ -60,81 +66,42 @@ def starter_template():
                                'starter-template.css')
 
 
-@app.route('/api/vac/cal/<int:vac_id>')
-def show_vac_calendar(vac_id):
+@app.route('/api/vac/cal/<int:vacancie_id>')
+def show_vac_calendar(vacancy_id):
     """Show the publication data of vacancy with the given id"""
-    con = sqlite3.connect("testdb.db")
-    cursor = cur()
-    sql = "SELECT data FROM calendar WHERE id = " + str(vac_id)
-    cursor.execute(sql)
-    vac = cursor.fetchall()
-    con.close()
-    data_list = []
-    for i in vac:
-        data_list.append(i[0])
-    return str(data_list)
+    vacancies = db.get_date_from_calendar_by_vacancy(vacancy_id=vacancy_id)
+    return [v[0] for v in vacancies]
 
 
-@app.route('/api/vac/<int:vac_id>')
-def show_vac_description(vac_id):
+@app.route('/api/vac/<int:vacancy_id>')
+def show_vac_description(vacancy_id):
     """Show the description of vacancy with the given id"""
-    con = sqlite3.connect("testdb.db")
-    cursor = con.cursor()
-    sql = "SELECT * FROM vacancies WHERE id = " + str(vac_id)
-    cursor.execute(sql)
-    vac = cursor.fetchone()
-    return str(
-        json.loads(vac[1])['employer']["name"] + "\n" +
-        json.loads(vac[1])["name"] + "\n" +
-        json.loads(vac[1])['description'])
+    vacancy_json = db.get_vacancy_by_id(vacancy_id=vacancy_id).json
+    return json.loads(vacancy_json)
 
 
 @app.route('/api/vac/last100id')
 def show_vac_top_new_by_id():
     """Get last 100 vacancies sorted by id"""
-    con = sqlite3.connect("testdb.db")
-    cursor = con.cursor()
-    sql = "SELECT * FROM vacancies ORDER BY published_at DESC LIMIT 100;"
-    cursor.execute(sql)
-    vac = cursor.fetchall()
-    con.close()
-    data_list = []
-    for i in vac:
-        data_list.append('<a href="https://hh.ru/vacancy/' + str(i[0]) + '">' + str(i[0]) + '</a>')
+    vacancies = db.get_vacancy_ordered_by_id()
+    data_list = [f'<a href="https://hh.ru/vacancy/{v.id}">{v.id}</a>' for v in vacancies]
     return str(data_list)
 
 
 @app.route('/api/vac/last100date')
 def show_vac_top_new_by_date():
     """Get last 100 vacancies sorted by last publication data"""
-    con = sqlite3.connect("testdb.db")
-    cursor = con.cursor()
-    sql = "SELECT * FROM calendar ORDER BY data DESC LIMIT 100;"
-    cursor.execute(sql)
-    vac = cursor.fetchall()
-    con.close()
-    data_list = []
-    for i in vac:
-        data_list.append('<a href="https://hh.ru/vacancy/' + str(i[0]) + '">' + str(i[0]) + '</a>')
-    return str(data_list)
+    publications = db.get_vacancy_publication_ordered_by_date()
+    output = [f'<a href="https://hh.ru/vacancy/{v.id}">{v.id}</a>' for v in publications]
+    return str(output)
 
 
 @app.route('/api/search/<search_phrase>')
 def search_vac(search_phrase):
-    """Get vacancies with search phrase in JSON"""
-    con = sqlite3.connect("testdb.db")
-    cursor = con.cursor()
-    sql = f"""
-    SELECT * FROM vacancies
-    WHERE json LIKE "%{search_phrase}%"
-    ORDER BY id DESC LIMIT 150;"""
-    cursor.execute(sql)
-    vac = cursor.fetchall()
-    con.close()
-    data_list = []
-    for i in vac:
-        data_list.append('<a href="https://hh.ru/vacancy/' + str(i[0]) + '">' + str(i[0]) + '</a>')
-    return str(data_list)
+    """Find vacancies by search phrase in JSON"""
+    vacancies = db.find_vacancy_by_substring(search_phrase)
+    output = [f'<a href="https://hh.ru/vacancy/{v.id}">{v.id}</a>' for v in vacancies]
+    return str(output)
 
 
 @app.route('/time_series')
@@ -144,9 +111,9 @@ def time_series():
     return render_template(
         '/time_series.html',
         title='Количество вакансий по месяцам и неделям.',
-        vacancy_count_week_by_week=utils.vacancy_count_week_by_week(cur()),
-        vacancy_rate_by_year=utils.get_vacancy_count_by_year(cur()),
-        vacancy_count_day_by_week=utils.vacancy_count_day_by_week(cur()),
+        vacancy_count_week_by_week=utils.get_vacancies_qty_week_by_week(),
+        vacancy_rate_by_year=utils.get_vacancies_qty_by_month_of_year(),
+        vacancy_count_day_by_week=utils.get_vacancies_qty_by_day_of_week(),
            )
 
 
@@ -170,7 +137,7 @@ def top_employers():
     for i in key_skills_list:
         i.append(i[0])
     sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
-    current_year = utils.years_tuple()[-1]
+    current_year = config.YEARS[-1]
     return render_template(
         '/horizontal_bar.html',
         title='Топ 50 работодателей',
@@ -182,12 +149,10 @@ def top_employers():
 @app.route('/salary_by_category')
 def salary_by_category():
     """Salary by category"""
-    chart = 'frameworks'
-    title = 'Медианная зарплата в зависимости от упоминания языка.'
-
     return render_template(
         '/tmp.html',
-        salary=utils.render_salary_by_category_charts(title, cur())
+        chart_data=utils.get_salary_by_category_data((cur())),
+        title='Медианная зарплата в зависимости от упоминания языка.'
     )
 
 
