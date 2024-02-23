@@ -9,7 +9,7 @@ import unicodedata
 import locale
 
 import requests
-from requests_html import HTMLSession
+# from requests_html import HTMLSession
 
 from db_connect import Database
 from config_obj import ConfigObj
@@ -752,26 +752,26 @@ def get_salary_by_category_data(cursor):
     data_list.sort(key=lambda row: row[2], reverse=True)
     return data_list
 
-def get_chart_data_from_route(url, script_num=2):
-    """Отдает результат запроса к заданному URL из которого выделяет данные
-     для построения графиков"""
-    try:
-        session = HTMLSession()
-        response = session.get(url)
-
-    except requests.exceptions.RequestException as e:
-        print(e)
-
-    script = response.html.find('script')[script_num].text
-
-    try:
-        finding_result = re.findall('arrayToDataTable\(((.+?))\);', script)
-    except AttributeError:
-        print('Data for chart not found.')
-
-    test_data_list = list()
-    for i in finding_result:
-        substitution_result = re.sub("'", "\"", i[0])
-        list_ = json.loads(substitution_result)
-        test_data_list.append(list_)
-    return test_data_list
+# def get_chart_data_from_route(url, script_num=2):
+#     """Отдает результат запроса к заданному URL из которого выделяет данные
+#      для построения графиков"""
+#     try:
+#         session = HTMLSession()
+#         response = session.get(url)
+#
+#     except requests.exceptions.RequestException as e:
+#         print(e)
+#
+#     script = response.html.find('script')[script_num].text
+#
+#     try:
+#         finding_result = re.findall('arrayToDataTable\(((.+?))\);', script)
+#     except AttributeError:
+#         print('Data for chart not found.')
+#
+#     test_data_list = list()
+#     for i in finding_result:
+#         substitution_result = re.sub("'", "\"", i[0])
+#         list_ = json.loads(substitution_result)
+#         test_data_list.append(list_)
+#     return test_data_list
