@@ -43,7 +43,6 @@ class Database(metaclass=SingletonMeta):
             .limit(limit).all()
 
     def get_vacancy_qty_by_day(self, day: date) -> int:
-        print(f'{type(day)=}')
         return self._session.query(Calendar).distinct(Calendar.id) \
             .filter(Calendar.data.between(day, day + timedelta(days=1))).count()
 
