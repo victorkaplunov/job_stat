@@ -541,30 +541,42 @@ def get_vacancies_qty_by_month_of_year():
                     (10, 'октябрь', 31), (11, 'ноябрь', 30), (12, 'декабрь', 31)
     )
 
-    year_tuple = config.YEARS
+    years = config.YEARS
     head_time_series = [['Месяц']]
     output_list = []
-    for y in year_tuple:
-        head_time_series[0].append(str(y))
+    for year in years:
+        head_time_series[0].append(str(year))
         for n, month in enumerate(month_tuples):
-            start_day = datetime(y, month[0], 1)
+            start_day = datetime(year, month[0], 1)
             # Processing for leap years
-            if isleap(y) and (month[0] == 2):
-                end_day = datetime(y, month[0], 29)
+            if isleap(year) and (month[0] == 2):
+                end_day = datetime(year, month[0], 29)
             else:
-                end_day = datetime(y, month[0], month[2])
+                end_day = datetime(year, month[0], month[2])
             vacancies_qty = db.get_vacancies_qty_by_period_of_time(start_day=start_day,
                                                                    end_day=end_day)
             # ToDo: Убрать январь 2024, июль 2023 гг.
-            if str(y) == '2019':
+            if str(year) == '2019':
                 # Данные за февраль неполные, поэтому вместо них пишем ноль
                 if month[1] == 'февраль':
                     output_list.append([month[1], 0])
                 else:
                     output_list.append([month[1], vacancies_qty])
+            elif year == 2023:
+                if (month[1] == 'июнь') or (month[1] == 'июль'):
+                    output_list[n].append(0)
+                else:
+                    output_list[n].append(vacancies_qty)
+            elif year == 2024:
+                if month[1] == 'январь':
+                    output_list[n].append(0)
+                else:
+                    output_list[n].append(vacancies_qty)
             else:
                 output_list[n].append(vacancies_qty)
     output_list = head_time_series + output_list
+    for i in output_list:
+        print(i)
     return output_list
 
 
