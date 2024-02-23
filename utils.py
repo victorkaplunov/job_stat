@@ -555,7 +555,7 @@ def get_vacancies_qty_by_month_of_year():
                 end_day = datetime(year, month[0], month[2])
             vacancies_qty = db.get_vacancies_qty_by_period_of_time(start_day=start_day,
                                                                    end_day=end_day)
-            # ToDo: Убрать январь 2024, июль 2023 гг.
+            # Remove data displaying for the incomplete months.
             if str(year) == '2019':
                 # Данные за февраль неполные, поэтому вместо них пишем ноль
                 if month[1] == 'февраль':
