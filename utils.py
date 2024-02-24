@@ -9,7 +9,6 @@ import unicodedata
 import locale
 
 import requests
-from requests_html import HTMLSession
 
 from db_connect import Database
 from config_obj import ConfigObj
