@@ -12,23 +12,23 @@ from config_obj import ConfigObj
 def charts_data():
     """Отдает результат запроса к заданному URL из которого выделяет данные
      для построения графиков"""
-    try:
-        session = HTMLSession()
-        response = session.get(f"{ConfigObj().LOCAL_HOST_BASE_URL}/salary")
+    def _get_charts_data(rout=f'{ConfigObj().LOCAL_HOST_BASE_URL}/', script_num=2):
+        try:
+            session = HTMLSession()
+            response = session.get(f'{ConfigObj().LOCAL_HOST_BASE_URL}/{rout}')
+            script = response.html.find('script')[script_num].text
+        except exceptions.RequestException as exception:
+            print(exception)
 
-    except exceptions.RequestException as e:
-        print(e)
+        try:
+            finding_result = re.findall('arrayToDataTable\(((.+?))\);', script)
+            output_data = dict()
+            for n, i in enumerate(finding_result):
+                substitution_result = re.sub("'", "\"", i[0])  # prepare data to json.loads
+                output_data[n] = json.loads(substitution_result)
+            return output_data
+        except AttributeError:
+            print('Data for chart not found.')
+            return
 
-    script = response.html.find('script')[2].text
-
-    try:
-        finding_result = re.findall('arrayToDataTable\(((.+?))\);', script)
-    except AttributeError:
-        print('Data for chart not found.')
-
-    test_data_list = list()
-    for i in finding_result:
-        substitution_result = re.sub("'", "\"", i[0])
-        list_ = json.loads(substitution_result)
-        test_data_list.append(list_)
-    return test_data_list
+    return _get_charts_data

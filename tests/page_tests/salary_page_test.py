@@ -1,34 +1,21 @@
 from config_obj import ConfigObj
 
 config = ConfigObj()
-
+rout = 'salary'
 
 def test_salary_chart_data_type(charts_data):
     """variable 'salary' in JS function 'salary' contains list."""
-    print(charts_data)
-    assert isinstance(charts_data, list)
-    for i in charts_data:
-        assert isinstance(charts_data, list)
+    testing_data = charts_data(rout=rout)[0]
+    assert isinstance(testing_data, list), 'Данные графика не являются списком.'
+    for i in testing_data:
+        assert isinstance(i, list), 'В данных графика использован не список.'
+        assert i != [], 'В данных графика обнаружен пустой список.'
 
 
-def test_first_row_in_salary_chart_data(charts_data):
-    """Тне title row contain 'Range' and years value."""
-    check_list = list(config.YEARS)
-    string_check_list = []
-    for i in check_list:
-        string_check_list.append(str(i))
-    assert charts_data[0][0][1:] == string_check_list
-    assert charts_data[0][0][0] == 'Range'
-
-
-def test_week_chart_legend_titles_data_type(charts_data):
-    assert isinstance(charts_data[0][0], list)
-    assert isinstance(charts_data[0][0][0], str)
-
-
-def test_week_chart_data_type(charts_data):
-    charts_data[0].pop(0)  # Remove title list
-    for i in charts_data[0]:
-        assert isinstance(i, list)
-        assert isinstance(i[0], str)
-        assert isinstance(i[1], int)
+def test_annotation_row_in_salary_chart_data(charts_data):
+    """Тне annotation row contain 'Range' and years value."""
+    title_row = charts_data(rout=rout)[0][0]
+    assert title_row[0] == 'Range', 'Первый элемент аннотации имеет неверное значение.'
+    for n, i in enumerate(config.YEARS):
+        assert str(i) == title_row[1:][n],\
+            "Год из заголовка графика не совпадает с годом из конфигурационного файла."

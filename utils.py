@@ -9,7 +9,7 @@ import unicodedata
 import locale
 
 import requests
-# from requests_html import HTMLSession
+from requests_html import HTMLSession
 
 from db_connect import Database
 from config_obj import ConfigObj
@@ -492,7 +492,7 @@ def get_vacancies_qty_by_day_of_week():
             start_weekday_num += 1
         else:
             start_weekday_num = 0
-    output_list = [['Неделя', 'текущая неделя', 'прошлая неделя', 'две недели назад', 'три недели назад']]
+    output_list = [['Неделя за неделей', 'текущая неделя', 'прошлая неделя', 'две недели назад', 'три недели назад']]
     for count, value in enumerate(weekday_list):
         day_list = [value]
         for n in range(0, 28, 7):
@@ -555,8 +555,8 @@ def get_vacancies_qty_by_month_of_year():
                 end_day = datetime(year, month[0], month[2])
             vacancies_qty = db.get_vacancies_qty_by_period_of_time(start_day=start_day,
                                                                    end_day=end_day)
-            # Remove data displaying for the incomplete months.
-            if str(year) == '2019':
+            # It is remove data displaying for the incomplete months.
+            if year == 2019:
                 # Данные за февраль неполные, поэтому вместо них пишем ноль
                 if month[1] == 'февраль':
                     output_list.append([month[1], 0])
@@ -763,27 +763,3 @@ def get_salary_by_category_data(cursor):
     # Sort by median value.
     data_list.sort(key=lambda row: row[2], reverse=True)
     return data_list
-
-# def get_chart_data_from_route(url, script_num=2):
-#     """Отдает результат запроса к заданному URL из которого выделяет данные
-#      для построения графиков"""
-#     try:
-#         session = HTMLSession()
-#         response = session.get(url)
-#
-#     except requests.exceptions.RequestException as e:
-#         print(e)
-#
-#     script = response.html.find('script')[script_num].text
-#
-#     try:
-#         finding_result = re.findall('arrayToDataTable\(((.+?))\);', script)
-#     except AttributeError:
-#         print('Data for chart not found.')
-#
-#     test_data_list = list()
-#     for i in finding_result:
-#         substitution_result = re.sub("'", "\"", i[0])
-#         list_ = json.loads(substitution_result)
-#         test_data_list.append(list_)
-#     return test_data_list
