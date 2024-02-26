@@ -5,17 +5,18 @@ import pytest
 from requests_html import HTMLSession
 from requests import exceptions
 
-from config_obj import ConfigObj
+from config import ConfigObj
+config = ConfigObj()
 
 
 @pytest.fixture
 def charts_data():
     """Отдает результат запроса к заданному URL из которого выделяет данные
      для построения графиков"""
-    def _get_charts_data(rout=f'{ConfigObj().LOCAL_HOST_BASE_URL}/', script_num=2):
+    def _get_charts_data(rout=f'{config.LOCAL_HOST_BASE_URL}/', script_num=2):
         try:
             session = HTMLSession()
-            response = session.get(f'{ConfigObj().LOCAL_HOST_BASE_URL}/{rout}')
+            response = session.get(f'{config.LOCAL_HOST_BASE_URL}/{rout}')
             script = response.html.find('script')[script_num].text
         except exceptions.RequestException as exception:
             print(exception)
