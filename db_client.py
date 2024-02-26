@@ -4,7 +4,7 @@ from typing import Type, List
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
 
-from models import Vacancies, Calendar, Charts
+from models import Vacancies, Calendar, Charts, VacWithSalary
 from config import ConfigObj
 
 
@@ -43,6 +43,11 @@ class Database(metaclass=SingletonMeta):
             .order_by(Vacancies.published_at.desc())\
             .limit(limit).all()
 
+    def find_vacancy_with_salary_by_substring(self, search_phrase: str) -> list[Type[VacWithSalary]]:
+        return self._session.query(VacWithSalary)\
+            .filter(VacWithSalary.description.like(f'%{search_phrase}%'))\
+            .order_by(VacWithSalary.published_at.desc()).all()
+
     def get_vacancy_qty_by_day(self, day: date) -> int:
         return self._session.query(Calendar).distinct(Calendar.id) \
             .filter(Calendar.data.between(day, day + timedelta(days=1))).count()
@@ -70,13 +75,12 @@ class Database(metaclass=SingletonMeta):
             .filter(Vacancies.published_at.between(start_date, end_date)).all()
         return [i[0] for i in result]
 
-    def get_salary_data_with_year(self, year) -> list[Type[Charts]]:
-        result = self._session.query(Charts) \
-            .filter(and_(Charts.chart_name == 'salary', Charts.year == year)).all()
-        return result
-
     def get_data_for_chart(self, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter_by(chart_name=chart_name).all()
+
+    def get_data_for_chart_per_year(self, year: int, chart_name: str) -> list[Type[Charts]]:
+        return self._session.query(Charts).filter(
+            and_(Charts.year == year, Charts.chart_name == chart_name)).all()
 
     # def execute_query(self, query):
     #     self._session.execute(query)
