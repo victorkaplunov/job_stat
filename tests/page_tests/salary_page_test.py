@@ -1,7 +1,8 @@
-from config_obj import ConfigObj
+from config import ConfigObj
 
 config = ConfigObj()
 rout = 'salary'
+
 
 def test_salary_chart_data_type(charts_data):
     """variable 'salary' in JS function 'salary' contains list."""
