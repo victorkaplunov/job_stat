@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from typing import Type, List
 
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
@@ -24,19 +25,19 @@ class Database(metaclass=SingletonMeta):
         self._db_engine = create_engine(f"sqlite:///{ConfigObj.DB_FILE_NAME}")
         self._session = sessionmaker(bind=self._db_engine)()
 
-    def get_date_from_calendar_by_vacancy(self, vacancy_id: int) -> list[Calendar]:
+    def get_date_from_calendar_by_vacancy(self, vacancy_id: int) -> list[Calendar.data]:
         return self._session.query(Calendar.data).filter_by(id=vacancy_id).all()
 
-    def get_vacancy_by_id(self, vacancy_id: int) -> list[Vacancies]:
+    def get_vacancy_by_id(self, vacancy_id: int) -> Type[Vacancies]:
         return self._session.query(Vacancies).filter_by(id=vacancy_id).one()
 
-    def get_vacancy_ordered_by_id(self, limit=100) -> list[Vacancies]:
+    def get_vacancy_ordered_by_id(self, limit=100) -> list[Type[Vacancies]]:
         return self._session.query(Vacancies).order_by(Vacancies.id.desc()).limit(limit).all()
 
-    def get_vacancy_publication_ordered_by_date(self, limit=100) -> list[Calendar]:
+    def get_vacancy_publication_ordered_by_date(self, limit=100) -> list[Type[Calendar]]:
         return self._session.query(Calendar).order_by(Calendar.data.desc()).limit(limit).all()
 
-    def find_vacancy_by_substring(self, search_phrase: str, limit=150) -> list[Vacancies]:
+    def find_vacancy_by_substring(self, search_phrase: str, limit=150) -> list[Type[Vacancies]]:
         return self._session.query(Vacancies)\
             .filter(Vacancies.json.like(f'%{search_phrase}%'))\
             .order_by(Vacancies.published_at.desc())\
@@ -54,7 +55,7 @@ class Database(metaclass=SingletonMeta):
     def get_all_vacancies_ids(self) -> list:
         return [i[0] for i in self._session.query(Vacancies.id)]
 
-    def count_vacancy_by_search_phrase_and_year(self, search_phrase: str, year: int):
+    def count_vacancy_by_search_phrase_and_year(self, search_phrase: str, year: int) -> int:
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
         return self._session.query(Vacancies) \
@@ -62,14 +63,14 @@ class Database(metaclass=SingletonMeta):
                          Vacancies.published_at.between(start_date, end_date)))\
             .count()
 
-    def get_json_from_vacancies_per_year(self, year: int):
+    def get_json_from_vacancies_per_year(self, year: int) -> list[str]:
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
         result = self._session.query(Vacancies.json) \
             .filter(Vacancies.published_at.between(start_date, end_date)).all()
         return [i[0] for i in result]
 
-    def get_salary_data_with_year(self, year):
+    def get_salary_data_with_year(self, year) -> list[Type[Charts]]:
         result = self._session.query(Charts) \
             .filter(and_(Charts.chart_name == 'salary', Charts.year == year)).all()
         return result
@@ -84,15 +85,3 @@ class Database(metaclass=SingletonMeta):
     #     self._session.execute(query)
     #     self._session.commit()
 
-
-
-
-
-# Execute a query
-# database.execute_query("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)")
-
-# Fetch data
-# data = database.fetch_data(text('SELECT * FROM vacancies ORDER BY id DESC LIMIT 100;'))
-# print(f'{data[0]=}')
-# Update data
-# database.update_data("INSERT INTO users (name) VALUES ('John')")
