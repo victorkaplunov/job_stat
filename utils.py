@@ -7,52 +7,22 @@ from operator import itemgetter
 import json
 import unicodedata
 import locale
+from typing import NoReturn
 
 import requests
 
-from db_connect import Database
-from config_obj import ConfigObj
+from db_client import Database
+from config import ConfigObj
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 db = Database()
 config = ConfigObj()
-
-translation_dict = dict(noExperience="Без опыта", between1And3="От года до трех",
-                        between3And6="От трех до шести лет", moreThan6="Более шести лет",
-                        fullDay='Полный день', flexible='Гибкий график',
-                        shift='Сменный график', remote='Удаленная работа',
-                        full='Полная занятость', part='Частичная занятость',
-                        project="Проектная работа", probation='Стажировка',
-                        volunteer="Волонтер",
-                        without_salary='Зарплата не указана', closed='Закрытый диапазон',
-                        open_up='Зарплата от...', open_down='Зарплата до...',
-                        flyInFlyOut='Вахтовый метод')
-
 today = date.today() - timedelta(days=6)
 first_day_of_current_year = date(date.today().year, 1, 1)
-
-MROT = 13890
 
 
 def reversed_years():
     return config.YEARS[::-1]
-
-
-def vac_id_list():
-    """Get list of id from "vacancies" table"""
-    con = sqlite3.connect("testdb.db")  # Open database
-    cur = con.cursor()
-    id_list = []
-    sql = "SELECT id FROM vacancies"
-    try:
-        cur.execute(sql)
-        # print(type((cur.fetchall()[0])[0]))
-        for n in cur.fetchall():
-            id_list.append(n[0])
-    except sqlite3.IntegrityError as err:
-        print("Error: ", err)
-    con.close()
-    return id_list
 
 
 def write_vacancies(response, base_url):
@@ -69,14 +39,11 @@ def write_vacancies(response, base_url):
             cur.executescript(sql)
         except sqlite3.IntegrityError as err:
             print("Error: ", err)
-            # break
 
         # If vacancy is new, write description to "vacancies" table.
-        if int(i["id"]) not in vac_id_list():
+        if int(i["id"]) not in db.get_all_vacancies_ids():
             # Get vacancies by ID
-            r = requests.get(base_url + (i["id"])
-                             # , proxies=proxies
-                             )
+            r = requests.get(base_url + (i["id"]))
             vac = r.json()
             del vac["branded_description"]  # Remove description in HTML format
             json_dump = json.dumps(vac, indent=None, ensure_ascii=False, separators=(', ', ': ', ))
@@ -98,7 +65,7 @@ def write_vacancies(response, base_url):
     return items
 
 
-def chart_with_category_filter(chart_name: str, param_list: list, cur, update, year):
+def chart_with_category_filter(chart_name: str, param_list: list, cur, update, year) -> NoReturn:
     """ Function count a number of entries of some string from param_list in all vacancies. """
     for i in param_list:
         sql = f"""SELECT json FROM vacancies WHERE json LIKE '%%%{i[0]}%%' AND
@@ -150,37 +117,32 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update, y
     return
 
 
-def stat_with_one_year(chart_name: str, param_list: list, year: int, cur, update=True):
-    """ Function count a number of entries of some string from param_list in the JSON of all vacancies. """
+def count_per_year(chart_name: str, param_list: list, year: int, cur, update=True) -> NoReturn:
+    """ Function count a number of entries of some string from param_list
+     in the JSON of all vacancies. """
     types = {i: 0 for i in param_list}  # Convert list to dictionary
     types = types.fromkeys(types, 0)  # Reset all values to zero
-    for t in types:
-        print(t)
-
-        sql = f"""SELECT COUNT(*), json
-                FROM vacancies
-                WHERE json LIKE '%{t}%' AND
-                published_at BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
-        cur.execute(sql)
-        type_count = cur.fetchall()[0][0]
+    for type in types:
+        print(type)
+        type_count = db.count_vacancy_by_search_phrase_and_year(search_phrase=type, year=year)
         if update is True:
             sql = f"""
             UPDATE charts
             SET popularity = {type_count}
-            WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{t}'
+            WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{type}'
             AND charts.'year' = '{year}';"""
         else:
             sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                  VALUES('{chart_name}', '{t}', {type_count}, {str(year)});"""
+                  VALUES('{chart_name}', '{type}', {type_count}, {str(year)});"""
         cur.executescript(sql)
     return
 
 
-def types_stat_with_year(types: dict, chart_name: str, key_name: str, all_vacancies, cur, year, update):
+def count_types_per_year(types: dict, chart_name: str, key_name: str, all_vacancies, cur, year, update):
 
     # Count vacancies with given type in current year.
     for i in all_vacancies:
-        body = json.loads(i[0])
+        body = json.loads(i)
         types[(body[key_name]['id'])] += 1
     # Write ready data to DB.
     print(types)
@@ -202,7 +164,7 @@ def count_schedule_types(types: dict, chart_name: str, year, all_vacancies, cur,
     types = types.fromkeys(types, 0)  # set all values to zero
     # Count vacancies with given type in given year.
     for n in all_vacancies:
-        body = json.loads((n[0]))
+        body = json.loads(n)
 
         if body['salary'] is None:
             types['without_salary'] += 1
@@ -410,7 +372,7 @@ def salary_to_db_new(year, experience, exchange_rate, conn):
     all_salary = []
     for i in salary_list:
         # Если расчетная ЗП меньше минимальной, пропускаем значение.
-        if (i['from'] or i['to']) < MROT:
+        if (i['from'] or i['to']) < config.MROT:
             continue
 
         # "Чистая" зарплата
@@ -552,8 +514,8 @@ def get_vacancies_qty_by_month_of_year():
                 end_day = datetime(year, month[0], 29)
             else:
                 end_day = datetime(year, month[0], month[2])
-            vacancies_qty = db.get_vacancies_qty_by_period_of_time(start_day=start_day,
-                                                                   end_day=end_day)
+            vacancies_qty = db.get_vacancies_qty_by_period(start_day=start_day,
+                                                           end_day=end_day)
             # It is remove data displaying for the incomplete months.
             if year == 2019:
                 # Данные за февраль неполные, поэтому вместо них пишем ноль
@@ -574,8 +536,6 @@ def get_vacancies_qty_by_month_of_year():
             else:
                 output_list[n].append(vacancies_qty)
     output_list = head_time_series + output_list
-    for i in output_list:
-        print(i)
     return output_list
 
 
@@ -591,22 +551,20 @@ def get_data_for_horizontal_bar_chart(chart_name, cursor):
     return data_list
 
 
-def get_salary_data_with_year(cursor):
+def get_salary_data_with_year():
     experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
 
     data = [['Range']]
     for year in config.YEARS:
         data[0].append(str(year))  # Добавляем года в колонку легенды.
-        request = f'SELECT data, popularity ' \
-                  f'FROM charts ' \
-                  f'WHERE chart_name="salary" AND year={str(year)};'
-        cursor.execute(request)
-        statistics_data = cursor.fetchall()
+        # Добавляем расчетные зарплаты в соответствии с диапазоном опыта.
+        statistics_data = db.get_salary_data_with_year(year=year)
         for i in statistics_data:
-            experience_ranges[i[0]].append(i[1])
+            experience_ranges[i.data].append(i.popularity)
+    # Переводим названия диапазонов на русский
     for i in experience_ranges:
         rang_data = experience_ranges[i]
-        rang_data.insert(0, translation_dict[i])
+        rang_data.insert(0, config.TRANSLATIONS[i])
         data.append(rang_data)
     return data
 
@@ -621,7 +579,7 @@ def get_data_with_year(cursor, year, chart_name, sort=True):
     data_list = []
     for i in statistics_data:
         if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
-            row = [translation_dict[i[0]], i[1]]
+            row = [config.TRANSLATIONS[i[0]], i[1]]
             data_list.append(row)
         else:
             data_list.append(list(i))
