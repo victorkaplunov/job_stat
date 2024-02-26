@@ -139,7 +139,7 @@ def count_per_year(chart_name: str, param_list: list, year: int, cur, update=Tru
 
 
 def count_types_per_year(types: dict, chart_name: str, key_name: str,
-                         all_vacancies, cur, year, update) -> NoReturn:
+                         all_vacancies: list, cur, year: int, update: bool) -> NoReturn:
 
     # Count vacancies with given type in current year.
     for i in all_vacancies:
@@ -160,7 +160,8 @@ def count_types_per_year(types: dict, chart_name: str, key_name: str,
     return
 
 
-def count_schedule_types(types: dict, chart_name: str, year, all_vacancies, cur, update) -> NoReturn:
+def count_schedule_types(types: dict, chart_name: str, year: int,
+                         all_vacancies: list, cur, update: bool) -> NoReturn:
     # Count types of schedule in all vacancies.
     types = types.fromkeys(types, 0)  # set all values to zero
     # Count vacancies with given type in given year.
@@ -192,7 +193,7 @@ def count_schedule_types(types: dict, chart_name: str, year, all_vacancies, cur,
     return
 
 
-def salary_to_db(experience, exchange_rate, conn, year):
+def salary_to_db(experience: str, exchange_rate: float, conn, year: int):
     """Приводит зарплаты к общему виду (нетто, руб.) и записывает в отдельную таблицу для быстрого
     отображения на графике."""
     cur = conn.cursor()
@@ -386,9 +387,8 @@ def get_vacancies_qty_by_month_of_year():
                 end_day = datetime(year, month[0], month[2])
             vacancies_qty = db.get_vacancies_qty_by_period(start_day=start_day,
                                                            end_day=end_day)
-            # It is remove data displaying for the incomplete months.
+            # Удаляем данные в неполных месяцах, вместо неполных данных пишем ноль.
             if year == 2019:
-                # Данные за февраль неполные, поэтому вместо них пишем ноль
                 if month[1] == 'февраль':
                     output_list.append([month[1], 0])
                 else:
@@ -409,15 +409,9 @@ def get_vacancies_qty_by_month_of_year():
     return output_list
 
 
-def get_data_for_horizontal_bar_chart(chart_name, cursor):
-    """ Get data from 'charts' DB table for chart drawing"""
-    request = f'SELECT data, popularity FROM charts WHERE chart_name="{chart_name}";'
-    cursor.execute(request)
-    statistics_data = cursor.fetchall()
-    # Convert list of tuples to list of lists
-    data_list = []
-    for i in statistics_data:
-        data_list.append(list(i))
+def get_data_for_horizontal_bar_chart(chart_name: str) -> list[list[str | int]]:
+    statistics_data = db.get_data_for_chart(chart_name=chart_name)
+    data_list = [[i.data, i.popularity] for i in statistics_data]
     return data_list
 
 

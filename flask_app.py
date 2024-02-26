@@ -133,7 +133,8 @@ def salary():
 @app.route('/top_employers')
 def top_employers():
     """Employers by vacancies quantity page"""
-    key_skills_list = utils.get_data_for_horizontal_bar_chart('top_employers', cur())
+    key_skills_list = utils.get_data_for_horizontal_bar_chart('top_employers')
+    print(f'{key_skills_list=}')
     for i in key_skills_list:
         i.append(i[0])
     sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
@@ -263,7 +264,7 @@ def with_salary():
 @app.route('/key_skills')
 def key_skills():
     """Key skills popularity page"""
-    key_skills_list = utils.get_data_for_horizontal_bar_chart('key_skills', cur())
+    key_skills_list = utils.get_data_for_horizontal_bar_chart('key_skills')
     for i in key_skills_list:
         i.append(i[0])
     sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
