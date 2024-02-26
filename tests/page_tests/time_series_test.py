@@ -1,5 +1,5 @@
 import pytest
-from config_obj import ConfigObj
+from config import ConfigObj
 
 config = ConfigObj()
 
