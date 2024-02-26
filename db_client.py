@@ -75,6 +75,9 @@ class Database(metaclass=SingletonMeta):
             .filter(and_(Charts.chart_name == 'salary', Charts.year == year)).all()
         return result
 
+    def get_data_for_chart(self, chart_name: str) -> list[Type[Charts]]:
+        return self._session.query(Charts).filter_by(chart_name=chart_name).all()
+
     # def execute_query(self, query):
     #     self._session.execute(query)
     #
