@@ -1,5 +1,3 @@
-# -*- encoding=utf8 -*-
-import os
 from datetime import date
 import json
 import sqlite3
@@ -7,8 +5,10 @@ import sqlite3
 import requests
 
 import utils
-from config_obj import ConfigObj
+from config import ConfigObj
+import db_client
 
+db = db_client.Database()
 config = ConfigObj()
 base_url = config.BASE_URL
 
@@ -84,96 +84,64 @@ if update is False:
 
 # Wright statistics data to database
 for year in years_tuple:
-    sql = f"""
-    SELECT json
-    FROM vacancies
-    WHERE published_at
-    BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
-    cur.execute(sql)
-    all_vacancies = cur.fetchall()
+    all_vacancies_jsons = db.get_json_from_vacancies_per_year(year=year)
 
-    utils.stat_with_one_year(
-        'languages',
-        ['Java', 'Python', 'JavaScript', 'C#', "PHP", 'C++',
-         'Ruby', 'Groovy', ' Go ', 'Scala', 'Swift',
-         'Kotlin', 'TypeScript', 'VBScript', 'tcl', 'Perl',
-         'AutoIT'
-         ], year, cur, update)
+    utils.count_per_year(chart_name='languages',
+                         param_list=config.PROGRAM_LANGUAGES,
+                         year=year, cur=cur, update=update)
 
-    utils.stat_with_one_year(
-        'bdd_frameworks',
-        ['Cucumber', 'Robot_Framework', 'SpecFlow', 'TestLeft',
-         'RSpec', 'JBehave', 'HipTest', "Jasmine", 'Behat',
-         'behave', 'Fitnesse', 'Cucumber-JVM',
-         'pytest-bdd', 'NSpec', 'Serenity BDD'
-         ], year, cur, update)
+    utils.count_per_year(chart_name='bdd_frameworks',
+                         param_list=config.BDD_FRAMEWORKS,
+                         year=year, cur=cur, update=update)
 
-    utils.stat_with_one_year(
-        'load_testing_tools',
-        ['JMeter', 'LoadRunner', 'Locust', 'Gatling',
-         'Yandex.Tank', 'ApacheBench', 'Grinder',
-         'Performance Center', 'IBM Rational Performance', 'K6'],
-        year, cur, update)
+    utils.count_per_year(chart_name='load_testing_tools',
+                         param_list=config.LOAD_TESTING_TOOLS,
+                         year=year, cur=cur, update=update)
 
-    utils.stat_with_one_year(
-        'ci_cd', ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
-                  'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity'],
-        year, cur, update)
+    utils.count_per_year(chart_name='ci_cd',
+                         param_list=config.CI_CD,
+                         year=year, cur=cur, update=update)
 
-    utils.stat_with_one_year(
-        'monitoring',
-        ['CloudWatch', 'Grafana', 'Zabbix',
-         'Prometheus', 'VictoriaMetrics',
-         'InfluxDB', 'Graphite', 'ClickHouse'],
-        year, cur, update)
+    utils.count_per_year(chart_name='monitoring',
+                         param_list=config.MONITORING,
+                         year=year, cur=cur, update=update)
 
-    utils.stat_with_one_year(
-        'web_ui_tools',
-        ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene',
-         'Cypress', 'Splinter', 'Puppeteer', 'WebDriverIO', 'Galen',
-         'Playwright', 'Protractor', 'TestCafe'],
-        year, cur, update)
+    utils.count_per_year(chart_name='web_ui_tools',
+                         param_list=config.WEB_UI_TOOLS,
+                         year=year, cur=cur, update=update)
 
-    utils.stat_with_one_year(
-        'mobile_testing_frameworks',
-        ['Appium', 'Selendroid', 'Espresso', 'Detox',
-         'robotium', 'Calabash', 'UI Automation',
-         'UIAutomator', 'XCTest', 'Kobiton'],
-        year, cur, update)
+    utils.count_per_year(chart_name='mobile_testing_frameworks',
+                         param_list=config.MOBILE_TESTING_FRAMEWORKS,
+                         year=year, cur=cur, update=update)
 
-    utils.stat_with_one_year(
-        'bugtracking_n_tms',
-        ['Youtrack', 'TestRail', 'TestLink', 'TestLodge',
-         'Jira', 'Confluence', 'Redmine', 'TFS', 'Zephyr',
-         'Hiptest', 'Xray', 'PractiTest', 'Testpad',
-         'Deviniti', 'Qase', 'IBM Rational Quality Manager',
-         'HP Quality Center', 'HP ALM', 'TestIt',
-         'Gemini', 'BugZilla', 'Fitnesse'], year, cur, update)
+    utils.count_per_year(chart_name='bugtracking_n_tms',
+                         param_list=config.BUGTRACKING_N_TMS,
+                         year=year, cur=cur, update=update)
 
-    utils.stat_with_one_year('cvs',
-                             ['git', 'SVN', 'Subversion', 'Mercurial'],
-                             year, cur, update)
+    utils.count_per_year(chart_name='cvs',
+                         param_list=config.CVS,
+                         year=year, cur=cur, update=update)
 
     schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0, flyInFlyOut=0)
-    utils.types_stat_with_year(schedule_types, 'schedule_type',
-                               'schedule', all_vacancies,
+    utils.count_types_per_year(schedule_types, 'schedule_type',
+                               'schedule', all_vacancies_jsons,
                                cur, year, update)
 
     experience_types = dict(noExperience=0, between1And3=0,
                             between3And6=0, moreThan6=0)
-    utils.types_stat_with_year(experience_types, 'experience',
-                               'experience', all_vacancies,
+    utils.count_types_per_year(experience_types, 'experience',
+                               'experience', all_vacancies_jsons,
                                cur, year, update)
 
     employment_types = dict(full=0, part=0, project=0,
                             probation=0, volunteer=0)
-    utils.types_stat_with_year(employment_types, 'employment_type',
-                               'employment', all_vacancies, cur,
+    utils.count_types_per_year(employment_types, 'employment_type',
+                               'employment', all_vacancies_jsons, cur,
                                year, update)
 
     with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
     utils.count_schedule_types(with_salary, 'with_salary', year,
-                               all_vacancies, cur, update)
+                               all_vacancies_jsons, cur, update)
 
     utils.chart_with_category_filter(
         'frameworks',
@@ -211,15 +179,13 @@ for year in years_tuple:
         except sqlite3.OperationalError:
             print('Some sqlite3.OperationalError')
 
-sql = f"""SELECT id, json FROM vacancies WHERE published_at
-          BETWEEN '{first_day_of_current_year}' AND '{today}';"""
-cur.execute(sql)
-current_year_vacancies = (cur.fetchall())
+# Получаем поле 'json' для каждой из вакансий за последний год.
+current_year_vacancies = db.get_json_from_vacancies_per_year(config.YEARS[-1])
 
 # Populate skills set
 key_skills = set()
 for n in current_year_vacancies:
-    body = json.loads((n[1]))
+    body = json.loads(n)
     try:
         for m in body['key_skills']:
             key_skills.add(m['name'])
@@ -231,7 +197,7 @@ for n in current_year_vacancies:
 # Count skills
 key_skills_dict = dict.fromkeys(key_skills, 0)
 for i in current_year_vacancies:
-    body = json.loads((i[1]))
+    body = json.loads(i)
     try:
         for x in body['key_skills']:
             key_skills_dict[(x['name'])] += 1
@@ -280,7 +246,7 @@ conn.commit()
 employers = set()
 for vacancy in current_year_vacancies:
     # Convert JSON description to dict.
-    body = json.loads((vacancy[1]))
+    body = json.loads(vacancy)
     try:
         employers.add(body['employer']['name'])
     except IndexError:
@@ -291,7 +257,7 @@ for vacancy in current_year_vacancies:
 # Count employers
 employers_dict = dict.fromkeys(employers, 0)  # Make dict from set
 for item in current_year_vacancies:
-    body = json.loads((item[1]))
+    body = json.loads(item)
     employer = body['employer']['name']
     if employer in employers_dict:
         employers_dict[employer] += 1
