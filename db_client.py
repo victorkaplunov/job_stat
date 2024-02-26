@@ -1,10 +1,10 @@
 from datetime import date, timedelta
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
 
-from models import Vacancies, Calendar
-from config_obj import ConfigObj
+from models import Vacancies, Calendar, Charts
+from config import ConfigObj
 
 
 class SingletonMeta(type):
@@ -46,13 +46,33 @@ class Database(metaclass=SingletonMeta):
         return self._session.query(Calendar).distinct(Calendar.id) \
             .filter(Calendar.data.between(day, day + timedelta(days=1))).count()
 
-    def get_vacancies_qty_by_period_of_time(self, start_day: date, end_day: date) -> int:
+    def get_vacancies_qty_by_period(self, start_day: date, end_day: date) -> int:
         """From start to finis, includes end date."""
         return self._session.query(Calendar.id.distinct()) \
             .filter(Calendar.data.between(start_day, end_day + timedelta(days=1))).count()
 
+    def get_all_vacancies_ids(self) -> list:
+        return [i[0] for i in self._session.query(Vacancies.id)]
 
+    def count_vacancy_by_search_phrase_and_year(self, search_phrase: str, year: int):
+        start_date = date(year, 1, 1)
+        end_date = date(year, 12, 31)
+        return self._session.query(Vacancies) \
+            .filter(and_(Vacancies.json.like(f'%{search_phrase}%'),
+                         Vacancies.published_at.between(start_date, end_date)))\
+            .count()
 
+    def get_json_from_vacancies_per_year(self, year: int):
+        start_date = date(year, 1, 1)
+        end_date = date(year, 12, 31)
+        result = self._session.query(Vacancies.json) \
+            .filter(Vacancies.published_at.between(start_date, end_date)).all()
+        return [i[0] for i in result]
+
+    def get_salary_data_with_year(self, year):
+        result = self._session.query(Charts) \
+            .filter(and_(Charts.chart_name == 'salary', Charts.year == year)).all()
+        return result
 
     # def execute_query(self, query):
     #     self._session.execute(query)
