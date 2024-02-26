@@ -9,8 +9,8 @@ from flask import Flask, send_from_directory, url_for, render_template
 from flask_bootstrap import Bootstrap
 
 import utils
-from db_connect import Database
-from config_obj import ConfigObj
+from db_client import Database
+from config import ConfigObj
 
 db = Database()
 config = ConfigObj()
@@ -123,7 +123,7 @@ def salary():
     return render_template(
         '/salary.html',
         title='Заработная плата в зависимости от опыта.',
-        salary=utils.get_salary_data_with_year(cur()),
+        salary=utils.get_salary_data_with_year(),
         no_experience_salary=utils.get_vac_with_salary(cur(), 'noExperience'),
         between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
         between3And6_salary=utils.get_vac_with_salary(cur(), 'between3And6'),
