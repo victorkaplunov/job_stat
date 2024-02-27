@@ -124,10 +124,10 @@ def salary():
         '/salary.html',
         title='Заработная плата в зависимости от опыта.',
         salary=utils.get_salary_data_per_year(),
-        no_experience_salary=utils.get_vac_with_salary(cur(), 'noExperience'),
-        between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
-        between3And6_salary=utils.get_vac_with_salary(cur(), 'between3And6'),
-        moreThan6e_salary=utils.get_vac_with_salary(cur(), 'moreThan6'))
+        no_experience_salary=utils.get_vacancies_with_salary(experience='noExperience'),
+        between1And3_salary=utils.get_vacancies_with_salary(experience='between1And3'),
+        between3And6_salary=utils.get_vacancies_with_salary(experience='between3And6'),
+        moreThan6e_salary=utils.get_vacancies_with_salary(experience='moreThan6'))
 
 
 @app.route('/top_employers')

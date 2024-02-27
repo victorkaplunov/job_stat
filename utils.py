@@ -449,17 +449,15 @@ def get_data_per_year(year: int, chart_name: str, sort=True) -> list[list[str | 
     return head + data_list
 
 
-def get_vac_with_salary(cursor, exp):
-    today = date.today()
-    delta = timedelta(days=30)
-    last_month = today - delta
-    sql = f"SELECT * FROM vac_with_salary WHERE experience = '{exp}' AND" \
-          f" published_at BETWEEN '{last_month}' AND '{today}' ORDER BY published_at ASC;"
-    cursor.execute(sql)
-    response = cursor.fetchall()
+def get_vacancies_with_salary(experience):
+    last_month = date.today() - timedelta(days=30)
+    response = db.find_vacancy_with_salary_by_substring_per_period(experience=experience,
+                                                                   start_day=last_month,
+                                                                   end_day=date.today())
     chart_data_list = []
     for i in response:
-        template = f"[new Date('{i[1]}'),{i[2]},'<a href=\"{i[4]}\">{int(i[2])}</a>'],\n"
+        template = (f"[new Date('{i.published_at}'),{i.calc_salary},"
+                    f"'<a href=\"{i.url}\">{int(i.calc_salary)}</a>'],\n")
         chart_data_list.append(template)
     chart_data = ''.join(chart_data_list)
     return chart_data

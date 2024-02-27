@@ -38,15 +38,24 @@ class Database(metaclass=SingletonMeta):
         return self._session.query(Calendar).order_by(Calendar.data.desc()).limit(limit).all()
 
     def find_vacancy_by_substring(self, search_phrase: str, limit=150) -> list[Type[Vacancies]]:
-        return self._session.query(Vacancies)\
-            .filter(Vacancies.json.like(f'%{search_phrase}%'))\
-            .order_by(Vacancies.published_at.desc())\
+        return self._session.query(Vacancies) \
+            .filter(Vacancies.json.like(f'%{search_phrase}%')) \
+            .order_by(Vacancies.published_at.desc()) \
             .limit(limit).all()
 
     def find_vacancy_with_salary_by_substring(self, search_phrase: str) -> list[Type[VacWithSalary]]:
-        return self._session.query(VacWithSalary)\
-            .filter(VacWithSalary.description.like(f'%{search_phrase}%'))\
-            .order_by(VacWithSalary.published_at.desc()).all()
+        return ((self._session.query(VacWithSalary)
+                 .filter(VacWithSalary.description.like(f'%{search_phrase}%')))
+                .order_by(VacWithSalary.published_at.desc()).all())
+
+    def find_vacancy_with_salary_by_substring_per_period(
+            self, experience: str, start_day: date, end_day: date
+    ) -> list[Type[VacWithSalary]]:
+        return (self._session.query(VacWithSalary)
+                .filter(VacWithSalary.experience == experience)
+                .filter(VacWithSalary.published_at.between(start_day, end_day))
+                .order_by(VacWithSalary.published_at.asc())
+                .all())
 
     def get_vacancy_qty_by_day(self, day: date) -> int:
         return self._session.query(Calendar).distinct(Calendar.id) \
@@ -65,7 +74,7 @@ class Database(metaclass=SingletonMeta):
         end_date = date(year, 12, 31)
         return self._session.query(Vacancies) \
             .filter(and_(Vacancies.json.like(f'%{search_phrase}%'),
-                         Vacancies.published_at.between(start_date, end_date)))\
+                         Vacancies.published_at.between(start_date, end_date))) \
             .count()
 
     def get_json_from_vacancies_per_year(self, year: int) -> list[str]:
@@ -91,4 +100,3 @@ class Database(metaclass=SingletonMeta):
     # def update_data(self, query):
     #     self._session.execute(query)
     #     self._session.commit()
-
