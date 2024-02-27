@@ -59,11 +59,10 @@ def starter_template():
                                'starter-template.css')
 
 
-@app.route('/api/vac/cal/<int:vacancie_id>')
+@app.route('/api/vac/cal/<int:vacancy_id>')
 def show_vac_calendar(vacancy_id):
     """Show the publication data of vacancy with the given id"""
-    vacancies = db.get_date_from_calendar_by_vacancy(vacancy_id=vacancy_id)
-    return [v[0] for v in vacancies]
+    return db.get_date_from_calendar_by_vacancy(vacancy_id=vacancy_id)
 
 
 @app.route('/api/vac/<int:vacancy_id>')
