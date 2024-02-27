@@ -26,7 +26,10 @@ def reversed_years():
 
 
 def write_vacancies(response: requests, base_url: str) -> list[int]:
-    """ Get list of vacancies from response and write to "calendar" and "vacancies" tables."""
+    """
+    Get list of vacancies from response and write to "calendar" and "vacancies" tables.
+    Return list of vacancies ID.
+    """
     con = sqlite3.connect("testdb.db")  # Open database
     cur = con.cursor()
     vac_list = response.json()["items"]
