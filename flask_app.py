@@ -16,9 +16,9 @@ config = ConfigObj()
 
 
 def create_app():
-    app = Flask(__name__)
-    Bootstrap(app)
-    return app
+    application = Flask(__name__)
+    Bootstrap(application)
+    return application
 
 
 app = create_app()
