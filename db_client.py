@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from typing import Type, List
+from typing import Type
 
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
