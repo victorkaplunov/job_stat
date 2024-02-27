@@ -1,7 +1,8 @@
 from datetime import date, timedelta
-from typing import Type
+from typing import Type, Sequence, Any
 
-from sqlalchemy import create_engine, and_
+from sqlalchemy import create_engine, and_, select, Row, RowMapping
+from sqlalchemy.dialects.postgresql import Any
 from sqlalchemy.orm import sessionmaker
 
 from models import Vacancies, Calendar, Charts, VacWithSalary
@@ -66,8 +67,8 @@ class Database(metaclass=SingletonMeta):
         return self._session.query(Calendar.id.distinct()) \
             .filter(Calendar.data.between(start_day, end_day + timedelta(days=1))).count()
 
-    def get_all_vacancies_ids(self) -> list:
-        return [i[0] for i in self._session.query(Vacancies.id)]
+    def get_all_vacancies_ids(self) -> Sequence[Row[Any] | RowMapping]:
+        return self._session.scalars(select(Vacancies.id)).all()
 
     def count_vacancy_by_search_phrase_and_year(self, search_phrase: str, year: int) -> int:
         start_date = date(year, 1, 1)
@@ -77,12 +78,11 @@ class Database(metaclass=SingletonMeta):
                          Vacancies.published_at.between(start_date, end_date))) \
             .count()
 
-    def get_json_from_vacancies_per_year(self, year: int) -> list[str]:
+    def get_json_from_vacancies_per_year(self, year: int) -> Sequence[Row[Any] | RowMapping]:
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
-        result = self._session.query(Vacancies.json) \
-            .filter(Vacancies.published_at.between(start_date, end_date)).all()
-        return [i[0] for i in result]
+        return (self._session.scalars(select(Vacancies.json)
+                .filter(Vacancies.published_at.between(start_date, end_date))).all())
 
     def get_data_for_chart(self, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter_by(chart_name=chart_name).all()
