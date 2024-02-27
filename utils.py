@@ -415,14 +415,14 @@ def get_data_for_horizontal_bar_chart(chart_name: str) -> list[list[str | int]]:
     return data_list
 
 
-def get_salary_data_with_year():
+def get_salary_data_per_year() -> list[list[str | int]]:
     experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
 
     data = [['Range']]
     for year in config.YEARS:
         data[0].append(str(year))  # Добавляем года в колонку легенды.
         # Добавляем расчетные зарплаты в соответствии с диапазоном опыта.
-        statistics_data = db.get_salary_data_with_year(year=year)
+        statistics_data = db.get_data_for_chart_per_year(year=year, chart_name='salary')
         for i in statistics_data:
             experience_ranges[i.data].append(i.popularity)
     # Переводим названия диапазонов на русский
@@ -433,22 +433,19 @@ def get_salary_data_with_year():
     return data
 
 
-def get_data_with_year(cursor, year, chart_name, sort=True):
-    request = f"""
-    SELECT data, popularity FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
-    """
+def get_data_per_year(year: int, chart_name: str, sort=True) -> list[list[str | int]]:
+    """Формирует данные для графиков по годам на основе запроса в БД."""
     head = [['Type', 'Popularity']]
-    cursor.execute(request)
-    statistics_data = cursor.fetchall()
+    statistics_data = db.get_data_for_chart_per_year(year=year, chart_name=chart_name)
     data_list = []
     for i in statistics_data:
+        # Переводим параметры для перечисленных видов графиков
         if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
-            row = [config.TRANSLATIONS[i[0]], i[1]]
+            row = [config.TRANSLATIONS[i.data], i.popularity]
             data_list.append(row)
-        else:
-            data_list.append(list(i))
-    data_list.sort(reverse=sort
-                   , key=itemgetter(1))
+        else:  # Для остальных не переводим
+            data_list.append([i.data, i.popularity])
+    data_list.sort(reverse=sort, key=itemgetter(1))
     return head + data_list
 
 
@@ -468,25 +465,23 @@ def get_vac_with_salary(cursor, exp):
     return chart_data
 
 
-def get_frameworks_data(cursor, year, chart_name):
+def get_frameworks_data(year: int, chart_name: str) -> list[list[str | int]]:
+    """Формирует данные для графика популярности фреймворков юнит-тестирования по годам."""
     head = [['Framework', 'Popularity', 'Language']]
-    request = f"""
-        SELECT data, popularity, parent FROM charts WHERE chart_name='{chart_name}' AND year='{year}';
-            """
-    cursor.execute(request)
-    statistics_data = cursor.fetchall()
+    statistics_data = db.get_data_for_chart_per_year(year=year, chart_name=chart_name)
     data_list = []
     for i in statistics_data:
-        data_list.append(list(i))
+        data_list.append([i.data, i.popularity, i.parent])
     data_list.sort(reverse=True, key=itemgetter(1))
     return head + data_list
 
 
-def render_framework_charts(title, chart, cursor):
+def render_framework_charts(title, chart):
+    """Генерация кода JS-функций графиков популярности фреймворков юнит-тестирования по годам."""
     charts = ''
     divs = ''
     for year in reversed_years():
-        data = get_frameworks_data(cursor, year, chart)
+        data = get_frameworks_data(year, chart)
         charts = charts + f"""
         google.charts.setOnLoadCallback(Chart{year});
         function Chart{year}() {{
@@ -534,12 +529,12 @@ def render_framework_charts(title, chart, cursor):
     return charts, divs
 
 
-def render_pie_charts(years, title, chart, cursor):
+def render_pie_charts(years, title, chart):
     charts = ''
     divs = ''
     for year in years:
-        data = get_data_with_year(cursor, year, chart)
-        # Генерация функция JavaScript для отдельных графиков
+        data = get_data_per_year(year, chart)
+        # Генерация функций JavaScript для отдельных графиков
         charts = charts + f'''
 
             google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
@@ -557,21 +552,14 @@ def render_pie_charts(years, title, chart, cursor):
     return charts, divs
 
 
-def get_salary_by_category_data(cursor):
-    request = f"SELECT DISTINCT data FROM charts WHERE chart_name='languages';"
-    cursor.execute(request)
-    languages = cursor.fetchall()
+def get_salary_by_category_data():
+    languages = config.PROGRAM_LANGUAGES
     data_list = []
     salary_list = []
     for language in languages:
-        request = f"""
-        SELECT calc_salary FROM vac_with_salary 
-        WHERE description LIKE "%{language[0]}%";
-        """
-        cursor.execute(request)
-        salary = cursor.fetchall()
+        salary = db.find_vacancy_with_salary_by_substring(search_phrase=language)
         for i in salary:
-            salary_list.append(i[0])
+            salary_list.append(float(i.calc_salary))
         try:
             median = statistics.median(salary_list)
         except statistics.StatisticsError:
@@ -579,8 +567,9 @@ def get_salary_by_category_data(cursor):
         if len(salary_list) < 10:
             continue
         data_list.append(
-            [language[0], min(salary_list), median, median,  max(salary_list)])
+            [language, min(salary_list), median, median,  max(salary_list)])
         salary_list = []
     # Sort by median value.
     data_list.sort(key=lambda row: row[2], reverse=True)
+    print(f'{data_list=}')
     return data_list
