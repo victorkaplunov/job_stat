@@ -1,5 +1,4 @@
 import os
-import sqlite3
 import copy
 from operator import itemgetter
 import json
@@ -23,12 +22,6 @@ def create_app():
 
 
 app = create_app()
-id_list = []
-
-
-def cur():
-    con = sqlite3.connect("testdb.db")
-    return con.cursor()
 
 
 @app.route('/')
