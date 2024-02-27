@@ -34,15 +34,18 @@ def home_page():
 def api():
     return f"""
 <html>
-<a href="{url_for('show_vac_calendar', vacancie_id='14658327')}">{url_for('show_vac_calendar', vacancie_id='14658327')}</a>
+<a href="{url_for('show_vac_calendar', vacancy_id='14658327')}">
+        {url_for('show_vac_calendar', vacancy_id='14658327')}</a>
 <br>
-<a href="{url_for('show_vac_description', vacancy_id='14658327')}">{url_for('show_vac_description', vacancy_id='14658327')}</a>
+<a href="{url_for('show_vac_description', vacancy_id='14658327')}">
+        {url_for('show_vac_description', vacancy_id='14658327')}</a>
 <br>
 <a href="{url_for('show_vac_top_new_by_id')}">{url_for('show_vac_top_new_by_id')}"</a>
 <br>
 <a href="{url_for('show_vac_top_new_by_date')}">{url_for('show_vac_top_new_by_date')}"</a>
 <br>
-<a href="{url_for('search_vac', search_phrase='Python')}">{url_for('search_vac', search_phrase='Python')}"</a>
+<a href="{url_for('search_vac', search_phrase='Python')}">
+    {url_for('search_vac', search_phrase='Python')}"</a>
 <br>
 </html>"""
 
