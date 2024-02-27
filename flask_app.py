@@ -123,7 +123,7 @@ def salary():
     return render_template(
         '/salary.html',
         title='Заработная плата в зависимости от опыта.',
-        salary=utils.get_salary_data_with_year(),
+        salary=utils.get_salary_data_per_year(),
         no_experience_salary=utils.get_vac_with_salary(cur(), 'noExperience'),
         between1And3_salary=utils.get_vac_with_salary(cur(), 'between1And3'),
         between3And6_salary=utils.get_vac_with_salary(cur(), 'between3And6'),
@@ -152,7 +152,7 @@ def salary_by_category():
     """Salary by category"""
     return render_template(
         '/tmp.html',
-        chart_data=utils.get_salary_by_category_data((cur())),
+        chart_data=utils.get_salary_by_category_data(),
         title='Медианная зарплата в зависимости от упоминания языка.'
     )
 
@@ -162,7 +162,7 @@ def schedule_type():
     """Schedule type popularity page"""
     chart = 'schedule_type'
     title = 'Популярность режимов работы'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Режимы работы.',
@@ -178,7 +178,7 @@ def employment_type():
     charts = ''
     divs = ''
     for year in utils.reversed_years():
-        data = utils.get_data_with_year(cur(), year, 'employment_type')  # Данные для графика
+        data = utils.get_data_per_year(year=year, chart_name='employment_type')
 
         # Данные для таблицы
         table_data = copy.deepcopy(data)
@@ -239,7 +239,7 @@ def experience():
     """Experience popularity page"""
     chart = 'experience'
     title = 'Требования к опыту '
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Требуемый опыт работы.',
@@ -252,7 +252,7 @@ def experience():
 def with_salary():
     chart = 'with_salary'
     title = 'Количество вакансий с указанной зарплатой '
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Количество вакансий с указанной зарплатой.',
@@ -281,7 +281,7 @@ def programming_languages():
     """Programming languages page"""
     chart = 'languages'
     title = 'Популярность языков программирования'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность языков программирования.',
@@ -295,7 +295,7 @@ def unit_test_frameworks():
     """Unit test frameworks popularity page"""
     chart = 'frameworks'
     title = 'Популярность фреймворков для юнит-тестирования'
-    result = utils.render_framework_charts(title, chart, cur())
+    result = utils.render_framework_charts(title, chart)
     return render_template(
         '/unittesting_frameworks_chart.html',
         title='Популярность фреймворков для юнит-тестирования.',
@@ -309,7 +309,7 @@ def load_testing_tool():
     """Load testing tools page"""
     chart = 'load_testing_tools'
     title = 'Популярность инструментов тестирования производительности'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Средства нагрузочного тестирования.',
@@ -323,7 +323,7 @@ def monitoring_tools():
     """ Monitoring tools page"""
     chart = 'monitoring'
     title = 'Популярность различных средств мониторинга'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность различных средств мониторинга.',
@@ -337,7 +337,7 @@ def bdd_frameworks():
     """BDD framework page"""
     chart = 'bdd_frameworks'
     title = 'Популярность фреймворков BDD'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность фреймворков BDD.',
@@ -351,7 +351,7 @@ def web_ui_tools():
     """Web UI testing tools page"""
     chart = 'web_ui_tools'
     title = 'Популярность средства тестирования Web UI'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность средства тестирования Web UI.',
@@ -365,7 +365,7 @@ def mobile_testing_frameworks():
     """Mobile app testing tools page"""
     chart = 'mobile_testing_frameworks'
     title = 'Популярность инструментов тестирования мобильных приложений'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность инструментов тестирования мобильных приложений.',
@@ -379,7 +379,7 @@ def bugtracking_n_tms():
     """Mobile app testing tools page"""
     chart = 'bugtracking_n_tms'
     title = 'Популярность систем управления тестированием, bugtracking system и т.п.'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность систем управления тестированием, bugtracking system и т.п.',
@@ -393,7 +393,7 @@ def cvs():
     """Mobile app testing tools page"""
     chart = 'cvs'
     title = 'Популярность систем управления версиями'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность систем управления версиями.',
@@ -407,7 +407,7 @@ def ci_cd():
     """Mobile app testing tools page"""
     chart = 'ci_cd'
     title = 'Популярность средств CI/CD'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart, cur())
+    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность средств CI/CD.',
