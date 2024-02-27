@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from typing import Type, Sequence, Any
+from typing import Type, Sequence
 
 from sqlalchemy import create_engine, and_, select, Row, RowMapping
 from sqlalchemy.dialects.postgresql import Any
