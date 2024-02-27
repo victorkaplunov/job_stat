@@ -26,8 +26,8 @@ class Database(metaclass=SingletonMeta):
         self._db_engine = create_engine(f"sqlite:///{ConfigObj.DB_FILE_NAME}")
         self._session = sessionmaker(bind=self._db_engine)()
 
-    def get_date_from_calendar_by_vacancy(self, vacancy_id: int) -> list[Calendar.data]:
-        return self._session.query(Calendar.data).filter_by(id=vacancy_id).all()
+    def get_date_from_calendar_by_vacancy(self, vacancy_id: int) -> Sequence[Row[Any] | RowMapping]:
+        return self._session.scalars(select(Calendar.data).filter(Calendar.id == vacancy_id)).all()
 
     def get_vacancy_by_id(self, vacancy_id: int) -> Type[Vacancies]:
         return self._session.query(Vacancies).filter_by(id=vacancy_id).one()
@@ -81,8 +81,9 @@ class Database(metaclass=SingletonMeta):
     def get_json_from_vacancies_per_year(self, year: int) -> Sequence[Row[Any] | RowMapping]:
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
-        return (self._session.scalars(select(Vacancies.json)
-                .filter(Vacancies.published_at.between(start_date, end_date))).all())
+        return self._session.scalars(
+            select(Vacancies.json).filter(Vacancies.published_at.between(start_date, end_date))
+        ).all()
 
     def get_data_for_chart(self, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter_by(chart_name=chart_name).all()
