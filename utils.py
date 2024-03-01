@@ -7,9 +7,10 @@ from operator import itemgetter
 import json
 import unicodedata
 import locale
-from typing import NoReturn
+from typing import NoReturn, Sequence, Any
 
 import requests
+from sqlalchemy import RowMapping, Row
 
 from db_client import Database
 from config import ConfigObj
@@ -120,29 +121,30 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update, y
     return
 
 
-def count_per_year(chart_name: str, param_list: list, year: int, cur, update=True) -> NoReturn:
+def count_per_year(chart_name: str, categories: list, year: int, cur, update=True) -> NoReturn:
     """ Function count a number of entries of some string from param_list
      in the JSON of all vacancies. """
-    types = {i: 0 for i in param_list}  # Convert list to dictionary
-    types = types.fromkeys(types, 0)  # Reset all values to zero
-    for type in types:
-        print(type)
-        type_count = db.count_vacancy_by_search_phrase_and_year(search_phrase=type, year=year)
+    categories_dict = {i: 0 for i in categories}  # Convert list to dictionary
+    categories_dict = categories_dict.fromkeys(categories_dict, 0)  # Reset all values to zero
+    for param_type in categories_dict:
+        print(param_type)
+        type_count = db.count_vacancy_by_search_phrase_and_year(search_phrase=param_type, year=year)
         if update is True:
             sql = f"""
             UPDATE charts
             SET popularity = {type_count}
-            WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{type}'
+            WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{param_type}'
             AND charts.'year' = '{year}';"""
         else:
             sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                  VALUES('{chart_name}', '{type}', {type_count}, {str(year)});"""
+                  VALUES('{chart_name}', '{param_type}', {type_count}, {str(year)});"""
         cur.executescript(sql)
     return
 
 
 def count_types_per_year(types: dict, chart_name: str, key_name: str,
-                         all_vacancies: list, cur, year: int, update: bool) -> NoReturn:
+                         all_vacancies:  Sequence[Row[Any] | RowMapping],
+                         cur, year: int, update: bool) -> NoReturn:
 
     # Count vacancies with given type in current year.
     for i in all_vacancies:
@@ -164,7 +166,8 @@ def count_types_per_year(types: dict, chart_name: str, key_name: str,
 
 
 def count_schedule_types(types: dict, chart_name: str, year: int,
-                         all_vacancies: list, cur, update: bool) -> NoReturn:
+                         all_vacancies:  Sequence[Row[Any] | RowMapping],
+                         cur, update: bool) -> NoReturn:
     # Count types of schedule in all vacancies.
     types = types.fromkeys(types, 0)  # set all values to zero
     # Count vacancies with given type in given year.
