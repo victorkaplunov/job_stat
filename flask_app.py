@@ -10,6 +10,7 @@ from flask_bootstrap import Bootstrap
 import utils
 from db_client import Database
 from config import ConfigObj
+from chart_generator import PieChartGen
 
 db = Database()
 config = ConfigObj()
@@ -155,14 +156,13 @@ def salary_by_category():
 @app.route('/schedule_type')
 def schedule_type():
     """Schedule type popularity page"""
-    chart = 'schedule_type'
-    title = 'Популярность режимов работы'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность режимов работы',
+                        chart_name='schedule_type')
     return render_template(
         '/pie_chart_with_year.html',
         title='Режимы работы.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
@@ -232,27 +232,25 @@ def employment_type():
 @app.route('/experience')
 def experience():
     """Experience popularity page"""
-    chart = 'experience'
-    title = 'Требования к опыту '
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Требования к опыту ',
+                        chart_name='experience')
     return render_template(
         '/pie_chart_with_year.html',
         title='Требуемый опыт работы.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
 @app.route('/with_salary')
 def with_salary():
-    chart = 'with_salary'
-    title = 'Количество вакансий с указанной зарплатой '
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Количество вакансий с указанной зарплатой',
+                        chart_name='with_salary')
     return render_template(
         '/pie_chart_with_year.html',
         title='Количество вакансий с указанной зарплатой.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
@@ -265,7 +263,7 @@ def key_skills():
     sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
     return render_template(
         '/horizontal_bar.html',
-        title='Ключевые навыки',
+        title='Ключевые навыки.',
         subtitle='Пятьдесят наиболее популярных тегов',
         chart_data=sorted_key_skills_list[:50]
     )
@@ -274,14 +272,13 @@ def key_skills():
 @app.route('/programming_languages')
 def programming_languages():
     """Programming languages page"""
-    chart = 'languages'
-    title = 'Популярность языков программирования'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность языков программирования',
+                        chart_name='languages')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность языков программирования.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
@@ -302,112 +299,104 @@ def unit_test_frameworks():
 @app.route('/load_testing_tools')
 def load_testing_tool():
     """Load testing tools page"""
-    chart = 'load_testing_tools'
-    title = 'Популярность инструментов тестирования производительности'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность инструментов тестирования производительностия',
+                        chart_name='load_testing_tools')
     return render_template(
         '/pie_chart_with_year.html',
         title='Средства нагрузочного тестирования.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
 @app.route('/monitoring_tools')
 def monitoring_tools():
     """ Monitoring tools page"""
-    chart = 'monitoring'
-    title = 'Популярность различных средств мониторинга'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность различных средств мониторинга',
+                        chart_name='monitoring')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность различных средств мониторинга.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
 @app.route('/bdd_frameworks')
 def bdd_frameworks():
     """BDD framework page"""
-    chart = 'bdd_frameworks'
-    title = 'Популярность фреймворков BDD'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность фреймворков BDD',
+                        chart_name='bdd_frameworks')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность фреймворков BDD.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
 @app.route('/web_ui_tools')
 def web_ui_tools():
     """Web UI testing tools page"""
-    chart = 'web_ui_tools'
-    title = 'Популярность средства тестирования Web UI'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность средства тестирования Web UI',
+                        chart_name='web_ui_tools')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность средства тестирования Web UI.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
 @app.route('/mobile_testing_frameworks')
 def mobile_testing_frameworks():
     """Mobile app testing tools page"""
-    chart = 'mobile_testing_frameworks'
-    title = 'Популярность инструментов тестирования мобильных приложений'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность инструментов тестирования мобильных приложений',
+                        chart_name='mobile_testing_frameworks')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность инструментов тестирования мобильных приложений.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
 @app.route('/bugtracking_n_tms')
 def bugtracking_n_tms():
     """Mobile app testing tools page"""
-    chart = 'bugtracking_n_tms'
-    title = 'Популярность систем управления тестированием, bugtracking system и т.п.'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность систем управления тестированием, bugtracking system и т.п.',
+                        chart_name='bugtracking_n_tms')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность систем управления тестированием, bugtracking system и т.п.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
 @app.route('/cvs')
 def cvs():
-    """Mobile app testing tools page"""
-    chart = 'cvs'
-    title = 'Популярность систем управления версиями'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    """CVS page"""
+    chart = PieChartGen(title='Популярность систем управления версиями',
+                        chart_name='cvs')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность систем управления версиями.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
 @app.route('/ci_cd')
 def ci_cd():
     """Mobile app testing tools page"""
-    chart = 'ci_cd'
-    title = 'Популярность средств CI/CD'
-    result = utils.render_pie_charts(utils.reversed_years(), title, chart)
+    chart = PieChartGen(title='Популярность средств CI/CD',
+                        chart_name='ci_cd')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность средств CI/CD.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
