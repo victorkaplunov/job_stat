@@ -533,29 +533,6 @@ def render_framework_charts(title, chart):
     return charts, divs
 
 
-def render_pie_charts(years, title, chart):
-    charts = ''
-    divs = ''
-    for year in years:
-        data = get_data_per_year(year, chart)
-        # Генерация функций JavaScript для отдельных графиков
-        charts = charts + f'''
-
-            google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
-            function drawScheduleTypeChart{year}() {{
-            var data = google.visualization.arrayToDataTable({data});
-            var options = {{'title':'{title} в {year} году.',
-            chartArea:{{width:'90%',height:'80%'}},
-            pieSliceTextStyle: {{fontSize: 11}}
-            }};
-            var chart = new google.visualization.PieChart(document.getElementById('chart_for_{year}'));
-            chart.draw(data, options);
-            }}'''
-        # Генерация разделов в которые будут вставляться графики.
-        divs = divs + f'<div id="chart_for_{year}" style="height: 300px;"></div>'
-    return charts, divs
-
-
 def get_salary_by_category_data():
     languages = config.PROGRAM_LANGUAGES
     data_list = []
