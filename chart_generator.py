@@ -6,8 +6,8 @@ from config import ConfigObj
 
 class BaseChartGenerator:
     """Базовый класс генерации JS-скриптов графиков."""
-    def __init__(self, chart_name: str, title: str):
-        self.title = title
+    def __init__(self, chart_name: str, chart_title: str):
+        self.title = chart_title
         self.chart_name = chart_name
         self.charts = ''
         self.divs = ''
