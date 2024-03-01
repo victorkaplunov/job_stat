@@ -10,7 +10,7 @@ from flask_bootstrap import Bootstrap
 import utils
 from db_client import Database
 from config import ConfigObj
-from chart_generator import PieChartGen
+from chart_generator import PieChart, PieChartWithTable
 
 db = Database()
 config = ConfigObj()
@@ -156,8 +156,8 @@ def salary_by_category():
 @app.route('/schedule_type')
 def schedule_type():
     """Schedule type popularity page"""
-    chart = PieChartGen(chart_title='Популярность режимов работы',
-                        chart_name='schedule_type')
+    chart = PieChart(chart_title='Популярность режимов работы',
+                     chart_name='schedule_type')
     return render_template(
         '/pie_chart_with_year.html',
         title='Режимы работы.',
@@ -168,72 +168,20 @@ def schedule_type():
 
 @app.route('/employment_type')
 def employment_type():
-    """Employment type popularity page"""
-    title = 'Популярность видов найма '
-    charts = ''
-    divs = ''
-    for year in utils.reversed_years():
-        data = utils.get_data_per_year(year=year, chart_name='employment_type')
-
-        # Данные для таблицы
-        table_data = copy.deepcopy(data)
-        table_data.remove(['Type', 'Popularity'])
-        sum_vac = 0
-        for i in table_data:
-            sum_vac += i[1]
-        for i in table_data:
-            percent = str(round(i[1] / sum_vac * 100, 1))
-            i.append(percent)
-
-        # Генерация функций JavaScript для отдельных графиков
-        charts = charts + f'''
-
-        google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
-        function drawScheduleTypeChart{year}() {{
-        var data = google.visualization.arrayToDataTable({data});
-        var options = {{'title':'{title} в {year} году.',
-        chartArea:{{width:'90%',height:'80%'}},
-        pieSliceTextStyle: {{fontSize: 11}}
-        }};
-        var chart = new google.visualization.PieChart(document.getElementById('chart_for_{year}'));
-        chart.draw(data, options);
-        }}
-        
-        google.charts.setOnLoadCallback(draw{year}Table);
-        function draw{year}Table() {{
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Вид');
-            data.addColumn('number', 'Количество вакансий');
-            data.addColumn('string', 'Доля, %');
-            data.addRows({ table_data });
-
-            var table = new google.visualization.Table(document.getElementById('table{year}div'));
-
-            table.draw(data, {{width: '100%', height: '100%'}});
-          }}
-        '''
-        # Генерация разделов в которые будут вставляться графики.
-        divs = divs + f'''
-        
-        <div id="chart_for_{year}" style="height: 300px;"></div>
-        <div id="table{year}div"></div>
-        <p>
-        <hr>
-        <p>
-        '''
+    chart = PieChartWithTable(chart_title='Виды занятости',
+                              chart_name='employment_type')
     return render_template(
         '/employment_type.html',
         title='Виды занятости.',
-        charts_function=charts,
-        divs=divs
+        charts_function=chart.generate_script() + chart.generate_table_script(),
+        divs=chart.generate_divs()
     )
-
 
 @app.route('/experience')
 def experience():
     """Experience popularity page"""
-    chart = PieChartGen(chart_title='Требования к опыту ',
-                        chart_name='experience')
+    chart = PieChart(chart_title='Требования к опыту ',
+                     chart_name='experience')
     return render_template(
         '/pie_chart_with_year.html',
         title='Требуемый опыт работы.',
@@ -244,8 +192,8 @@ def experience():
 
 @app.route('/with_salary')
 def with_salary():
-    chart = PieChartGen(chart_title='Количество вакансий с указанной зарплатой',
-                        chart_name='with_salary')
+    chart = PieChart(chart_title='Количество вакансий с указанной зарплатой',
+                     chart_name='with_salary')
     return render_template(
         '/pie_chart_with_year.html',
         title='Количество вакансий с указанной зарплатой.',
@@ -272,8 +220,8 @@ def key_skills():
 @app.route('/programming_languages')
 def programming_languages():
     """Programming languages page"""
-    chart = PieChartGen(chart_title='Популярность языков программирования',
-                        chart_name='languages')
+    chart = PieChart(chart_title='Популярность языков программирования',
+                     chart_name='languages')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность языков программирования.',
@@ -299,8 +247,8 @@ def unit_test_frameworks():
 @app.route('/load_testing_tools')
 def load_testing_tool():
     """Load testing tools page"""
-    chart = PieChartGen(chart_title='Популярность инструментов тестирования производительностия',
-                        chart_name='load_testing_tools')
+    chart = PieChart(chart_title='Популярность инструментов тестирования производительностия',
+                     chart_name='load_testing_tools')
     return render_template(
         '/pie_chart_with_year.html',
         title='Средства нагрузочного тестирования.',
@@ -312,8 +260,8 @@ def load_testing_tool():
 @app.route('/monitoring_tools')
 def monitoring_tools():
     """ Monitoring tools page"""
-    chart = PieChartGen(chart_title='Популярность различных средств мониторинга',
-                        chart_name='monitoring')
+    chart = PieChart(chart_title='Популярность различных средств мониторинга',
+                     chart_name='monitoring')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность различных средств мониторинга.',
@@ -325,8 +273,8 @@ def monitoring_tools():
 @app.route('/bdd_frameworks')
 def bdd_frameworks():
     """BDD framework page"""
-    chart = PieChartGen(chart_title='Популярность фреймворков BDD',
-                        chart_name='bdd_frameworks')
+    chart = PieChart(chart_title='Популярность фреймворков BDD',
+                     chart_name='bdd_frameworks')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность фреймворков BDD.',
@@ -338,8 +286,8 @@ def bdd_frameworks():
 @app.route('/web_ui_tools')
 def web_ui_tools():
     """Web UI testing tools page"""
-    chart = PieChartGen(chart_title='Популярность средства тестирования Web UI',
-                        chart_name='web_ui_tools')
+    chart = PieChart(chart_title='Популярность средства тестирования Web UI',
+                     chart_name='web_ui_tools')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность средства тестирования Web UI.',
@@ -351,8 +299,8 @@ def web_ui_tools():
 @app.route('/mobile_testing_frameworks')
 def mobile_testing_frameworks():
     """Mobile app testing tools page"""
-    chart = PieChartGen(chart_title='Популярность инструментов тестирования мобильных приложений',
-                        chart_name='mobile_testing_frameworks')
+    chart = PieChart(chart_title='Популярность инструментов тестирования мобильных приложений',
+                     chart_name='mobile_testing_frameworks')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность инструментов тестирования мобильных приложений.',
@@ -364,8 +312,8 @@ def mobile_testing_frameworks():
 @app.route('/bugtracking_n_tms')
 def bugtracking_n_tms():
     """Mobile app testing tools page"""
-    chart = PieChartGen(chart_title='Популярность систем управления тестированием, bugtracking system и т.п.',
-                        chart_name='bugtracking_n_tms')
+    chart = PieChart(chart_title='Популярность систем управления тестированием, bugtracking system и т.п.',
+                     chart_name='bugtracking_n_tms')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность систем управления тестированием, bugtracking system и т.п.',
@@ -377,8 +325,8 @@ def bugtracking_n_tms():
 @app.route('/cvs')
 def cvs():
     """CVS page"""
-    chart = PieChartGen(chart_title='Популярность систем управления версиями',
-                        chart_name='cvs')
+    chart = PieChart(chart_title='Популярность систем управления версиями',
+                     chart_name='cvs')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность систем управления версиями.',
@@ -390,8 +338,8 @@ def cvs():
 @app.route('/ci_cd')
 def ci_cd():
     """Mobile app testing tools page"""
-    chart = PieChartGen(chart_title='Популярность средств CI/CD',
-                        chart_name='ci_cd')
+    chart = PieChart(chart_title='Популярность средств CI/CD',
+                     chart_name='ci_cd')
     return render_template(
         '/pie_chart_with_year.html',
         title='Популярность средств CI/CD.',

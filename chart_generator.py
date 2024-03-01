@@ -1,3 +1,4 @@
+import copy
 from operator import itemgetter
 
 from db_client import Database
@@ -11,7 +12,6 @@ class BaseChartGenerator:
         self.chart_name = chart_name
         self.charts = ''
         self.divs = ''
-        self.data = []
         self.db = Database()
         self.config = ConfigObj()
         self.translations = self.config.TRANSLATIONS
@@ -34,16 +34,16 @@ class BaseChartGenerator:
         return head + data_list
 
 
-class PieChartGen(BaseChartGenerator):
+class PieChart(BaseChartGenerator):
     """Класс генерации JS функций и данных для круговой диаграммы."""
     def generate_script(self):
         """Генерация функций JavaScript для отдельных графиков"""
         for year in self.reversed_years:
-            data = self.get_data_per_year(year, self.chart_name)
+            chart_data = self.get_data_per_year(year, self.chart_name)
             self.charts = self.charts + f'''
                 google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
                 function drawScheduleTypeChart{year}() {{
-                var data = google.visualization.arrayToDataTable({data});
+                var data = google.visualization.arrayToDataTable({chart_data});
                 var options = {{'title':'{self.title} в {year} году.',
                 chartArea:{{width:'90%',height:'80%'}},
                 pieSliceTextStyle: {{fontSize: 11}}
@@ -56,6 +56,48 @@ class PieChartGen(BaseChartGenerator):
     def generate_divs(self):
         """Генерация разделов в которые будут вставляться графики."""
         for year in self.reversed_years:
-
             self.divs = self.divs + f'<div id="chart_for_{year}" style="height: 300px;"></div>'
+        return self.divs
+
+
+class PieChartWithTable(PieChart):
+    """Класс генерации JS функций и данных для круговой диаграммы с таблицей данных."""
+    def generate_table_script(self):
+        table = ''
+        for year in self.reversed_years:
+            table_data = self.get_data_per_year(year, self.chart_name)
+            table_data = copy.deepcopy(table_data)
+            table_data.remove(['Type', 'Popularity'])
+            sum_vac = 0
+            for i in table_data:
+                sum_vac += i[1]
+            for i in table_data:
+                percent = str(round(i[1] / sum_vac * 100, 1))
+                i.append(percent)
+
+            table = table + f'''
+                google.charts.setOnLoadCallback(draw{year}Table);
+                function draw{year}Table() {{
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Вид');
+                data.addColumn('number', 'Количество вакансий');
+                data.addColumn('string', 'Доля, %');
+                data.addRows({ table_data });
+    
+                var table = new google.visualization.Table(document.getElementById('table{year}div'));
+    
+                table.draw(data, {{width: '100%', height: '100%'}});
+              }}
+            '''
+        return table
+
+    def generate_divs(self):
+        """Генерация разделов в которые будут вставляться графики и таблицы."""
+        for year in self.reversed_years:
+            self.divs = self.divs + f'''
+                     <div id="chart_for_{year}" style="height: 300px;"></div>
+                     <div id="table{year}div"></div>
+                     <p>
+                     <hr>
+                     <p>'''
         return self.divs
