@@ -1,8 +1,7 @@
 from datetime import date, timedelta
-from typing import Type, Sequence
+from typing import Type, Sequence, Any
 
 from sqlalchemy import create_engine, and_, select, Row, RowMapping
-from sqlalchemy.dialects.postgresql import Any
 from sqlalchemy.orm import sessionmaker
 
 from models import Vacancies, Calendar, Charts, VacWithSalary
