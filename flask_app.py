@@ -156,7 +156,7 @@ def salary_by_category():
 @app.route('/schedule_type')
 def schedule_type():
     """Schedule type popularity page"""
-    chart = PieChartGen(title='Популярность режимов работы',
+    chart = PieChartGen(chart_title='Популярность режимов работы',
                         chart_name='schedule_type')
     return render_template(
         '/pie_chart_with_year.html',
@@ -232,7 +232,7 @@ def employment_type():
 @app.route('/experience')
 def experience():
     """Experience popularity page"""
-    chart = PieChartGen(title='Требования к опыту ',
+    chart = PieChartGen(chart_title='Требования к опыту ',
                         chart_name='experience')
     return render_template(
         '/pie_chart_with_year.html',
@@ -244,7 +244,7 @@ def experience():
 
 @app.route('/with_salary')
 def with_salary():
-    chart = PieChartGen(title='Количество вакансий с указанной зарплатой',
+    chart = PieChartGen(chart_title='Количество вакансий с указанной зарплатой',
                         chart_name='with_salary')
     return render_template(
         '/pie_chart_with_year.html',
@@ -272,7 +272,7 @@ def key_skills():
 @app.route('/programming_languages')
 def programming_languages():
     """Programming languages page"""
-    chart = PieChartGen(title='Популярность языков программирования',
+    chart = PieChartGen(chart_title='Популярность языков программирования',
                         chart_name='languages')
     return render_template(
         '/pie_chart_with_year.html',
@@ -299,7 +299,7 @@ def unit_test_frameworks():
 @app.route('/load_testing_tools')
 def load_testing_tool():
     """Load testing tools page"""
-    chart = PieChartGen(title='Популярность инструментов тестирования производительностия',
+    chart = PieChartGen(chart_title='Популярность инструментов тестирования производительностия',
                         chart_name='load_testing_tools')
     return render_template(
         '/pie_chart_with_year.html',
@@ -312,7 +312,7 @@ def load_testing_tool():
 @app.route('/monitoring_tools')
 def monitoring_tools():
     """ Monitoring tools page"""
-    chart = PieChartGen(title='Популярность различных средств мониторинга',
+    chart = PieChartGen(chart_title='Популярность различных средств мониторинга',
                         chart_name='monitoring')
     return render_template(
         '/pie_chart_with_year.html',
@@ -325,7 +325,7 @@ def monitoring_tools():
 @app.route('/bdd_frameworks')
 def bdd_frameworks():
     """BDD framework page"""
-    chart = PieChartGen(title='Популярность фреймворков BDD',
+    chart = PieChartGen(chart_title='Популярность фреймворков BDD',
                         chart_name='bdd_frameworks')
     return render_template(
         '/pie_chart_with_year.html',
@@ -338,7 +338,7 @@ def bdd_frameworks():
 @app.route('/web_ui_tools')
 def web_ui_tools():
     """Web UI testing tools page"""
-    chart = PieChartGen(title='Популярность средства тестирования Web UI',
+    chart = PieChartGen(chart_title='Популярность средства тестирования Web UI',
                         chart_name='web_ui_tools')
     return render_template(
         '/pie_chart_with_year.html',
@@ -351,7 +351,7 @@ def web_ui_tools():
 @app.route('/mobile_testing_frameworks')
 def mobile_testing_frameworks():
     """Mobile app testing tools page"""
-    chart = PieChartGen(title='Популярность инструментов тестирования мобильных приложений',
+    chart = PieChartGen(chart_title='Популярность инструментов тестирования мобильных приложений',
                         chart_name='mobile_testing_frameworks')
     return render_template(
         '/pie_chart_with_year.html',
@@ -364,7 +364,7 @@ def mobile_testing_frameworks():
 @app.route('/bugtracking_n_tms')
 def bugtracking_n_tms():
     """Mobile app testing tools page"""
-    chart = PieChartGen(title='Популярность систем управления тестированием, bugtracking system и т.п.',
+    chart = PieChartGen(chart_title='Популярность систем управления тестированием, bugtracking system и т.п.',
                         chart_name='bugtracking_n_tms')
     return render_template(
         '/pie_chart_with_year.html',
@@ -377,7 +377,7 @@ def bugtracking_n_tms():
 @app.route('/cvs')
 def cvs():
     """CVS page"""
-    chart = PieChartGen(title='Популярность систем управления версиями',
+    chart = PieChartGen(chart_title='Популярность систем управления версиями',
                         chart_name='cvs')
     return render_template(
         '/pie_chart_with_year.html',
@@ -390,7 +390,7 @@ def cvs():
 @app.route('/ci_cd')
 def ci_cd():
     """Mobile app testing tools page"""
-    chart = PieChartGen(title='Популярность средств CI/CD',
+    chart = PieChartGen(chart_title='Популярность средств CI/CD',
                         chart_name='ci_cd')
     return render_template(
         '/pie_chart_with_year.html',
