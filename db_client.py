@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from typing import Type, Sequence, Any
 
-from sqlalchemy import create_engine, and_, select, Row, RowMapping
+from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc
 from sqlalchemy.orm import sessionmaker
 
 from models import Vacancies, Calendar, Charts, VacWithSalary
@@ -90,6 +90,19 @@ class Database(metaclass=SingletonMeta):
     def get_data_for_chart_per_year(self, year: int, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name)).all()
+
+    def insert_vacancy(self, vac_id, json, published_at):
+        vacancy = Vacancies(id=vac_id, json=json, published_at=published_at)
+        return self._session.add(vacancy)
+
+    def insert_vac_id_to_calendar(self, vac_id, published_at):
+        vacancy = Calendar(id=vac_id, data=published_at)
+        try:
+            self._session.add(vacancy)
+        except exc.IntegrityError:
+            self._session.rollback()
+        return self._session.commit()
+
 
     # def execute_query(self, query):
     #     self._session.execute(query)

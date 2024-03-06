@@ -5,6 +5,8 @@ from datetime import datetime, timedelta, date
 from calendar import isleap
 from operator import itemgetter
 import json
+
+import sqlalchemy
 import unicodedata
 import locale
 from typing import NoReturn, Sequence, Any
@@ -31,18 +33,11 @@ def write_vacancies(response: requests, base_url: str) -> list[int]:
     Get list of vacancies from response and write to "calendar" and "vacancies" tables.
     Return list of vacancies ID.
     """
-    con = sqlite3.connect("testdb.db")  # Open database
-    cur = con.cursor()
+
     vac_list = response.json()["items"]
     items = []
     for i in vac_list:
-        items.append(i["id"])
-        sql = 'INSERT INTO calendar (id, data) VALUES (%d, "%s");' % (int(i["id"]), i["published_at"])
-        # print(sql)
-        try:
-            cur.executescript(sql)
-        except sqlite3.IntegrityError as err:
-            print("Error: ", err)
+        db.insert_vac_id_to_calendar(vac_id=int(i["id"]), published_at=i["published_at"])
 
         # If vacancy is new, write description to "vacancies" table.
         if int(i["id"]) not in db.get_all_vacancies_ids():
@@ -59,13 +54,7 @@ def write_vacancies(response: requests, base_url: str) -> list[int]:
             cleaner = re.compile('<.*?>')  # Remove HTML tags
             json_dump = re.sub(cleaner, '', json_dump)
             published_at = json.loads(json_dump)['published_at']
-            sql_in = f"""INSERT INTO vacancies (id, json, published_at)
-                         VALUES ({int(i['id'])}, '{json_dump}', '{published_at}');"""
-            try:
-                cur.executescript(sql_in)
-            except sqlite3.IntegrityError as error:
-                print("Error: ", error)
-    con.close()
+            db.insert_vacancy(vac_id=i['id'], json=json_dump, published_at=published_at)
     return items
 
 
@@ -344,6 +333,7 @@ def get_vacancies_qty_week_by_week() -> list[list[str | int | dict]]:
     day = first_day_of_current_year
     weeks_dictionary = dict(Неделя="количество вакансий")
     for i in range(0, delta.days):
+        # ToDo: Делать запросы по неделям, а не дням.
         vacancy_qty = db.get_vacancy_qty_by_day(day)
         week_number = str(day.isocalendar()[1])
         if week_number in weeks_dictionary:
@@ -362,7 +352,6 @@ def get_vacancies_qty_week_by_week() -> list[list[str | int | dict]]:
     def get_start_and_finish_of_calendar_week(year: int, calendar_week: int):
         monday = datetime.strptime(f'{year}.{calendar_week}.1', "%Y.%W.%w").date()
         return monday, monday + timedelta(days=6.9)
-        # return monday, monday + timedelta(days=7)
 
     for week in output_list[1:]:
         start_n_end = get_start_and_finish_of_calendar_week(config.YEARS[-1], int(week[0]))
