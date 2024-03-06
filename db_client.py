@@ -99,9 +99,11 @@ class Database(metaclass=SingletonMeta):
         vacancy = Calendar(id=vac_id, data=published_at)
         try:
             self._session.add(vacancy)
-        except exc.IntegrityError:
+            self._session.commit()
+        except exc.IntegrityError as err:
+            print(err.args[0])
             self._session.rollback()
-        return self._session.commit()
+        return
 
 
     # def execute_query(self, query):
