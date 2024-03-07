@@ -12,7 +12,7 @@ config = ConfigObj()
 @pytest.fixture
 def charts_data():
     """Отдает результат запроса к заданному URL из которого выделяет данные
-     для построения графиков"""
+     для построения графиков."""
     def _get_charts_data(rout=f'{config.LOCAL_HOST_BASE_URL}/', script_num=2):
         try:
             session = HTMLSession()
@@ -31,5 +31,23 @@ def charts_data():
         except AttributeError:
             print('Data for chart not found.')
             return
+    return _get_charts_data
 
+
+@pytest.fixture
+def scatter_charts_data():
+    """Отдает результат запроса к заданному URL из которого выделяет данные
+     для построения точечных графиков."""
+    def _get_charts_data(rout=f'{config.LOCAL_HOST_BASE_URL}/', script_num=2):
+        try:
+            session = HTMLSession()
+            response = session.get(f'{config.LOCAL_HOST_BASE_URL}/{rout}')
+            script = response.html.find('script')[script_num].text
+        except exceptions.RequestException as exception:
+            print(exception)
+        try:
+            return re.findall('data.addRows\(((.+?))\);', script)
+        except AttributeError:
+            print('Data for chart not found.')
+            return
     return _get_charts_data
