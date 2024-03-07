@@ -20,7 +20,6 @@ from config import ConfigObj
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 db = Database()
 config = ConfigObj()
-today = date.today() - timedelta(days=6)
 first_day_of_current_year = date(date.today().year, 1, 1)
 
 
@@ -61,52 +60,24 @@ def write_vacancies(response: requests, base_url: str) -> list[int]:
 def chart_with_category_filter(chart_name: str, param_list: list, cur, update, year) -> NoReturn:
     """ Function count a number of entries of some string from param_list in all vacancies. """
     for i in param_list:
-        sql = f"""SELECT json FROM vacancies WHERE json LIKE '%%%{i[0]}%%' AND
-                 published_at BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
-        cur.execute(sql)
-        vac = cur.fetchall()
+        vac_qty = db.count_vacancy_by_search_phrase_and_year(search_phrase=i[0], year=year)
         if update is True:
-            sql = f"""
-            UPDATE charts
-            SET popularity = {len(vac)}
-            WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{i[0]}'
-            AND charts.'parent' = '{i[1]}' AND year = {year};"""
+            if i[0] == 'py.test':
+                db.update_charts(chart_name=chart_name, parent=i[1],
+                                 popularity=db.get_pytest_data(year=year) + vac_qty,
+                                 year=year, data='pytest')
+            else:
+                db.update_charts(chart_name=chart_name, parent=i[1], popularity=vac_qty,
+                                 year=year, data=i[0])
         else:
-            sql = f"""INSERT INTO charts(chart_name, data, popularity, parent, year)
-                  VALUES('{chart_name}', '{i[0]}', {len(vac)}, '{i[1]}', {year});"""
-        try:
-            cur.executescript(sql)
-        except sqlite3.IntegrityError as error:
-            print("Error: ", error)
-
-    # Sum data for Py.test and Pytest and delete Py.test row
-    sql = f"""SELECT popularity FROM charts WHERE data = 'py.test' AND year = {year};"""
-    cur.execute(sql)
-    py_test_popularity = cur.fetchall()
-    if not py_test_popularity:
-        py_test_popularity = 0
-    else:
-        print(py_test_popularity)
-        py_test_popularity = py_test_popularity[0][0]
-    print('py.test popularity: ', py_test_popularity)
-
-    sql = f"""SELECT popularity FROM charts WHERE data = 'pytest' AND year = {year};"""
-    cur.execute(sql)
-    pytest_popularity = cur.fetchall()
-    if not pytest_popularity:
-        pytest_popularity = 0
-    else:
-        print(pytest_popularity)
-        pytest_popularity = pytest_popularity[0][0]
-    print('pytest popularity: ', pytest_popularity)
-
-    sum_pop = py_test_popularity + pytest_popularity
-    sql = f"""UPDATE charts SET popularity = "{sum_pop}" WHERE data = 'pytest' AND year = {year};"""
-    cur.execute(sql)
-    sql = f"""DELETE FROM charts WHERE data = 'py.test' AND year = {year};"""
-    cur.execute(sql)
-
-    # con.close()
+            if i[0] == 'py.test':
+                db.update_charts(chart_name=chart_name, parent=i[1],
+                                 popularity=db.get_pytest_data(year=year) + vac_qty,
+                                 year=year, data='pytest')
+            else:
+                db.insert_in_charts(chart_name=chart_name, data=i[0],
+                                    popularity=vac_qty,
+                                    parent=i[1], year=year)
     return
 
 
@@ -156,7 +127,7 @@ def count_types_per_year(types: dict, chart_name: str, key_name: str,
 
 def count_schedule_types(types: dict, chart_name: str, year: int,
                          all_vacancies:  Sequence[Row[Any] | RowMapping],
-                         cur, update: bool) -> NoReturn:
+                         cur, conn, update: bool) -> NoReturn:
     # Count types of schedule in all vacancies.
     types = types.fromkeys(types, 0)  # set all values to zero
     # Count vacancies with given type in given year.
@@ -185,6 +156,7 @@ def count_schedule_types(types: dict, chart_name: str, year: int,
             sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
                         VALUES('{chart_name}', '{n}', {types[n]}, '{year}');"""
         cur.execute(sql)
+        conn.commit()
     return
 
 
@@ -308,6 +280,7 @@ def salary_to_db(experience: str, exchange_rate: float, conn, year: int):
 
 
 def get_vacancies_qty_by_day_of_week() -> list:
+    today = date.today() - timedelta(days=6)  #???
     yesterday = today - timedelta(days=1)
     start_weekday_num = yesterday.weekday()
     weekday_name = ['пн.', 'вт.', 'ср.', 'чт', 'пт.', 'сб.', 'вс.']

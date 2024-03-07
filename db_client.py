@@ -77,11 +77,19 @@ class Database(metaclass=SingletonMeta):
                          Vacancies.published_at.between(start_date, end_date))) \
             .count()
 
-    def get_json_from_vacancies_per_year(self, year: int) -> Sequence[Row[Any] | RowMapping]:
+    def get_json_from_vacancies_by_year(self, year: int) -> Sequence[Row[Any] | RowMapping]:
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
         return self._session.scalars(
             select(Vacancies.json).filter(Vacancies.published_at.between(start_date, end_date))
+        ).all()
+
+    def get_json_from_filtered_vacancies_by_year(self, search_phrase: str, year: int) -> Sequence[Row[Any] | RowMapping]:
+        start_date = date(year, 1, 1)
+        end_date = date(year, 12, 31)
+        return self._session.scalars(
+            select(Vacancies.json).filter(Vacancies.published_at.between(start_date, end_date))
+            .filter(Vacancies.json.like(f'%{search_phrase}%'))
         ).all()
 
     def get_data_for_chart(self, chart_name: str) -> list[Type[Charts]]:
@@ -91,11 +99,20 @@ class Database(metaclass=SingletonMeta):
         return self._session.query(Charts).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name)).all()
 
+    def get_pytest_data(self, year: int) -> int:
+        return self._session.scalars(
+            select(Charts.popularity).filter(and_(
+                Charts.year == year,
+                Charts.chart_name == 'frameworks',
+                Charts.data == 'pytest'
+            ))
+        ).one()
+
     def insert_vacancy(self, vac_id, json, published_at):
         vacancy = Vacancies(id=vac_id, json=json, published_at=published_at)
         return self._session.add(vacancy)
 
-    def insert_vac_id_to_calendar(self, vac_id, published_at):
+    def insert_vac_id_to_calendar(self, vac_id: int, published_at: str):
         vacancy = Calendar(id=vac_id, data=published_at)
         try:
             self._session.add(vacancy)
@@ -105,6 +122,22 @@ class Database(metaclass=SingletonMeta):
             self._session.rollback()
         return
 
+    def update_charts(self, chart_name: str, parent: str, popularity: int,
+                      year: int, data: str):
+        print(f'{year=}', f'{chart_name=}', f'{parent=}', f'{data=}', f'{popularity=}', )
+        row = self._session.query(Charts).filter(
+            and_(Charts.year == year, Charts.chart_name == chart_name,
+                 Charts.parent == parent, Charts.data == data)).one()
+        row.popularity = popularity
+        self._session.commit()
+        return
+
+    def insert_in_charts(self, chart_name: str, data: str, parent: str, popularity: int, year: int):
+        print(f'{year=}', f'{chart_name=}', f'{parent=}', f'{data=}', f'{popularity=}',)
+        row = Charts(chart_name=chart_name, parent=parent,
+                     popularity=popularity, year=year, data=data)
+        self._session.add(row)
+        self._session.commit()
 
     # def execute_query(self, query):
     #     self._session.execute(query)

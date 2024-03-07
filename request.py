@@ -84,43 +84,28 @@ if update is False:
 
 # Wright statistics data to database
 for year in years_tuple:
-    all_vacancies_jsons = db.get_json_from_vacancies_per_year(year=year)
+    all_vacancies_jsons = db.get_json_from_vacancies_by_year(year=year)
 
-    utils.count_per_year(chart_name='languages',
-                         param_list=config.PROGRAM_LANGUAGES,
-                         year=year, cur=cur, update=update)
+    pie_diagrams = {'languages': config.PROGRAM_LANGUAGES,
+                    'bdd_frameworks': config.BDD_FRAMEWORKS,
+                    'load_testing_tools': config.LOAD_TESTING_TOOLS,
+                    'ci_cd': config.CI_CD,
+                    'monitoring': config.MONITORING,
+                    'web_ui_tools': config.WEB_UI_TOOLS,
+                    'mobile_testing_frameworks': config.MOBILE_TESTING_FRAMEWORKS,
+                    'bugtracking_n_tms': config.BUGTRACKING_N_TMS,
+                    'cvs': config.CVS}
 
-    utils.count_per_year(chart_name='bdd_frameworks',
-                         param_list=config.BDD_FRAMEWORKS,
-                         year=year, cur=cur, update=update)
+    for chart_name, categories in pie_diagrams.items():
+        utils.count_per_year(chart_name=chart_name,
+                             categories=categories,
+                             year=year, cur=cur, update=update)
 
-    utils.count_per_year(chart_name='load_testing_tools',
-                         param_list=config.LOAD_TESTING_TOOLS,
-                         year=year, cur=cur, update=update)
-
-    utils.count_per_year(chart_name='ci_cd',
-                         param_list=config.CI_CD,
-                         year=year, cur=cur, update=update)
-
-    utils.count_per_year(chart_name='monitoring',
-                         param_list=config.MONITORING,
-                         year=year, cur=cur, update=update)
-
-    utils.count_per_year(chart_name='web_ui_tools',
-                         param_list=config.WEB_UI_TOOLS,
-                         year=year, cur=cur, update=update)
-
-    utils.count_per_year(chart_name='mobile_testing_frameworks',
-                         param_list=config.MOBILE_TESTING_FRAMEWORKS,
-                         year=year, cur=cur, update=update)
-
-    utils.count_per_year(chart_name='bugtracking_n_tms',
-                         param_list=config.BUGTRACKING_N_TMS,
-                         year=year, cur=cur, update=update)
-
-    utils.count_per_year(chart_name='cvs',
-                         param_list=config.CVS,
-                         year=year, cur=cur, update=update)
+    # external_categories_charts = [config.SCHEDULE, config.EXPERIENCE, config.EMPLOYMENT]
+    # for i in external_categories_charts:
+    #     utils.count_types_per_year(schedule_types, 'schedule_type',
+    #                                'schedule', all_vacancies_jsons,
+    #                                cur, year, update)
 
     schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0, flyInFlyOut=0)
     utils.count_types_per_year(schedule_types, 'schedule_type',
@@ -139,23 +124,13 @@ for year in years_tuple:
                                'employment', all_vacancies_jsons, cur,
                                year, update)
 
+
     with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
     utils.count_schedule_types(with_salary, 'with_salary', year,
-                               all_vacancies_jsons, cur, update)
+                               all_vacancies_jsons, cur, conn, update)
 
     utils.chart_with_category_filter(
-        'frameworks',
-        [['pytest', 'Python'], ['py.test', 'Python'],
-         ['Unittest', 'Python'], ['Nose', 'Python'],
-         ['JUnit', 'Java'], ['TestNG', 'Java'],
-         ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
-         ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
-         ['Spock', 'C#'], ['NUnit', 'C#'],
-         ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'],
-         ['Jest', 'JavaScript'], ['Jasmine', 'JavaScript'],
-         ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
-         ['CodeceptJS', 'JavaScript'],
-         ['Robot_Framework', 'multiple_language']], cur, update, year)
+        'frameworks', config.UNIT_FRAMEWORKS, cur, update, year)
     # Count salary
     for experience in config.EXPERIENCE_GRADES:
         print("Опыт: ", experience)
@@ -180,7 +155,7 @@ for year in years_tuple:
             print('Some sqlite3.OperationalError')
 
 # Получаем поле 'json' для каждой из вакансий за последний год.
-current_year_vacancies = db.get_json_from_vacancies_per_year(config.YEARS[-1])
+current_year_vacancies = db.get_json_from_vacancies_by_year(config.YEARS[-1])
 
 # Populate skills set
 key_skills = set()
