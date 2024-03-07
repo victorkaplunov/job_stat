@@ -177,6 +177,7 @@ def employment_type():
         divs=chart.generate_divs()
     )
 
+
 @app.route('/experience')
 def experience():
     """Experience popularity page"""
