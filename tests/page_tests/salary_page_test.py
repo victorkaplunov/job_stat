@@ -20,3 +20,13 @@ def test_annotation_row_in_salary_chart_data(charts_data):
     for n, i in enumerate(config.YEARS):
         assert str(i) == title_row[1:][n],\
             "Год из заголовка графика не совпадает с годом из конфигурационного файла."
+
+
+def test_scatter_chart(scatter_charts_data):
+    """Проверка данных для точечных диаграм."""
+    testing_data = scatter_charts_data(rout=rout)
+    assert len(testing_data) == 4, 'Данные для точечных графиков не найдены или найдены не полностью.'
+    assert isinstance(testing_data, list), 'Тип данных для точечных графиков не совпадает с ожидаемым.'
+    for i in testing_data:
+        assert isinstance(i, tuple), 'Тип данных для точечных графиков не совпадает с ожидаемым.'
+    print(f'{(testing_data)=}')
