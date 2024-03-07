@@ -3,6 +3,7 @@ from typing import Type, Sequence, Any
 
 from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 from models import Vacancies, Calendar, Charts, VacWithSalary
 from config import ConfigObj
@@ -20,6 +21,7 @@ class SingletonMeta(type):
 class Database(metaclass=SingletonMeta):
     _db_engine = None
     _session = None
+
 
     def __init__(self):
         self._db_engine = create_engine(f"sqlite:///{ConfigObj.DB_FILE_NAME}")
@@ -139,12 +141,16 @@ class Database(metaclass=SingletonMeta):
         self._session.add(row)
         self._session.commit()
 
-    # def execute_query(self, query):
-    #     self._session.execute(query)
-    #
-    # def fetch_data(self, query):
-    #     return self._session.execute(query).fetchall()
-    #
-    # def update_data(self, query):
-    #     self._session.execute(query)
-    #     self._session.commit()
+    def delete_vacancy_with_json_like(self, word: str):
+        vacancies = self._session.query(Vacancies).filter(Vacancies.json.like(f'%{word}%'))
+        vacancies.delete()
+        self._session.commit()
+
+    def drop_and_recreate_vac_with_salary_table(self):
+        VacWithSalary.__table__.drop(bind=self._db_engine)
+        VacWithSalary.__table__.create(bind=self._db_engine)
+
+    def drop_and_recreate_charts_table(self):
+        Charts.__table__.drop(bind=self._db_engine)
+        Charts.__table__.create(bind=self._db_engine)
+
