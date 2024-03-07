@@ -30,7 +30,7 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
 req = requests.get((base_url + search_string).encode('utf-8'))
 
 # Get quantity of pages in response
-pages = 12  # req.json()["pages"]
+pages = 0  # req.json()["pages"]
 
 # Put new vacancies to DB
 for page_num in range(0, pages):
@@ -41,45 +41,14 @@ for page_num in range(0, pages):
 
 # Delete vacancies, which contain words from stop list.
 for word in config.STOP_LIST:
-    sql = f"""DELETE FROM vacancies WHERE json LIKE '%{word}%';"""
-    response = cur.execute(sql)
-    print(f'Number of occurrences for substring "{word}": {response.rowcount}')
-    conn.commit()
+    db.delete_vacancy_with_json_like(word=word)
 
 # Drop table 'vac_with_salary' and recreate it
-sql = """DROP TABLE IF EXISTS vac_with_salary;"""
-cur.execute(sql)
-conn.commit()
-
-sql = f"""CREATE TABLE IF NOT EXISTS vac_with_salary
-(
-  id INTEGER,
-  published_at TEXT,
-  calc_salary NUMERIC,
-  experience TEXT,
-  url TEXT,
-  description TEXT
-);"""
-cur.execute(sql)
-conn.commit()
+db.drop_and_recreate_vac_with_salary_table()
 
 if update is False:
     # Drop table 'charts' with statistics and recreate it
-    cur.execute("""DROP TABLE IF EXISTS charts;""")
-    conn.commit()
-    sql = """
-    CREATE TABLE IF NOT EXISTS charts
-    (
-        id INTEGER PRIMARY KEY,
-        chart_name NOT NULL,
-        data NOT NULL,
-        popularity  INTEGER,
-        parent,
-        year INTEGER
-    );
-    """
-    cur.execute(sql)
-    conn.commit()
+    db.drop_and_recreate_charts_table()
 
 
 # Wright statistics data to database
@@ -101,12 +70,6 @@ for year in years_tuple:
                              categories=categories,
                              year=year, cur=cur, update=update)
 
-    # external_categories_charts = [config.SCHEDULE, config.EXPERIENCE, config.EMPLOYMENT]
-    # for i in external_categories_charts:
-    #     utils.count_types_per_year(schedule_types, 'schedule_type',
-    #                                'schedule', all_vacancies_jsons,
-    #                                cur, year, update)
-
     schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0, flyInFlyOut=0)
     utils.count_types_per_year(schedule_types, 'schedule_type',
                                'schedule', all_vacancies_jsons,
@@ -124,13 +87,13 @@ for year in years_tuple:
                                'employment', all_vacancies_jsons, cur,
                                year, update)
 
-
     with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
     utils.count_schedule_types(with_salary, 'with_salary', year,
                                all_vacancies_jsons, cur, conn, update)
 
     utils.chart_with_category_filter(
         'frameworks', config.UNIT_FRAMEWORKS, cur, update, year)
+
     # Count salary
     for experience in config.EXPERIENCE_GRADES:
         print("Опыт: ", experience)
