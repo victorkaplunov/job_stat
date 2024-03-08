@@ -160,7 +160,7 @@ def count_schedule_types(types: dict, chart_name: str, year: int,
     return
 
 
-def salary_to_db(experience: str, exchange_rate: float, conn, year: int):
+def count_salary_median(experience: str, exchange_rate: float, conn, year: int):
     """Приводит зарплаты к общему виду (нетто, руб.) и записывает в отдельную таблицу для быстрого
     отображения на графике."""
     cur = conn.cursor()
