@@ -22,6 +22,14 @@ def test_annotation_row_in_salary_chart_data(charts_data):
             "Год из заголовка графика не совпадает с годом из конфигурационного файла."
 
 
+def test_salary_chart_values_qty(charts_data):
+    """Длина списка со значениями не совпадает с длинной списка заголовка."""
+    testing_data = charts_data(rout=rout)[0]
+    for exp_range in testing_data[1:-1]:
+        assert len(exp_range) == len(testing_data[0]),\
+            "Год из заголовка графика не совпадает с годом из конфигурационного файла."
+
+
 def test_scatter_chart(scatter_charts_data):
     """Проверка данных для точечных диаграм."""
     testing_data = scatter_charts_data(rout=rout)
@@ -29,4 +37,3 @@ def test_scatter_chart(scatter_charts_data):
     assert isinstance(testing_data, list), 'Тип данных для точечных графиков не совпадает с ожидаемым.'
     for i in testing_data:
         assert isinstance(i, tuple), 'Тип данных для точечных графиков не совпадает с ожидаемым.'
-    print(f'{(testing_data)=}')
