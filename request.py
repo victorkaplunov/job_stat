@@ -97,25 +97,16 @@ for year in years_tuple:
     # Count salary
     for experience in config.EXPERIENCE_GRADES:
         print("Опыт: ", experience)
-        try:
-            median = utils.salary_to_db(experience,
-                                        config.EXCHANGE_RATES,
-                                        conn, year)
+        median = utils.count_salary_median(experience,
+                                           config.EXCHANGE_RATES,
+                                           conn, year)
+        if update is True:
+            db.update_charts(chart_name='salary', parent=None,
+                             data=experience, year=year, popularity=median)
+        else:
+            db.insert_in_charts(chart_name='salary', parent=None,
+                                data=experience, year=year, popularity=median)
 
-            if update is True:
-                sql = f"""
-                        UPDATE charts
-                        SET popularity = {median} WHERE data = '{experience}'
-                        AND chart_name = 'salary' AND year = {str(year)};
-                        """
-            else:
-                sql = f"""
-                INSERT INTO charts(chart_name, data, popularity, year)
-                VALUES("salary", "{experience}", "{median}", {str(year)});"""
-
-            cur.executescript(sql)
-        except sqlite3.OperationalError:
-            print('Some sqlite3.OperationalError')
 
 # Получаем поле 'json' для каждой из вакансий за последний год.
 current_year_vacancies = db.get_json_from_vacancies_by_year(config.YEARS[-1])
