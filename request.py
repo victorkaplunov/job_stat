@@ -14,10 +14,6 @@ base_url = config.BASE_URL
 update = True
 years_tuple = (config.YEARS[-1],)
 
-today = date.today()
-first_day_of_current_year = date(date.today().year, 1, 1)
-conn = sqlite3.connect("testdb.db")  # Open database
-cur = conn.cursor()  # Create cursor
 
 search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR ТЕСТ* ' \
                 u' OR SDET OR test* OR Test* OR TEST* OR Quality OR quality&' \
@@ -96,9 +92,8 @@ for year in years_tuple:
     # Count salary
     for experience in config.EXPERIENCE_GRADES:
         print("Опыт: ", experience)
-        median = utils.count_salary_median(experience,
-                                           config.EXCHANGE_RATES,
-                                           conn, year)
+        median = utils.count_salary_median(experience, config.EXCHANGE_RATES,
+                                           year)
         if update is True:
             db.update_charts(chart_name='salary', data=experience,
                              year=year, popularity=median)
