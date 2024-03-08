@@ -26,25 +26,32 @@ class Database(metaclass=SingletonMeta):
         self._db_engine = create_engine(f"sqlite:///{ConfigObj.DB_FILE_NAME}")
         self._session = sessionmaker(bind=self._db_engine)()
 
-    def get_date_from_calendar_by_vacancy(self, vacancy_id: int) -> Sequence[Row[Any] | RowMapping]:
-        return self._session.scalars(select(Calendar.data).filter(Calendar.id == vacancy_id)).all()
+    def get_date_from_calendar_by_vacancy(
+            self, vacancy_id: int) -> Sequence[Row[Any] | RowMapping]:
+        return self._session.scalars(select(Calendar.data)
+                                     .filter(Calendar.id == vacancy_id)).all()
 
     def get_vacancy_by_id(self, vacancy_id: int) -> Type[Vacancies]:
         return self._session.query(Vacancies).filter_by(id=vacancy_id).one()
 
     def get_vacancy_ordered_by_id(self, limit=100) -> list[Type[Vacancies]]:
-        return self._session.query(Vacancies).order_by(Vacancies.id.desc()).limit(limit).all()
+        return self._session.query(Vacancies)\
+            .order_by(Vacancies.id.desc()).limit(limit).all()
 
-    def get_vacancy_publication_ordered_by_date(self, limit=100) -> list[Type[Calendar]]:
-        return self._session.query(Calendar).order_by(Calendar.data.desc()).limit(limit).all()
+    def get_vacancy_publication_ordered_by_date(
+            self, limit=100) -> list[Type[Calendar]]:
+        return self._session.query(Calendar)\
+            .order_by(Calendar.data.desc()).limit(limit).all()
 
-    def find_vacancy_by_substring(self, search_phrase: str, limit=150) -> list[Type[Vacancies]]:
+    def find_vacancy_by_substring(
+            self, search_phrase: str, limit=150) -> list[Type[Vacancies]]:
         return self._session.query(Vacancies) \
             .filter(Vacancies.json.like(f'%{search_phrase}%')) \
             .order_by(Vacancies.published_at.desc()) \
             .limit(limit).all()
 
-    def find_vacancy_with_salary_by_substring(self, search_phrase: str) -> list[Type[VacWithSalary]]:
+    def find_vacancy_with_salary_by_substring(
+            self, search_phrase: str) -> list[Type[VacWithSalary]]:
         return ((self._session.query(VacWithSalary)
                  .filter(VacWithSalary.description.like(f'%{search_phrase}%')))
                 .order_by(VacWithSalary.published_at.desc()).all())
@@ -65,12 +72,14 @@ class Database(metaclass=SingletonMeta):
     def get_vacancies_qty_by_period(self, start_day: date, end_day: date) -> int:
         """From start to finis, includes end date."""
         return self._session.query(Calendar.id.distinct()) \
-            .filter(Calendar.data.between(start_day, end_day + timedelta(days=1))).count()
+            .filter(Calendar.data.between(start_day,
+                                          end_day + timedelta(days=1))).count()
 
     def get_all_vacancies_ids(self) -> Sequence[Row[Any] | RowMapping]:
         return self._session.scalars(select(Vacancies.id)).all()
 
-    def count_vacancy_by_search_phrase_and_year(self, search_phrase: str, year: int) -> int:
+    def count_vacancy_by_search_phrase_and_year(
+            self, search_phrase: str, year: int) -> int:
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
         return self._session.query(Vacancies) \
@@ -78,25 +87,29 @@ class Database(metaclass=SingletonMeta):
                          Vacancies.published_at.between(start_date, end_date))) \
             .count()
 
-    def get_json_from_vacancies_by_year(self, year: int) -> Sequence[Row[Any] | RowMapping]:
+    def get_json_from_vacancies_by_year(
+            self, year: int) -> Sequence[Row[Any] | RowMapping]:
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
         return self._session.scalars(
-            select(Vacancies.json).filter(Vacancies.published_at.between(start_date, end_date))
-        ).all()
+            select(Vacancies.json)
+            .filter(Vacancies.published_at.between(start_date, end_date))).all()
 
-    def get_json_from_filtered_vacancies_by_year(self, search_phrase: str, year: int) -> Sequence[Row[Any] | RowMapping]:
+    def get_json_from_filtered_vacancies_by_year(
+            self, search_phrase: str, year: int) -> Sequence[Row[Any] | RowMapping]:
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
         return self._session.scalars(
-            select(Vacancies.json).filter(Vacancies.published_at.between(start_date, end_date))
+            select(Vacancies.json)
+            .filter(Vacancies.published_at.between(start_date, end_date))
             .filter(Vacancies.json.like(f'%{search_phrase}%'))
         ).all()
 
     def get_data_for_chart(self, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter_by(chart_name=chart_name).all()
 
-    def get_data_for_chart_per_year(self, year: int, chart_name: str) -> list[Type[Charts]]:
+    def get_data_for_chart_per_year(
+            self, year: int, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name)).all()
 
@@ -140,20 +153,24 @@ class Database(metaclass=SingletonMeta):
         self._session.add(row)
         self._session.commit()
 
-    def insert_in_vac_with_salary(self, _id: int, published_at: str, calc_salary: float,
+    def insert_in_vac_with_salary(self, vac_id: int, published_at: str,
+                                  calc_salary: float, experience: str,
                                   url: str, description: str) -> NoReturn:
-        row = VacWithSalary(id=id, published_at=published_at, calc_salary=calc_salary,
+        row = VacWithSalary(id=vac_id, published_at=published_at,
+                            calc_salary=calc_salary, experience=experience,
                             url=url, description=description)
         self._session.add(row)
         self._session.commit()
 
     def delete_vacancy_with_json_like(self, word: str) -> NoReturn:
-        vacancies = self._session.query(Vacancies).filter(Vacancies.json.like(f'%{word}%'))
+        vacancies = self._session.query(Vacancies)\
+            .filter(Vacancies.json.like(f'%{word}%'))
         vacancies.delete()
         self._session.commit()
 
     def delete_chart_data(self, chart_name: str) -> NoReturn:
-        chart_data = self._session.query(Charts).filter(Charts.chart_name == chart_name)
+        chart_data = self._session.query(Charts)\
+            .filter(Charts.chart_name == chart_name)
         chart_data.delete()
         self._session.commit()
 
