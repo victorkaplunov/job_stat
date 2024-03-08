@@ -516,3 +516,113 @@ def get_salary_by_category_data():
     data_list.sort(key=lambda row: row[2], reverse=True)
     print(f'{data_list=}')
     return data_list
+
+
+def fill_skill_set_chart(update: bool) -> None:
+    """Заполнение данных для графика 'Ключевые навыки'."""
+    current_year_vacancies = db.get_json_from_vacancies_by_year(config.YEARS[-1])
+    # Populate skills set
+    key_skills = set()
+    for vacancy in current_year_vacancies:
+        body = json.loads(str(vacancy))
+        try:
+            for m in body['key_skills']:
+                key_skills.add(m['name'])
+        except IndexError:
+            continue
+        except KeyError:
+            continue
+
+    # Count skills
+    key_skills_dict = dict.fromkeys(key_skills, 0)
+    for vacancy in current_year_vacancies:
+        body = json.loads(str(vacancy))
+        try:
+            for x in body['key_skills']:
+                key_skills_dict[(x['name'])] += 1
+        except IndexError:
+            continue
+        except KeyError:
+            continue
+
+    # Sort dict
+    key_skills_dict = dict(sorted(key_skills_dict.items(),
+                                  key=lambda item: item[1],
+                                  reverse=True))
+
+    # Wright first 50 skills data to DB
+    counter = 50
+    for skill in key_skills_dict:
+        print(skill, key_skills_dict[skill])
+        if update is True:
+            db.update_charts(chart_name='key_skills', data=skill,
+                             parent=None, year=None,
+                             popularity=key_skills_dict[skill])
+        else:
+            db.insert_in_charts(chart_name='key_skills', data=skill,
+                                parent=None, year=None,
+                                popularity=key_skills_dict[skill])
+        counter -= 1
+        if counter == 0:
+            break
+
+
+def fill_top_employers_chart(update: bool) -> None:
+    """Заполнение данных для графика 'Топ 50 работодателей'."""
+    current_year_vacancies = db.get_json_from_vacancies_by_year(config.YEARS[-1])
+    # Delete employers data
+    db.delete_chart_data(chart_name='top_employers')
+    # sql = f"""DELETE FROM charts WHERE chart_name = 'top_employers';"""
+    # cur.executescript(sql)
+    # conn.commit()
+
+    # Populate employers set
+    employers = set()
+    for vacancy in current_year_vacancies:
+        # Convert JSON description to dict.
+        body = json.loads(vacancy)
+        try:
+            employers.add(body['employer']['name'])
+        except IndexError:
+            continue
+        except KeyError:
+            continue
+
+    # Count employers
+    employers_dict = dict.fromkeys(employers, 0)  # Make dict from set
+    for vacancy in current_year_vacancies:
+        body = json.loads(vacancy)
+        employer = body['employer']['name']
+        if employer in employers_dict:
+            employers_dict[employer] += 1
+        else:
+            continue
+
+    # Sort dict
+    employers_dict = dict(sorted(employers_dict.items(),
+                                 key=lambda item: item[1],
+                                 reverse=True))
+
+    # Wright first 50 employers data to DB
+    counter = 50
+    for employer in employers_dict:
+        print(employer, employers_dict[employer])
+        db.insert_in_charts(chart_name='top_employers', data=employer,
+                            parent=None, year=None,
+                            popularity=employers_dict[employer])
+        # sql = f"""
+        # INSERT INTO charts(chart_name, data, popularity)
+        # VALUES("top_employers", "{employer}", {employers_dict[employer]});"""
+        # try:
+        #     cur.executescript(sql)
+        # except sqlite3.IntegrityError as error:
+        #     print("Error: ", error)
+        # sql = f"""
+        # UPDATE charts
+        # SET popularity = {employers_dict[employer]}
+        # WHERE data = '{employer}' AND chart_name = 'top_employers';"""
+        # cur.executescript(sql)
+        # conn.commit()
+        counter -= 1
+        if counter == 0:
+            break
