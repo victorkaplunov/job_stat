@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from typing import Type, Sequence, Any
 
-from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc
+from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -21,7 +21,6 @@ class SingletonMeta(type):
 class Database(metaclass=SingletonMeta):
     _db_engine = None
     _session = None
-
 
     def __init__(self):
         self._db_engine = create_engine(f"sqlite:///{ConfigObj.DB_FILE_NAME}")
@@ -114,7 +113,7 @@ class Database(metaclass=SingletonMeta):
         vacancy = Vacancies(id=vac_id, json=json, published_at=published_at)
         return self._session.add(vacancy)
 
-    def insert_vac_id_to_calendar(self, vac_id: int, published_at: str):
+    def insert_vac_id_to_calendar(self, vac_id: int, published_at: str) -> None:
         vacancy = Calendar(id=vac_id, data=published_at)
         try:
             self._session.add(vacancy)
@@ -124,8 +123,8 @@ class Database(metaclass=SingletonMeta):
             self._session.rollback()
         return
 
-    def update_charts(self, chart_name: str, data: str, parent: [str, None],
-                      popularity: int, year: int):
+    def update_charts(self, chart_name: str, data: str, popularity: int,
+                      year: [int, None], parent: [str, None] = None) -> None:
         print(f'{year=}', f'{chart_name=}', f'{parent=}', f'{data=}', f'{popularity=}')
         row = self._session.query(Charts).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name,
@@ -134,24 +133,32 @@ class Database(metaclass=SingletonMeta):
         self._session.commit()
         return
 
-    def insert_in_charts(self, chart_name: str, data: str, parent: [str, None],
-                         popularity: int, year: int):
+    def insert_in_charts(self, chart_name: str, data: str, popularity: int,
+                         year: [int, None], parent: [str, None] = None) -> None:
         print(f'{year=}', f'{chart_name=}', f'{parent=}', f'{data=}', f'{popularity=}')
         row = Charts(chart_name=chart_name, parent=parent,
                      popularity=popularity, year=year, data=data)
         self._session.add(row)
         self._session.commit()
 
-    def delete_vacancy_with_json_like(self, word: str):
+    def delete_vacancy_with_json_like(self, word: str) -> None:
         vacancies = self._session.query(Vacancies).filter(Vacancies.json.like(f'%{word}%'))
         vacancies.delete()
         self._session.commit()
 
-    def drop_and_recreate_vac_with_salary_table(self):
+    def delete_chart_data(self, chart_name: str) -> None:
+        chart_data = self._session.query(Charts).filter(Charts.chart_name == chart_name)
+        chart_data.delete()
+        self._session.commit()
+
+    def drop_and_recreate_vac_with_salary_table(self) -> None:
         VacWithSalary.__table__.drop(bind=self._db_engine)
         VacWithSalary.__table__.create(bind=self._db_engine)
 
-    def drop_and_recreate_charts_table(self):
+    def drop_and_recreate_charts_table(self) -> None:
         Charts.__table__.drop(bind=self._db_engine)
         Charts.__table__.create(bind=self._db_engine)
 
+    def vacuum_db(self) -> None:
+        """ Очистка БД, для уменьшения ее размера."""
+        self._session.execute(text('VACUUM'))
