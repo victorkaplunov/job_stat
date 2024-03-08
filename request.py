@@ -1,5 +1,4 @@
 from datetime import date
-import json
 import sqlite3
 
 import requests
@@ -101,130 +100,16 @@ for year in years_tuple:
                                            config.EXCHANGE_RATES,
                                            conn, year)
         if update is True:
-            db.update_charts(chart_name='salary', parent=None,
-                             data=experience, year=year, popularity=median)
+            db.update_charts(chart_name='salary', data=experience,
+                             year=year, popularity=median)
         else:
-            db.insert_in_charts(chart_name='salary', parent=None,
-                                data=experience, year=year, popularity=median)
+            db.insert_in_charts(chart_name='salary', data=experience,
+                                year=year, popularity=median)
 
 
-# Получаем поле 'json' для каждой из вакансий за последний год.
-current_year_vacancies = db.get_json_from_vacancies_by_year(config.YEARS[-1])
-
-# Populate skills set
-key_skills = set()
-for n in current_year_vacancies:
-    body = json.loads(n)
-    try:
-        for m in body['key_skills']:
-            key_skills.add(m['name'])
-    except IndexError:
-        continue
-    except KeyError:
-        continue
-
-# Count skills
-key_skills_dict = dict.fromkeys(key_skills, 0)
-for i in current_year_vacancies:
-    body = json.loads(i)
-    try:
-        for x in body['key_skills']:
-            key_skills_dict[(x['name'])] += 1
-    except IndexError:
-        continue
-    except KeyError:
-        continue
-
-# Sort dict
-key_skills_dict = dict(sorted(key_skills_dict.items(),
-                              key=lambda item: item[1],
-                              reverse=True))
-
-# Wright first 50 skills data to DB
-counter = 50
-for n in key_skills_dict:
-    print(n, key_skills_dict[n])
-    if update is True:
-        sql = f"""
-        UPDATE charts SET popularity = {key_skills_dict[n]}
-        WHERE data = '{n}' AND chart_name = 'key_skills';
-        """
-    else:
-        sql = f"""
-        INSERT INTO charts(chart_name, data, popularity)
-        VALUES("key_skills", "{n}", {key_skills_dict[n]});"""
-    try:
-        cur.executescript(sql)
-    except sqlite3.IntegrityError as error:
-        print("Error: ", error)
-    sql = f"""
-    UPDATE charts
-    SET popularity = {key_skills_dict[n]}
-    WHERE data = '{n}' AND chart_name = 'key_skills';"""
-    cur.executescript(sql)
-    counter -= 1
-    if counter == 0:
-        break
-
-# Delete employers data
-sql = f"""DELETE FROM charts WHERE chart_name = 'top_employers';"""
-cur.executescript(sql)
-conn.commit()
-
-# Populate employers set
-employers = set()
-for vacancy in current_year_vacancies:
-    # Convert JSON description to dict.
-    body = json.loads(vacancy)
-    try:
-        employers.add(body['employer']['name'])
-    except IndexError:
-        continue
-    except KeyError:
-        continue
-
-# Count employers
-employers_dict = dict.fromkeys(employers, 0)  # Make dict from set
-for item in current_year_vacancies:
-    body = json.loads(item)
-    employer = body['employer']['name']
-    if employer in employers_dict:
-        employers_dict[employer] += 1
-    else:
-        continue
-
-# Sort dict
-employers_dict = dict(sorted(employers_dict.items(),
-                             key=lambda item: item[1],
-                             reverse=True))
-
-# Wright first 50 employers data to DB
-counter = 50
-for n in employers_dict:
-    print(n, employers_dict[n])
-    sql = f"""
-    INSERT INTO charts(chart_name, data, popularity)
-    VALUES("top_employers", "{n}", {employers_dict[n]});"""
-    try:
-        cur.executescript(sql)
-    except sqlite3.IntegrityError as error:
-        print("Error: ", error)
-    sql = f"""
-    UPDATE charts
-    SET popularity = {employers_dict[n]}
-    WHERE data = '{n}' AND chart_name = 'top_employers';"""
-    cur.executescript(sql)
-    conn.commit()
-    counter -= 1
-    if counter == 0:
-        break
-
-
-sql = "VACUUM;"
-cur.execute(sql)
-conn.commit()
-# Close database connection
-conn.close()
+utils.fill_skill_set_chart(update=update)
+utils.fill_top_employers_chart(update=update)
+db.vacuum_db()
 
 # username = 'clingon'
 # TOKEN = os.getenv('PA_TOKEN')
