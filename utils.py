@@ -157,35 +157,29 @@ def count_schedule_types(types: dict, chart_name: str, year: int,
     return
 
 
-def count_salary_median(experience: str, exchange_rate: float, conn, year: int):
+def count_salary_median(experience: str, exchange_rate: float, year: int):
     """Приводит зарплаты к общему виду (нетто, руб.) и записывает в отдельную таблицу для быстрого
     отображения на графике."""
-    # cur = conn.cursor()
-    # sql = f"""SELECT DISTINCT json FROM vacancies WHERE published_at
-    #           BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
-    # cur.execute(sql)
-    # vacancies = cur.fetchall()
-    vacancies = db.get_json_from_vacancies_by_year()
-
+    vacancies = db.get_json_from_vacancies_by_year(year=year)
     # Отбираем вакансии с нужным опытом и собираем зарплаты в список
     salary_list = []
-    for i in vacancies:
-        if json.loads(i[0])['experience']['id'] == experience and json.loads(i[0])['salary'] is not None:
-            salary_obj = json.loads(i[0])['salary']
-            salary_obj.update({'id': json.loads(i[0])['id']})
-            salary_obj.update({'published_at': json.loads(i[0])['published_at']})
-            salary_obj.update({'alternate_url': json.loads(i[0])['alternate_url']})
-            salary_obj.update({'experience': json.loads(i[0])['experience']['id']})
-            salary_obj.update({'description': json.loads(i[0])['description']})
+    for vacancy in vacancies:
+        if json.loads(vacancy)['experience']['id'] == experience and json.loads(vacancy)['salary'] is not None:
+            salary_obj = json.loads(vacancy)['salary']
+            salary_obj.update({'id': json.loads(vacancy)['id']})
+            salary_obj.update({'published_at': json.loads(vacancy)['published_at']})
+            salary_obj.update({'alternate_url': json.loads(vacancy)['alternate_url']})
+            salary_obj.update({'experience': json.loads(vacancy)['experience']['id']})
+            salary_obj.update({'description': json.loads(vacancy)['description']})
             salary_list.append(salary_obj)
 
     # Считаем средний разброс для вакансий с закрытым диапазоном
     closed_salary = []
-    for i in salary_list:
-        if i['from'] is None or i['to'] is None:
+    for salary in salary_list:
+        if salary['from'] is None or salary['to'] is None:
             pass
         else:
-            closed_salary.append((i['to'] - i['from'])*exchange_rate[i['currency']])
+            closed_salary.append((salary['to'] - salary['from'])*exchange_rate[salary['currency']])
 
     closed_salary_sum = 0
     for i in closed_salary:
@@ -201,16 +195,9 @@ def count_salary_median(experience: str, exchange_rate: float, conn, year: int):
 
     def write_to_vac_with_salary(item, salary):
         """ Записываем вакансии с указанной зарплатой в промежуточную таблицу vac_with_salary."""
-        # today = datetime.today()
-        # delta = timedelta(days=30)
-        # last_month = today - delta
-        # vac_date = datetime.strptime(item['published_at'][:-5], "%Y-%m-%dT%H:%M:%S")
-        # if (vac_date <= today) and (vac_date >= last_month):
-        cur.execute(f"""INSERT INTO vac_with_salary(id, published_at, calc_salary, experience, url, description)
-                        VALUES(?,?,?,?,?,?);""", (item['id'], str(item['published_at']), salary,
-                                                  item['experience'], item['alternate_url'], item['description']))
-        conn.commit()
-        db.insert_in_vac_with_salary(chart_name='vac_with_salary', )
+        db.insert_in_vac_with_salary(vac_id=item['id'], published_at=str(item['published_at']),
+                                     calc_salary=salary, experience=item['experience'],
+                                     url=item['alternate_url'], description=item['description'])
     # Считаем среднюю предполагаемую зарплату с учетом открытых диапазонов и НДФЛ.
     all_salary = []
     for i in salary_list:
