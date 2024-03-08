@@ -57,7 +57,7 @@ def write_vacancies(response: requests, base_url: str) -> list[int]:
     return items
 
 
-def chart_with_category_filter(chart_name: str, param_list: list, cur, update, year) -> NoReturn:
+def chart_with_category_filter(chart_name: str, param_list: list, update, year) -> NoReturn:
     """ Function count a number of entries of some string from param_list in all vacancies. """
     for i in param_list:
         vac_qty = db.count_vacancy_by_search_phrase_and_year(search_phrase=i[0], year=year)
@@ -81,7 +81,7 @@ def chart_with_category_filter(chart_name: str, param_list: list, cur, update, y
     return
 
 
-def count_per_year(chart_name: str, categories: list, year: int, cur, update=True) -> NoReturn:
+def count_per_year(chart_name: str, categories: list, year: int, update=True) -> NoReturn:
     """ Function count a number of entries of some string from param_list
      in the JSON of all vacancies. """
     categories_dict = {i: 0 for i in categories}  # Convert list to dictionary
@@ -90,49 +90,50 @@ def count_per_year(chart_name: str, categories: list, year: int, cur, update=Tru
         print(param_type)
         type_count = db.count_vacancy_by_search_phrase_and_year(search_phrase=param_type, year=year)
         if update is True:
-            sql = f"""
-            UPDATE charts
-            SET popularity = {type_count}
-            WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{param_type}'
-            AND charts.'year' = '{year}';"""
+            db.update_charts(chart_name=chart_name, data=param_type,
+                             popularity=type_count, year=year)
+            # sql = f"""
+            # UPDATE charts
+            # SET popularity = {type_count}
+            # WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{param_type}'
+            # AND charts.'year' = '{year}';"""
         else:
-            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                  VALUES('{chart_name}', '{param_type}', {type_count}, {str(year)});"""
-        cur.executescript(sql)
+            db.insert_in_charts(chart_name=chart_name, data=param_type,
+                                popularity=type_count, year=year)
+        #     sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
+        #           VALUES('{chart_name}', '{param_type}', {type_count}, {str(year)});"""
+        # cur.executescript(sql)
     return
 
 
 def count_types_per_year(types: dict, chart_name: str, key_name: str,
                          all_vacancies:  Sequence[Row[Any] | RowMapping],
-                         cur, year: int, update: bool) -> NoReturn:
+                         year: int, update: bool) -> NoReturn:
 
     # Count vacancies with given type in current year.
-    for i in all_vacancies:
-        body = json.loads(i)
+    for vacancy in all_vacancies:
+        body = json.loads(str(vacancy))
         types[(body[key_name]['id'])] += 1
     # Write ready data to DB.
     print(types)
-    for i in types:
+    for _type in types:
         if update is True:
-            sql = f"""UPDATE charts
-                      SET popularity = {types[i]}
-                      WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{i}'
-                      AND charts.'year' = '{year}';"""
+            db.update_charts(chart_name=chart_name, data=_type,
+                             popularity=types[_type], year=year)
         else:
-            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                        VALUES('{chart_name}', '{i}', {types[i]}, {str(year)});"""
-        cur.execute(sql)
+            db.insert_in_charts(chart_name=chart_name, data=_type,
+                                popularity=types[_type], year=year)
     return
 
 
 def count_schedule_types(types: dict, chart_name: str, year: int,
-                         all_vacancies:  Sequence[Row[Any] | RowMapping],
-                         cur, conn, update: bool) -> NoReturn:
+                         all_vacancies: Sequence[Row[Any] | RowMapping],
+                         update: bool) -> NoReturn:
     # Count types of schedule in all vacancies.
     types = types.fromkeys(types, 0)  # set all values to zero
     # Count vacancies with given type in given year.
-    for n in all_vacancies:
-        body = json.loads(n)
+    for vacancy in all_vacancies:
+        body = json.loads(str(vacancy))
 
         if body['salary'] is None:
             types['without_salary'] += 1
@@ -146,28 +147,25 @@ def count_schedule_types(types: dict, chart_name: str, year: int,
 
     # Write ready data to DB.
     print(types)
-    for n in types:
+    for _type in types:
         if update is True:
-            sql = f"""UPDATE charts
-                      SET popularity = {types[n]}
-                      WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{n}'
-                      AND charts.'year' = '{year}';"""
+            db.update_charts(chart_name=chart_name, data=_type,
+                             popularity=types[_type], year=year)
         else:
-            sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-                        VALUES('{chart_name}', '{n}', {types[n]}, '{year}');"""
-        cur.execute(sql)
-        conn.commit()
+            db.insert_in_charts(chart_name=chart_name, data=_type,
+                                popularity=types[_type], year=year)
     return
 
 
 def count_salary_median(experience: str, exchange_rate: float, conn, year: int):
     """Приводит зарплаты к общему виду (нетто, руб.) и записывает в отдельную таблицу для быстрого
     отображения на графике."""
-    cur = conn.cursor()
-    sql = f"""SELECT DISTINCT json FROM vacancies WHERE published_at
-              BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
-    cur.execute(sql)
-    vacancies = cur.fetchall()
+    # cur = conn.cursor()
+    # sql = f"""SELECT DISTINCT json FROM vacancies WHERE published_at
+    #           BETWEEN '{year}-01-01T00:00:00+0300' AND '{year}-12-31T11:59:59+0300';"""
+    # cur.execute(sql)
+    # vacancies = cur.fetchall()
+    vacancies = db.get_json_from_vacancies_by_year()
 
     # Отбираем вакансии с нужным опытом и собираем зарплаты в список
     salary_list = []
@@ -212,7 +210,7 @@ def count_salary_median(experience: str, exchange_rate: float, conn, year: int):
                         VALUES(?,?,?,?,?,?);""", (item['id'], str(item['published_at']), salary,
                                                   item['experience'], item['alternate_url'], item['description']))
         conn.commit()
-
+        db.insert_in_vac_with_salary(chart_name='vac_with_salary', )
     # Считаем среднюю предполагаемую зарплату с учетом открытых диапазонов и НДФЛ.
     all_salary = []
     for i in salary_list:

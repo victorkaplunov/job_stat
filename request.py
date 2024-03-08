@@ -67,31 +67,31 @@ for year in years_tuple:
     for chart_name, categories in pie_diagrams.items():
         utils.count_per_year(chart_name=chart_name,
                              categories=categories,
-                             year=year, cur=cur, update=update)
+                             year=year, update=update)
 
     schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0, flyInFlyOut=0)
     utils.count_types_per_year(schedule_types, 'schedule_type',
                                'schedule', all_vacancies_jsons,
-                               cur, year, update)
+                               year, update)
 
     experience_types = dict(noExperience=0, between1And3=0,
                             between3And6=0, moreThan6=0)
     utils.count_types_per_year(experience_types, 'experience',
                                'experience', all_vacancies_jsons,
-                               cur, year, update)
+                               year, update)
 
     employment_types = dict(full=0, part=0, project=0,
                             probation=0, volunteer=0)
     utils.count_types_per_year(employment_types, 'employment_type',
-                               'employment', all_vacancies_jsons, cur,
+                               'employment', all_vacancies_jsons,
                                year, update)
 
     with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
     utils.count_schedule_types(with_salary, 'with_salary', year,
-                               all_vacancies_jsons, cur, conn, update)
+                               all_vacancies_jsons, update)
 
     utils.chart_with_category_filter(
-        'frameworks', config.UNIT_FRAMEWORKS, cur, update, year)
+        'frameworks', config.UNIT_FRAMEWORKS, update, year)
 
     # Count salary
     for experience in config.EXPERIENCE_GRADES:
