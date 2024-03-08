@@ -124,7 +124,7 @@ class Database(metaclass=SingletonMeta):
             self._session.rollback()
         return
 
-    def update_charts(self, chart_name: str, data: str, parent: str,
+    def update_charts(self, chart_name: str, data: str, parent: [str, None],
                       popularity: int, year: int):
         print(f'{year=}', f'{chart_name=}', f'{parent=}', f'{data=}', f'{popularity=}')
         row = self._session.query(Charts).filter(
@@ -134,7 +134,7 @@ class Database(metaclass=SingletonMeta):
         self._session.commit()
         return
 
-    def insert_in_charts(self, chart_name: str, data: str, parent: str,
+    def insert_in_charts(self, chart_name: str, data: str, parent: [str, None],
                          popularity: int, year: int):
         print(f'{year=}', f'{chart_name=}', f'{parent=}', f'{data=}', f'{popularity=}')
         row = Charts(chart_name=chart_name, parent=parent,
