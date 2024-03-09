@@ -25,7 +25,7 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
 req = requests.get((base_url + search_string).encode('utf-8'))
 
 # Get quantity of pages in response
-pages = 0  # req.json()["pages"]
+pages = 12  # req.json()["pages"]
 
 # Put new vacancies to DB
 for page_num in range(0, pages):
