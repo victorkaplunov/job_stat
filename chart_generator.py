@@ -25,7 +25,7 @@ class BaseChartGenerator:
         data_list = []
         for i in statistics_data:
             # Переводим параметры для перечисленных видов графиков
-            if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
+            if chart_name in ['schedule', 'employment', 'experience', 'with_salary']:
                 row = [self.translations[i.data], i.popularity]
                 data_list.append(row)
             else:  # Для остальных не переводим
