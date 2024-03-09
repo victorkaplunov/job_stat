@@ -4,6 +4,15 @@ class ConfigObj:
 
     BASE_URL = 'http://api.hh.ru/vacancies/'
 
+    SEARCH_STRING = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR ТЕСТ* ' \
+                    u' OR SDET OR test* OR Test* OR TEST* OR Quality OR quality&' \
+                    'no_magic=true&order_by=publication_time&' \
+                    'area=1&specialization=1.117&' \
+                    'search_field=name&' \
+                    'page=0'
+
+    PAGES_QTY = 12
+
     DB_FILE_NAME = 'testdb.db'
 
     YEARS = [2019, 2020, 2021, 2022, 2023, 2024]

@@ -1,3 +1,4 @@
+import os
 from argparse import ArgumentParser
 
 import requests
@@ -23,21 +24,9 @@ if args.rebuild is True:
     update = False
     years_tuple = tuple(config.YEARS)
 
-search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR ТЕСТ* ' \
-                u' OR SDET OR test* OR Test* OR TEST* OR Quality OR quality&' \
-                'no_magic=true&order_by=publication_time&' \
-                'area=1&specialization=1.117&' \
-                'search_field=name&' \
-                'page=0'
-
-req = requests.get((config.BASE_URL + search_string).encode('utf-8'))
-
-# Get quantity of pages in request
-pages = 12
-
 # Put new vacancies to DB
-for page_num in range(0, pages):
-    search_url = config.BASE_URL + search_string.replace("page=0", "page=" + str(page_num))
+for page_num in range(0, config.PAGES_QTY):
+    search_url = config.BASE_URL + config.SEARCH_STRING.replace("page=0", "page=" + str(page_num))
     resp = requests.get(search_url)
     s = utils.write_vacancies(resp, config.BASE_URL)
     print("Items on page: ", len(set(s)))
@@ -95,16 +84,16 @@ utils.fill_skill_set_chart(update=update)
 utils.fill_top_employers_chart(update=update)
 db.vacuum_db()
 
-# username = 'clingon'
-# TOKEN = os.getenv('PA_TOKEN')
-# headers = {'Authorization': f'Token {TOKEN}'}
-# base_url = f'https://www.pythonanywhere.com/api/v0/user/{username}/'
-#
-# # Get first webapps name
-# response = requests.get(base_url + 'webapps/', headers=headers)
-# domain_name = response.json()[0]['domain_name']
-# print(domain_name)
-#
-# # Reload first webapps
-# response = requests.post(base_url + f'webapps/{domain_name}/reload/', headers=headers)
-# print(response.status_code)
+username = 'clingon'
+TOKEN = os.getenv('PA_TOKEN')
+headers = {'Authorization': f'Token {TOKEN}'}
+base_url = f'https://www.pythonanywhere.com/api/v0/user/{username}/'
+
+# Get first webapps name
+response = requests.get(base_url + 'webapps/', headers=headers)
+domain_name = response.json()[0]['domain_name']
+print(domain_name)
+
+# Reload first webapps
+response = requests.post(base_url + f'webapps/{domain_name}/reload/', headers=headers)
+print(response.status_code)
