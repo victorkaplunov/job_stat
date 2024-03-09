@@ -304,7 +304,6 @@ def get_vacancies_qty_week_by_week() -> list[list[str | int | dict]]:
     day = first_day_of_current_year
     weeks_dictionary = dict(Неделя="количество вакансий")
     for i in range(0, delta.days):
-        # ToDo: Делать запросы по неделям, а не дням.
         vacancy_qty = db.get_vacancy_qty_by_day(day)
         week_number = str(day.isocalendar()[1])
         if week_number in weeks_dictionary:
