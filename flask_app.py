@@ -153,11 +153,11 @@ def salary_by_category():
     )
 
 
-@app.route('/schedule_type')
-def schedule_type():
+@app.route('/schedule')
+def schedule():
     """Schedule type popularity page"""
     chart = PieChart(chart_title='Популярность режимов работы',
-                     chart_name='schedule_type')
+                     chart_name='schedule')
     return render_template(
         '/pie_chart_with_year.html',
         title='Режимы работы.',
@@ -166,12 +166,12 @@ def schedule_type():
     )
 
 
-@app.route('/employment_type')
-def employment_type():
+@app.route('/employment')
+def employment():
     chart = PieChartWithTable(chart_title='Виды занятости',
-                              chart_name='employment_type')
+                              chart_name='employment')
     return render_template(
-        '/employment_type.html',
+        '/employment.html',
         title='Виды занятости.',
         charts_function=chart.generate_script() + chart.generate_table_script(),
         divs=chart.generate_divs()

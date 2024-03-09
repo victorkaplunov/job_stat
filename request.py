@@ -65,32 +65,26 @@ for year in years_tuple:
                              categories=categories,
                              year=year, update=update)
 
-    schedule_types = dict(fullDay=0, flexible=0, shift=0, remote=0, flyInFlyOut=0)
-    utils.count_types_per_year(schedule_types, 'schedule_type',
-                               'schedule', all_vacancies_jsons,
-                               year, update)
+    utils.count_types_per_year(types=config.SCHEDULE, chart_name='schedule',
+                               all_vacancies=all_vacancies_jsons,
+                               year=year, update=update)
 
-    experience_types = dict(noExperience=0, between1And3=0,
-                            between3And6=0, moreThan6=0)
-    utils.count_types_per_year(experience_types, 'experience',
-                               'experience', all_vacancies_jsons,
-                               year, update)
+    utils.count_types_per_year(types=config.EXPERIENCE, chart_name='experience',
+                               all_vacancies=all_vacancies_jsons,
+                               year=year, update=update)
 
-    employment_types = dict(full=0, part=0, project=0,
-                            probation=0, volunteer=0)
-    utils.count_types_per_year(employment_types, 'employment_type',
-                               'employment', all_vacancies_jsons,
-                               year, update)
+    utils.count_types_per_year(types=config.EMPLOYMENT, chart_name='employment',
+                               all_vacancies=all_vacancies_jsons,
+                               year=year, update=update)
 
-    with_salary = dict(without_salary=0, closed=0, open_up=0, open_down=0)
-    utils.count_schedule_types(with_salary, 'with_salary', year,
-                               all_vacancies_jsons, update)
+    utils.count_salary_types(config.WITH_SALARY, 'with_salary', year,
+                             all_vacancies_jsons, update)
 
     utils.chart_with_category_filter(
         'frameworks', config.UNIT_FRAMEWORKS, update, year)
 
     # Count salary
-    for experience in config.EXPERIENCE_GRADES:
+    for experience in config.EXPERIENCE:
         print("Опыт: ", experience)
         median = utils.count_salary_median(experience, config.EXCHANGE_RATES,
                                            year)

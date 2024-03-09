@@ -17,9 +17,6 @@ class ConfigObj:
 
     MROT = 13890  # Минимальный размер оплаты труда
 
-    EXPERIENCE_GRADES = ['noExperience', 'between1And3',
-                         'between3And6', 'moreThan6']
-
     TRANSLATIONS = dict(noExperience="Без опыта",
                         between1And3="От года до трех",
                         between3And6="От трех до шести лет",
@@ -84,16 +81,10 @@ class ConfigObj:
                        ['CodeceptJS', 'JavaScript'],
                        ['Robot_Framework', 'multiple_language']]
 
-    # EMPLOYMENT = {'name': 'EMPLOYMENT', 'params': ['full', 'part', 'project',
-    #                                                'volunteer', 'probation']}
-    #
-    # SCHEDULE = [{'id': 'fullDay', 'name': 'Полный день'},
-    #             {'id': 'shift', 'name': 'Сменный график'},
-    #             {'id': 'flexible', 'name': 'Гибкий график'},
-    #             {'id': 'remote', 'name': 'Удаленная работа'},
-    #             {'id': 'flyInFlyOut', 'name': 'Вахтовый метод'}]
-    #
-    # EXPERIENCE = [{'id': 'noExperience', 'name': 'Нет опыта'},
-    #               {'id': 'between1And3', 'name': 'От 1 года до 3 лет'},
-    #               {'id': 'between3And6', 'name': 'От 3 до 6 лет'},
-    #               {'id': 'moreThan6', 'name': 'Более 6 лет'}]
+    SCHEDULE = ['fullDay', 'flexible', 'shift', 'remote', 'flyInFlyOut']
+     
+    EXPERIENCE = ['noExperience', 'between1And3', 'between3And6', 'moreThan6']
+    
+    EMPLOYMENT = ['full', 'part', 'project', 'probation', 'volunteer']
+    
+    WITH_SALARY = ['without_salary', 'closed', 'open_up', 'open_down']

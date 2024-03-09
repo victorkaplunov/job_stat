@@ -106,14 +106,15 @@ def count_per_year(chart_name: str, categories: list, year: int, update=True) ->
     return
 
 
-def count_types_per_year(types: dict, chart_name: str, key_name: str,
+def count_types_per_year(types: list, chart_name: str,
                          all_vacancies:  Sequence[Row[Any] | RowMapping],
                          year: int, update: bool) -> NoReturn:
-
+    # Convert list to dict with zero values.
+    types = {item: 0 for item in types}
     # Count vacancies with given type in current year.
     for vacancy in all_vacancies:
         body = json.loads(str(vacancy))
-        types[(body[key_name]['id'])] += 1
+        types[(body[chart_name]['id'])] += 1
     # Write ready data to DB.
     print(types)
     for _type in types:
@@ -126,11 +127,11 @@ def count_types_per_year(types: dict, chart_name: str, key_name: str,
     return
 
 
-def count_schedule_types(types: dict, chart_name: str, year: int,
-                         all_vacancies: Sequence[Row[Any] | RowMapping],
-                         update: bool) -> NoReturn:
-    # Count types of schedule in all vacancies.
-    types = types.fromkeys(types, 0)  # set all values to zero
+def count_salary_types(types: list, chart_name: str, year: int,
+                       all_vacancies: Sequence[Row[Any] | RowMapping],
+                       update: bool) -> NoReturn:
+    # Convert list to dict with zero values.
+    types = {item: 0 for item in types}
     # Count vacancies with given type in given year.
     for vacancy in all_vacancies:
         body = json.loads(str(vacancy))
@@ -154,7 +155,6 @@ def count_schedule_types(types: dict, chart_name: str, year: int,
         else:
             db.insert_in_charts(chart_name=chart_name, data=_type,
                                 popularity=types[_type], year=year)
-    return
 
 
 def count_salary_median(experience: str, exchange_rate: float, year: int):
@@ -164,13 +164,13 @@ def count_salary_median(experience: str, exchange_rate: float, year: int):
     # Отбираем вакансии с нужным опытом и собираем зарплаты в список
     salary_list = []
     for vacancy in vacancies:
-        if json.loads(vacancy)['experience']['id'] == experience and json.loads(vacancy)['salary'] is not None:
-            salary_obj = json.loads(vacancy)['salary']
-            salary_obj.update({'id': json.loads(vacancy)['id']})
-            salary_obj.update({'published_at': json.loads(vacancy)['published_at']})
-            salary_obj.update({'alternate_url': json.loads(vacancy)['alternate_url']})
-            salary_obj.update({'experience': json.loads(vacancy)['experience']['id']})
-            salary_obj.update({'description': json.loads(vacancy)['description']})
+        if json.loads(str(vacancy))['experience']['id'] == experience and json.loads(str(vacancy))['salary'] is not None:
+            salary_obj = json.loads(str(vacancy))['salary']
+            salary_obj.update({'id': json.loads(str(vacancy))['id']})
+            salary_obj.update({'published_at': json.loads(str(vacancy))['published_at']})
+            salary_obj.update({'alternate_url': json.loads(str(vacancy))['alternate_url']})
+            salary_obj.update({'experience': json.loads(str(vacancy))['experience']['id']})
+            salary_obj.update({'description': json.loads(str(vacancy))['description']})
             salary_list.append(salary_obj)
 
     # Считаем средний разброс для вакансий с закрытым диапазоном
