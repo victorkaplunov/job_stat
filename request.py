@@ -1,3 +1,5 @@
+from argparse import ArgumentParser
+
 import requests
 
 import utils
@@ -7,9 +9,19 @@ import db_client
 db = db_client.Database()
 config = ConfigObj()
 
+parser = ArgumentParser()
+parser.add_argument("-r", "--rebuild", dest='rebuild', action="store_true",
+                    help="rebuild all calculated tables for all years.")
+args = parser.parse_args()
+
+# По умолчанию значения в данных обновляются только за последний год.
 update = True
 years_tuple = (config.YEARS[-1],)
 
+# При опции CLI "-r" или "--rebuild", старые данные удаляются и пересчитываются за все годы.
+if args.rebuild is True:
+    update = False
+    years_tuple = tuple(config.YEARS)
 
 search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR ТЕСТ* ' \
                 u' OR SDET OR test* OR Test* OR TEST* OR Quality OR quality&' \
@@ -34,12 +46,11 @@ for word in config.STOP_LIST:
     db.delete_vacancy_with_json_like(word=word)
 
 db.drop_and_recreate_vac_with_salary_table()
-
 if update is False:
     db.drop_and_recreate_charts_table()
 
 
-# Wright statistics data to database
+# Count data for chart per year.
 for year in years_tuple:
     all_vacancies_jsons = db.get_json_from_vacancies_by_year(year=year)
 
