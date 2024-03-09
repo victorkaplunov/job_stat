@@ -219,22 +219,22 @@ def count_salary_median(experience: str, exchange_rate: float, year: int):
             # закрытый диапазон
             if (i['from'] is not None) and (i['to'] is not None):
                 calc_salary = (i['from'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']]
-                if calc_salary < 12792:   # Пишем в базу МРОТ, если расчетная ЗП меньше минимальной.
-                    calc_salary = 12792
+                if calc_salary < config.MROT:   # Пишем в базу МРОТ, если расчетная ЗП меньше минимальной.
+                    calc_salary = config.MROT
                 all_salary.append(calc_salary)
                 write_to_vac_with_salary(i, calc_salary)
             # открытый вверх
             elif i['to'] is None:
                 calc_salary = i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary/2
-                if calc_salary < 12792:
-                    calc_salary = 12792
+                if calc_salary < config.MROT:
+                    calc_salary = config.MROT
                 all_salary.append(calc_salary)
                 write_to_vac_with_salary(i, calc_salary)
             # открытый вниз
             elif i['from'] is None:
                 calc_salary = i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary/2
-                if calc_salary < 12792:
-                    calc_salary = 12792
+                if calc_salary < config.MROT:
+                    calc_salary = config.MROT
                 all_salary.append(calc_salary)
                 write_to_vac_with_salary(i, calc_salary)
 
@@ -244,24 +244,24 @@ def count_salary_median(experience: str, exchange_rate: float, year: int):
             if (i['from'] is not None) and (i['to'] is not None):
                 gross_salary = (i['from'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']]
                 calc_salary = gross_salary - gross_salary * 0.13
-                if calc_salary < 12792:
-                    calc_salary = 12792
+                if calc_salary < config.MROT:
+                    calc_salary = config.MROT
                 all_salary.append(calc_salary)
                 write_to_vac_with_salary(i, calc_salary)
             # открытый вверх
             elif i['to'] is None:
                 gross_salary = (i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary/2)
                 calc_salary = gross_salary - gross_salary * 0.13
-                if calc_salary < 12792:
-                    calc_salary = 12792
+                if calc_salary < config.MROT:
+                    calc_salary = config.MROT
                 all_salary.append(calc_salary)
                 write_to_vac_with_salary(i, calc_salary)
             # открытый вниз
             elif i['from'] is None:
                 gross_salary = (i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary/2)
                 calc_salary = gross_salary - gross_salary * 0.13
-                if calc_salary < 12792:
-                    calc_salary = 12792
+                if calc_salary < config.MROT:
+                    calc_salary = config.MROT
                 all_salary.append(calc_salary)
                 write_to_vac_with_salary(i, calc_salary)
 
@@ -278,7 +278,7 @@ def count_salary_median(experience: str, exchange_rate: float, year: int):
 
 
 def get_vacancies_qty_by_day_of_week() -> list:
-    today = date.today() - timedelta(days=6)  #???
+    today = date.today() - timedelta(days=6)
     yesterday = today - timedelta(days=1)
     start_weekday_num = yesterday.weekday()
     weekday_name = ['пн.', 'вт.', 'ср.', 'чт', 'пт.', 'сб.', 'вс.']
