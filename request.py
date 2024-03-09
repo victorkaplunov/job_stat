@@ -1,6 +1,3 @@
-from datetime import date
-import sqlite3
-
 import requests
 
 import utils
@@ -9,7 +6,6 @@ import db_client
 
 db = db_client.Database()
 config = ConfigObj()
-base_url = config.BASE_URL
 
 update = True
 years_tuple = (config.YEARS[-1],)
@@ -20,29 +16,26 @@ search_string = u'?text=QA OR Qa OR QА OR Qа Q.A. тест* OR Тест* OR Т
                 'no_magic=true&order_by=publication_time&' \
                 'area=1&specialization=1.117&' \
                 'search_field=name&' \
-                'page=0'  # &per_page=100
+                'page=0'
 
-req = requests.get((base_url + search_string).encode('utf-8'))
+req = requests.get((config.BASE_URL + search_string).encode('utf-8'))
 
-# Get quantity of pages in response
-pages = 12  # req.json()["pages"]
+# Get quantity of pages in request
+pages = 12
 
 # Put new vacancies to DB
 for page_num in range(0, pages):
-    search_url = base_url + search_string.replace("page=0", "page=" + str(page_num))
+    search_url = config.BASE_URL + search_string.replace("page=0", "page=" + str(page_num))
     resp = requests.get(search_url)
-    s = utils.write_vacancies(resp, base_url)
+    s = utils.write_vacancies(resp, config.BASE_URL)
     print("Items on page: ", len(set(s)))
 
-# Delete vacancies, which contain words from stop list.
 for word in config.STOP_LIST:
     db.delete_vacancy_with_json_like(word=word)
 
-# Drop table 'vac_with_salary' and recreate it
 db.drop_and_recreate_vac_with_salary_table()
 
 if update is False:
-    # Drop table 'charts' with statistics and recreate it
     db.drop_and_recreate_charts_table()
 
 
@@ -83,19 +76,10 @@ for year in years_tuple:
     utils.chart_with_category_filter(
         'frameworks', config.UNIT_FRAMEWORKS, update, year)
 
-    # Count salary
-    for experience in config.EXPERIENCE:
-        print("Опыт: ", experience)
-        median = utils.count_salary_median(experience, config.EXCHANGE_RATES,
-                                           year)
-        if update is True:
-            db.update_charts(chart_name='salary', data=experience,
-                             year=year, popularity=median)
-        else:
-            db.insert_in_charts(chart_name='salary', data=experience,
-                                year=year, popularity=median)
+    utils.count_salary(year=year, update=update)
 
 
+# Count data for current year only charts
 utils.fill_skill_set_chart(update=update)
 utils.fill_top_employers_chart(update=update)
 db.vacuum_db()

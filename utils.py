@@ -157,6 +157,19 @@ def count_salary_types(types: list, chart_name: str, year: int,
                                 popularity=types[_type], year=year)
 
 
+def count_salary(year: int, update: bool) -> NoReturn:
+    """Заполняет таблицу данными для графика зарплат в зависимости от опыта."""
+    for experience in config.EXPERIENCE:
+        print("Опыт: ", experience)
+        median = count_salary_median(experience, config.EXCHANGE_RATES, year)
+        if update is True:
+            db.update_charts(chart_name='salary', data=experience,
+                             year=year, popularity=median)
+        else:
+            db.insert_in_charts(chart_name='salary', data=experience,
+                                year=year, popularity=median)
+
+
 def count_salary_median(experience: str, exchange_rate: float, year: int):
     """Приводит зарплаты к общему виду (нетто, руб.) и записывает в отдельную таблицу для быстрого
     отображения на графике."""
