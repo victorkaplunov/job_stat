@@ -428,7 +428,6 @@ def get_salary_by_category_data():
         salary_list = []
     # Sort by median value.
     data_list.sort(key=lambda row: row[2], reverse=True)
-    print(f'{data_list=}')
     return data_list
 
 
