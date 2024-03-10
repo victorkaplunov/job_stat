@@ -7,13 +7,21 @@
       google.charts.setOnLoadCallback(drawChart);
 
   function drawChart() {
-    var data = google.visualization.arrayToDataTable({{ chart_data | safe }}, true);
-
+    var data = new google.visualization.DataTable();
+    // A column for custom tooltip content
+    data.addColumn({type: 'string'});
+    data.addColumn({type: 'number'});
+    data.addColumn({type: 'number'});
+    data.addColumn({type: 'number'});
+    data.addColumn({type: 'number'});
+    data.addColumn({type: 'string', role: 'tooltip'});
+    data.addRows({{  chart_data | safe  }});
 
     var options = {
       legend:'none',
       orientation: 'vertical',
-      bar: { groupWidth: '50%' }
+      bar: { groupWidth: '50%' },
+      tooltip: {isHtml: false, trigger: 'focus' },
     };
 
     var chart = new google.visualization.CandlestickChart(
