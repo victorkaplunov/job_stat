@@ -101,3 +101,70 @@ class PieChartWithTable(PieChart):
                      <hr>
                      <p>'''
         return self.divs
+
+
+class PieChartWithFilter(BaseChartGenerator):
+
+    def get_data_per_year(self, year: int, chart_name: str, sort=True) -> list[list[str | int]]:
+        """Формирует данные для графика популярности фреймворков юнит-тестирования по годам."""
+        head = [['Framework', 'Popularity', 'Language']]
+        statistics_data = self.db.get_data_for_chart_per_year(year=year, chart_name=chart_name)
+        data_list = []
+        for i in statistics_data:
+            data_list.append([i.data, i.popularity, i.parent])
+        data_list.sort(reverse=True, key=itemgetter(1))
+        return head + data_list
+
+    def generate_script(self):
+        """Генерация функций JavaScript для отдельных графиков"""
+        for year in self.reversed_years:
+            chart_data = self.get_data_per_year(year, self.chart_name)
+            self.charts = self.charts + f"""
+        google.charts.setOnLoadCallback(Chart{year});
+        function Chart{year}() {{
+        var data = google.visualization.arrayToDataTable({chart_data});
+        
+        var dashboard{year} = new google.visualization.Dashboard(
+            document.getElementById('dashboard{year}_div'));
+            
+        var CategoryFilter{year} = new google.visualization.ControlWrapper({{
+          'controlType': 'CategoryFilter',
+          'containerId': 'filter_div{year}',
+          'options': {{
+            'filterColumnLabel': 'Language',
+            'ui': {{
+                'caption': 'Выберите язык',
+                'selectedValuesLayout': 'belowStacked',
+                'labelStacking': 'vertical',
+                'label': 'Языки программирования',
+                'labelStacking': 'vertical'
+            }},
+            'useFormattedValue': true
+          }}
+        }});
+        
+        // Create a pie chart, passing some options
+        var pieChart{year} = new google.visualization.ChartWrapper({{
+          'chartType': 'PieChart',
+          'containerId': 'chart_div{year}',
+          'options': {{
+            'title':'{self.title} в {year} году.',
+            chartArea:{{width:'100%',height:'75%'}},
+            'height':500,
+            'pieSliceText': 'value',
+            'legend': 'right'
+          }}
+        }});
+
+        dashboard{year}.bind(CategoryFilter{year}, pieChart{year});
+        dashboard{year}.draw(data);
+      }}"""
+        return self.charts
+
+    def generate_divs(self):
+        """Генерация разделов в которые будут вставляться графики."""
+        for year in self.reversed_years:
+            self.divs = self.divs + f'''
+        <div id="chart_div{year}"></div>
+        <div id="filter_div{year}"></div>'''
+        return self.divs
