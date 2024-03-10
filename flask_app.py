@@ -1,5 +1,4 @@
 import os
-import copy
 from operator import itemgetter
 import json
 from functools import lru_cache
@@ -10,7 +9,7 @@ from flask_bootstrap import Bootstrap
 import utils
 from db_client import Database
 from config import ConfigObj
-from chart_generator import PieChart, PieChartWithTable
+from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter
 
 db = Database()
 config = ConfigObj()
@@ -234,14 +233,14 @@ def programming_languages():
 @app.route('/unit_test_frameworks')
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
-    chart = 'frameworks'
-    title = 'Популярность фреймворков для юнит-тестирования'
-    result = utils.render_framework_charts(title, chart)
+    chart = PieChartWithFilter(chart_title='Популярность фреймворков для юнит-тестирования',
+                               chart_name='frameworks')
+
     return render_template(
         '/unittesting_frameworks_chart.html',
         title='Популярность фреймворков для юнит-тестирования.',
-        charts_function=result[0],
-        divs=result[1]
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
     )
 
 
