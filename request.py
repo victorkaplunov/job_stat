@@ -20,7 +20,7 @@ update = True
 years_tuple = (config.YEARS[-1],)
 
 # При опции CLI "-r" или "--rebuild", старые данные удаляются и пересчитываются за все годы.
-if args.rebuild is True:
+if args.rebuild:
     update = False
     years_tuple = tuple(config.YEARS)
 
@@ -81,7 +81,7 @@ for year in years_tuple:
 
 # Count data for current year only charts
 utils.fill_skill_set_chart(update=update)
-utils.fill_top_employers_chart(update=update)
+utils.fill_top_employers_chart()
 db.vacuum_db()
 
 username = 'clingon'
