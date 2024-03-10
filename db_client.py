@@ -3,7 +3,6 @@ from typing import Type, Sequence, Any, NoReturn
 
 from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc, text
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 
 from models import Vacancies, Calendar, Charts, VacWithSalary
 from config import ConfigObj
@@ -153,12 +152,10 @@ class Database(metaclass=SingletonMeta):
         self._session.add(row)
         self._session.commit()
 
-    def insert_in_vac_with_salary(self, vac_id: int, published_at: str,
-                                  calc_salary: float, experience: str,
-                                  url: str, description: str) -> NoReturn:
-        row = VacWithSalary(id=vac_id, published_at=published_at,
-                            calc_salary=calc_salary, experience=experience,
-                            url=url, description=description)
+    def insert_in_vac_with_salary(self, item: dict, salary: float) -> NoReturn:
+        row = VacWithSalary(id=item['id'], published_at=str(item['published_at']),
+                            calc_salary=salary, experience=item['experience'],
+                            url=item['alternate_url'], description=item['description'])
         self._session.add(row)
         self._session.commit()
 
