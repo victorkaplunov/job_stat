@@ -107,7 +107,7 @@ class PieChartWithFilter(BaseChartGenerator):
 
     def get_data_per_year(self, year: int, chart_name: str, sort=True) -> list[list[str | int]]:
         """Формирует данные для графика популярности фреймворков юнит-тестирования по годам."""
-        head = [['Framework', 'Popularity', 'Language']]
+        head = [['Framework', 'Popularity', 'Filter']]
         statistics_data = self.db.get_data_for_chart_per_year(year=year, chart_name=chart_name)
         data_list = []
         for i in statistics_data:
@@ -131,7 +131,7 @@ class PieChartWithFilter(BaseChartGenerator):
           'controlType': 'CategoryFilter',
           'containerId': 'filter_div{year}',
           'options': {{
-            'filterColumnLabel': 'Language',
+            'filterColumnLabel': 'Filter',
             'ui': {{
                 'caption': 'Выберите язык',
                 'selectedValuesLayout': 'belowStacked',
