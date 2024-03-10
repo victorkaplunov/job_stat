@@ -388,7 +388,7 @@ def get_data_per_year(year: int, chart_name: str, sort=True) -> list[list[str | 
     return head + data_list
 
 
-def get_vacancies_with_salary(experience) -> str:
+def get_vacancies_with_salary(experience: str) -> str:
     last_month = date.today() - timedelta(days=30)
     response = db.find_vacancy_with_salary_by_substring_per_period(experience=experience,
                                                                    start_day=last_month,
@@ -402,7 +402,12 @@ def get_vacancies_with_salary(experience) -> str:
     return chart_data
 
 
-def get_salary_by_category_data():
+def get_formatted_salary(salary: int) -> str:
+    salary = str(salary)
+    return f'{salary[:-3]} {salary[-3:]}'
+
+
+def get_salary_by_category_data() -> list[list]:
     languages = config.PROGRAM_LANGUAGES
     data_list = []
     salary_list = []
@@ -416,9 +421,9 @@ def get_salary_by_category_data():
             continue
         if len(salary_list) < 10:
             continue
-        tooltip = f'минимум: {round(min(salary_list))}\xa0р.,\n ' \
-                  f'медиана: {round(median)}\xa0р.,\n ' \
-                  f'максимум: {round(max(salary_list))}\xa0р.'
+        tooltip = f'минимум: {get_formatted_salary(round(min(salary_list)))}\xa0р.,\n ' \
+                  f'медиана: {get_formatted_salary(round(median))}\xa0р.,\n ' \
+                  f'максимум: {get_formatted_salary(round(max(salary_list)))}\xa0р.'
         data_list.append(
             [language, min(salary_list), median, median,  max(salary_list), tooltip])
         salary_list = []
