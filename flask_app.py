@@ -146,7 +146,7 @@ def top_employers():
 def salary_by_category():
     """Salary by category"""
     return render_template(
-        '/candlestick.html',
+        '/candle.html',
         chart_data=utils.get_salary_by_category_data(),
         title='Медианная зарплата в зависимости от упоминания языка.'
     )
