@@ -84,7 +84,6 @@ def count_per_year(chart_name: str, categories: list, year: int, update=True) ->
     categories_dict = {i: 0 for i in categories}  # Convert list to dictionary
     categories_dict = categories_dict.fromkeys(categories_dict, 0)  # Reset all values to zero
     for param_type in categories_dict:
-        print(param_type)
         type_count = db.count_vacancy_by_search_phrase_and_year(search_phrase=param_type, year=year)
         if update:
             db.update_charts(chart_name=chart_name, data=param_type,
@@ -104,7 +103,6 @@ def count_types_per_year(types: list, chart_name: str,
         body = json.loads(str(vacancy))
         types[(body[chart_name]['id'])] += 1
     # Write ready data to DB.
-    print(types)
     for _type in types:
         if update:
             db.update_charts(chart_name=chart_name, data=_type,
@@ -134,7 +132,6 @@ def count_salary_types(types: list, chart_name: str, year: int,
                 types['closed'] += 1
 
     # Write ready data to DB.
-    print(types)
     for _type in types:
         if update:
             db.update_charts(chart_name=chart_name, data=_type,
@@ -147,7 +144,6 @@ def count_salary_types(types: list, chart_name: str, year: int,
 def count_salary(year: int, update: bool) -> NoReturn:
     """Заполняет таблицу данными для графика зарплат в зависимости от опыта."""
     for experience in config.EXPERIENCE:
-        print("Опыт: ", experience)
         median = count_salary_median(experience, config.EXCHANGE_RATES, year)
         if update:
             db.update_charts(chart_name='salary', data=experience,
@@ -189,7 +185,6 @@ def count_salary_median(experience: str, exchange_rate: list, year: int):
 
     try:
         average_delta_for_closed_salary = closed_salary_sum/len(closed_salary)
-        print('average_delta_for_closed_salary: ', average_delta_for_closed_salary)
     except ZeroDivisionError:
         print('closed salary list is empty!')
 
@@ -248,14 +243,12 @@ def count_salary_median(experience: str, exchange_rate: list, year: int):
                 db.insert_in_vac_with_salary(salary, calc_salary)
 
     salary_sum = 0
-    print('salary qty: ', len(all_salaries))
     if len(all_salaries) == 0:
         return 0
     else:
         for salary in all_salaries:
             salary_sum += salary
         median_salary = int(statistics.median(all_salaries))
-        print("median: ", median_salary)
         return median_salary
 
 
@@ -423,8 +416,11 @@ def get_salary_by_category_data():
             continue
         if len(salary_list) < 10:
             continue
+        tooltip = f'минимум: {round(min(salary_list))}\xa0р.,\n ' \
+                  f'медиана: {round(median)}\xa0р.,\n ' \
+                  f'максимум: {round(max(salary_list))}\xa0р.'
         data_list.append(
-            [language, min(salary_list), median, median,  max(salary_list)])
+            [language, min(salary_list), median, median,  max(salary_list), tooltip])
         salary_list = []
     # Sort by median value.
     data_list.sort(key=lambda row: row[2], reverse=True)
@@ -465,7 +461,6 @@ def fill_skill_set_chart(update: bool) -> None:
     # Wright first 50 skills data to DB
     counter = 50
     for skill in key_skills_dict:
-        print(skill, key_skills_dict[skill])
         if update:
             db.update_charts(chart_name='key_skills', data=skill,
                              parent=None, year=None,
@@ -514,7 +509,6 @@ def fill_top_employers_chart() -> None:
     # Wright first 50 employers data to DB
     counter = 50
     for employer in employers_dict:
-        print(employer, employers_dict[employer])
         db.insert_in_charts(chart_name='top_employers', data=employer,
                             parent=None, year=None,
                             popularity=employers_dict[employer])

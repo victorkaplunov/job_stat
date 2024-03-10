@@ -131,13 +131,11 @@ class Database(metaclass=SingletonMeta):
         try:
             self._session.add(vacancy)
             self._session.commit()
-        except exc.IntegrityError as err:
-            print(err.args[0])
+        except exc.IntegrityError:
             self._session.rollback()
 
     def update_charts(self, chart_name: str, data: str, popularity: int,
                       year: [int, None], parent: [str, None] = None) -> NoReturn:
-        print(f'{year=}', f'{chart_name=}', f'{parent=}', f'{data=}', f'{popularity=}')
         row = self._session.query(Charts).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name,
                  Charts.parent == parent, Charts.data == data)).one()
@@ -146,7 +144,6 @@ class Database(metaclass=SingletonMeta):
 
     def insert_in_charts(self, chart_name: str, data: str, popularity: int,
                          year: [int, None], parent: [str, None] = None) -> NoReturn:
-        print(f'{year=}', f'{chart_name=}', f'{parent=}', f'{data=}', f'{popularity=}')
         row = Charts(chart_name=chart_name, parent=parent,
                      popularity=popularity, year=year, data=data)
         self._session.add(row)
