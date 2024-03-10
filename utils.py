@@ -1,4 +1,3 @@
-import sqlite3
 import re
 import statistics
 from datetime import datetime, timedelta, date
@@ -6,7 +5,6 @@ from calendar import isleap
 from operator import itemgetter
 import json
 
-import sqlalchemy
 import unicodedata
 import locale
 from typing import NoReturn, Sequence, Any
@@ -35,13 +33,13 @@ def write_vacancies(response: requests, base_url: str) -> list[int]:
 
     vac_list = response.json()["items"]
     items = []
-    for i in vac_list:
-        db.insert_vac_id_to_calendar(vac_id=int(i["id"]), published_at=i["published_at"])
+    for vacancy in vac_list:
+        db.insert_vac_id_to_calendar(vac_id=int(vacancy["id"]), published_at=vacancy["published_at"])
 
         # If vacancy is new, write description to "vacancies" table.
-        if int(i["id"]) not in db.get_all_vacancies_ids():
+        if int(vacancy["id"]) not in db.get_all_vacancies_ids():
             # Get vacancies by ID
-            r = requests.get(base_url + (i["id"]))
+            r = requests.get(base_url + (vacancy["id"]))
             vac = r.json()
             del vac["branded_description"]  # Remove description in HTML format
             json_dump = json.dumps(vac, indent=None, ensure_ascii=False, separators=(', ', ': ', ))
@@ -53,32 +51,31 @@ def write_vacancies(response: requests, base_url: str) -> list[int]:
             cleaner = re.compile('<.*?>')  # Remove HTML tags
             json_dump = re.sub(cleaner, '', json_dump)
             published_at = json.loads(json_dump)['published_at']
-            db.insert_vacancy(vac_id=i['id'], json=json_dump, published_at=published_at)
+            db.insert_vacancy(vac_id=vacancy['id'], json=json_dump, published_at=published_at)
     return items
 
 
 def chart_with_category_filter(chart_name: str, param_list: list, update, year) -> NoReturn:
     """ Function count a number of entries of some string from param_list in all vacancies. """
-    for i in param_list:
-        vac_qty = db.count_vacancy_by_search_phrase_and_year(search_phrase=i[0], year=year)
-        if update is True:
-            if i[0] == 'py.test':
-                db.update_charts(chart_name=chart_name, parent=i[1],
+    for param in param_list:
+        vac_qty = db.count_vacancy_by_search_phrase_and_year(search_phrase=param[0], year=year)
+        if update:
+            if param[0] == 'py.test':
+                db.update_charts(chart_name=chart_name, parent=param[1],
                                  popularity=db.get_pytest_data(year=year) + vac_qty,
                                  year=year, data='pytest')
             else:
-                db.update_charts(chart_name=chart_name, parent=i[1], popularity=vac_qty,
-                                 year=year, data=i[0])
+                db.update_charts(chart_name=chart_name, parent=param[1], popularity=vac_qty,
+                                 year=year, data=param[0])
         else:
-            if i[0] == 'py.test':
-                db.update_charts(chart_name=chart_name, parent=i[1],
+            if param[0] == 'py.test':
+                db.update_charts(chart_name=chart_name, parent=param[1],
                                  popularity=db.get_pytest_data(year=year) + vac_qty,
                                  year=year, data='pytest')
             else:
-                db.insert_in_charts(chart_name=chart_name, data=i[0],
+                db.insert_in_charts(chart_name=chart_name, data=param[0],
                                     popularity=vac_qty,
-                                    parent=i[1], year=year)
-    return
+                                    parent=param[1], year=year)
 
 
 def count_per_year(chart_name: str, categories: list, year: int, update=True) -> NoReturn:
@@ -89,21 +86,12 @@ def count_per_year(chart_name: str, categories: list, year: int, update=True) ->
     for param_type in categories_dict:
         print(param_type)
         type_count = db.count_vacancy_by_search_phrase_and_year(search_phrase=param_type, year=year)
-        if update is True:
+        if update:
             db.update_charts(chart_name=chart_name, data=param_type,
                              popularity=type_count, year=year)
-            # sql = f"""
-            # UPDATE charts
-            # SET popularity = {type_count}
-            # WHERE charts.chart_name = '{chart_name}' AND charts.'data' = '{param_type}'
-            # AND charts.'year' = '{year}';"""
         else:
             db.insert_in_charts(chart_name=chart_name, data=param_type,
                                 popularity=type_count, year=year)
-        #     sql = f"""INSERT INTO charts(chart_name, data, popularity, year)
-        #           VALUES('{chart_name}', '{param_type}', {type_count}, {str(year)});"""
-        # cur.executescript(sql)
-    return
 
 
 def count_types_per_year(types: list, chart_name: str,
@@ -118,20 +106,19 @@ def count_types_per_year(types: list, chart_name: str,
     # Write ready data to DB.
     print(types)
     for _type in types:
-        if update is True:
+        if update:
             db.update_charts(chart_name=chart_name, data=_type,
                              popularity=types[_type], year=year)
         else:
             db.insert_in_charts(chart_name=chart_name, data=_type,
                                 popularity=types[_type], year=year)
-    return
 
 
 def count_salary_types(types: list, chart_name: str, year: int,
                        all_vacancies: Sequence[Row[Any] | RowMapping],
                        update: bool) -> NoReturn:
     # Convert list to dict with zero values.
-    types = {item: 0 for item in types}
+    types = {_type: 0 for _type in types}
     # Count vacancies with given type in given year.
     for vacancy in all_vacancies:
         body = json.loads(str(vacancy))
@@ -149,7 +136,7 @@ def count_salary_types(types: list, chart_name: str, year: int,
     # Write ready data to DB.
     print(types)
     for _type in types:
-        if update is True:
+        if update:
             db.update_charts(chart_name=chart_name, data=_type,
                              popularity=types[_type], year=year)
         else:
@@ -162,7 +149,7 @@ def count_salary(year: int, update: bool) -> NoReturn:
     for experience in config.EXPERIENCE:
         print("Опыт: ", experience)
         median = count_salary_median(experience, config.EXCHANGE_RATES, year)
-        if update is True:
+        if update:
             db.update_charts(chart_name='salary', data=experience,
                              year=year, popularity=median)
         else:
@@ -170,7 +157,7 @@ def count_salary(year: int, update: bool) -> NoReturn:
                                 year=year, popularity=median)
 
 
-def count_salary_median(experience: str, exchange_rate: float, year: int):
+def count_salary_median(experience: str, exchange_rate: list, year: int):
     """Приводит зарплаты к общему виду (нетто, руб.) и записывает в отдельную таблицу для быстрого
     отображения на графике."""
     vacancies = db.get_json_from_vacancies_by_year(year=year)
@@ -178,13 +165,13 @@ def count_salary_median(experience: str, exchange_rate: float, year: int):
     salary_list = []
     for vacancy in vacancies:
         if json.loads(str(vacancy))['experience']['id'] == experience and json.loads(str(vacancy))['salary'] is not None:
-            salary_obj = json.loads(str(vacancy))['salary']
-            salary_obj.update({'id': json.loads(str(vacancy))['id']})
-            salary_obj.update({'published_at': json.loads(str(vacancy))['published_at']})
-            salary_obj.update({'alternate_url': json.loads(str(vacancy))['alternate_url']})
-            salary_obj.update({'experience': json.loads(str(vacancy))['experience']['id']})
-            salary_obj.update({'description': json.loads(str(vacancy))['description']})
-            salary_list.append(salary_obj)
+            salary_dict = json.loads(str(vacancy))['salary']
+            salary_dict.update({'id': json.loads(str(vacancy))['id']})
+            salary_dict.update({'published_at': json.loads(str(vacancy))['published_at']})
+            salary_dict.update({'alternate_url': json.loads(str(vacancy))['alternate_url']})
+            salary_dict.update({'experience': json.loads(str(vacancy))['experience']['id']})
+            salary_dict.update({'description': json.loads(str(vacancy))['description']})
+            salary_list.append(salary_dict)
 
     # Считаем средний разброс для вакансий с закрытым диапазоном
     closed_salary = []
@@ -195,8 +182,8 @@ def count_salary_median(experience: str, exchange_rate: float, year: int):
             closed_salary.append((salary['to'] - salary['from'])*exchange_rate[salary['currency']])
 
     closed_salary_sum = 0
-    for i in closed_salary:
-        closed_salary_sum += i
+    for salary in closed_salary:
+        closed_salary_sum += salary
 
     average_delta_for_closed_salary = 0
 
@@ -206,73 +193,68 @@ def count_salary_median(experience: str, exchange_rate: float, year: int):
     except ZeroDivisionError:
         print('closed salary list is empty!')
 
-    def write_to_vac_with_salary(item, salary):
-        """ Записываем вакансии с указанной зарплатой в промежуточную таблицу vac_with_salary."""
-        db.insert_in_vac_with_salary(vac_id=item['id'], published_at=str(item['published_at']),
-                                     calc_salary=salary, experience=item['experience'],
-                                     url=item['alternate_url'], description=item['description'])
     # Считаем среднюю предполагаемую зарплату с учетом открытых диапазонов и НДФЛ.
-    all_salary = []
-    for i in salary_list:
+    all_salaries = []
+    for salary in salary_list:
         # "Чистая" зарплата
-        if i['gross'] is False:
+        if salary['gross'] is False:
             # закрытый диапазон
-            if (i['from'] is not None) and (i['to'] is not None):
-                calc_salary = (i['from'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']]
+            if (salary['from'] is not None) and (salary['to'] is not None):
+                calc_salary = (salary['from'] + (salary['to'] - salary['from'])/2) * exchange_rate[salary['currency']]
                 if calc_salary < config.MROT:   # Пишем в базу МРОТ, если расчетная ЗП меньше минимальной.
                     calc_salary = config.MROT
-                all_salary.append(calc_salary)
-                write_to_vac_with_salary(i, calc_salary)
+                all_salaries.append(calc_salary)
+                db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вверх
-            elif i['to'] is None:
-                calc_salary = i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary/2
+            elif salary['to'] is None:
+                calc_salary = salary['from'] * exchange_rate[salary['currency']] + average_delta_for_closed_salary/2
                 if calc_salary < config.MROT:
                     calc_salary = config.MROT
-                all_salary.append(calc_salary)
-                write_to_vac_with_salary(i, calc_salary)
+                all_salaries.append(calc_salary)
+                db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вниз
-            elif i['from'] is None:
-                calc_salary = i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary/2
+            elif salary['from'] is None:
+                calc_salary = salary['to'] * exchange_rate[salary['currency']] - average_delta_for_closed_salary/2
                 if calc_salary < config.MROT:
                     calc_salary = config.MROT
-                all_salary.append(calc_salary)
-                write_to_vac_with_salary(i, calc_salary)
+                all_salaries.append(calc_salary)
+                db.insert_in_vac_with_salary(salary, calc_salary)
 
         # "Грязная" зарплата
-        elif i['gross'] is True:
+        elif salary['gross']:
             # закрытый диапазон
-            if (i['from'] is not None) and (i['to'] is not None):
-                gross_salary = (i['from'] + (i['to'] - i['from'])/2) * exchange_rate[i['currency']]
+            if (salary['from'] is not None) and (salary['to'] is not None):
+                gross_salary = (salary['from'] + (salary['to'] - salary['from'])/2) * exchange_rate[salary['currency']]
                 calc_salary = gross_salary - gross_salary * 0.13
                 if calc_salary < config.MROT:
                     calc_salary = config.MROT
-                all_salary.append(calc_salary)
-                write_to_vac_with_salary(i, calc_salary)
+                all_salaries.append(calc_salary)
+                db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вверх
-            elif i['to'] is None:
-                gross_salary = (i['from'] * exchange_rate[i['currency']] + average_delta_for_closed_salary/2)
+            elif salary['to'] is None:
+                gross_salary = (salary['from'] * exchange_rate[salary['currency']] + average_delta_for_closed_salary/2)
                 calc_salary = gross_salary - gross_salary * 0.13
                 if calc_salary < config.MROT:
                     calc_salary = config.MROT
-                all_salary.append(calc_salary)
-                write_to_vac_with_salary(i, calc_salary)
+                all_salaries.append(calc_salary)
+                db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вниз
-            elif i['from'] is None:
-                gross_salary = (i['to'] * exchange_rate[i['currency']] - average_delta_for_closed_salary/2)
+            elif salary['from'] is None:
+                gross_salary = (salary['to'] * exchange_rate[salary['currency']] - average_delta_for_closed_salary/2)
                 calc_salary = gross_salary - gross_salary * 0.13
                 if calc_salary < config.MROT:
                     calc_salary = config.MROT
-                all_salary.append(calc_salary)
-                write_to_vac_with_salary(i, calc_salary)
+                all_salaries.append(calc_salary)
+                db.insert_in_vac_with_salary(salary, calc_salary)
 
     salary_sum = 0
-    print('salary qty: ', len(all_salary))
-    if len(all_salary) == 0:
+    print('salary qty: ', len(all_salaries))
+    if len(all_salaries) == 0:
         return 0
     else:
-        for i in all_salary:
-            salary_sum += i
-        median_salary = int(statistics.median(all_salary))
+        for salary in all_salaries:
+            salary_sum += salary
+        median_salary = int(statistics.median(all_salaries))
         print("median: ", median_salary)
         return median_salary
 
@@ -331,12 +313,11 @@ def get_vacancies_qty_week_by_week() -> list[list[str | int | dict]]:
     return output_list
 
 
-def get_vacancies_qty_by_month_of_year():
+def get_vacancies_qty_by_month_of_year() -> list[list]:
     month_tuples = ((1, 'январь', 31), (2, 'февраль', 28), (3, 'март', 31),
                     (4, 'апрель', 30), (5, 'май', 31), (6, 'июнь', 30),
                     (7, 'июль', 31), (8, 'август', 31), (9, 'сентябрь', 30),
-                    (10, 'октябрь', 31), (11, 'ноябрь', 30), (12, 'декабрь', 31)
-    )
+                    (10, 'октябрь', 31), (11, 'ноябрь', 30), (12, 'декабрь', 31))
 
     years = config.YEARS
     head_time_series = [['Месяц']]
@@ -414,7 +395,7 @@ def get_data_per_year(year: int, chart_name: str, sort=True) -> list[list[str | 
     return head + data_list
 
 
-def get_vacancies_with_salary(experience):
+def get_vacancies_with_salary(experience) -> str:
     last_month = date.today() - timedelta(days=30)
     response = db.find_vacancy_with_salary_by_substring_per_period(experience=experience,
                                                                    start_day=last_month,
@@ -426,70 +407,6 @@ def get_vacancies_with_salary(experience):
         chart_data_list.append(template)
     chart_data = ''.join(chart_data_list)
     return chart_data
-
-
-def get_frameworks_data(year: int, chart_name: str) -> list[list[str | int]]:
-    """Формирует данные для графика популярности фреймворков юнит-тестирования по годам."""
-    head = [['Framework', 'Popularity', 'Language']]
-    statistics_data = db.get_data_for_chart_per_year(year=year, chart_name=chart_name)
-    data_list = []
-    for i in statistics_data:
-        data_list.append([i.data, i.popularity, i.parent])
-    data_list.sort(reverse=True, key=itemgetter(1))
-    return head + data_list
-
-
-def render_framework_charts(title, chart):
-    """Генерация кода JS-функций графиков популярности фреймворков юнит-тестирования по годам."""
-    charts = ''
-    divs = ''
-    for year in reversed_years():
-        data = get_frameworks_data(year, chart)
-        charts = charts + f"""
-        google.charts.setOnLoadCallback(Chart{year});
-        function Chart{year}() {{
-        var data = google.visualization.arrayToDataTable({data});
-        
-        var dashboard{year} = new google.visualization.Dashboard(
-            document.getElementById('dashboard{year}_div'));
-            
-        var CategoryFilter{year} = new google.visualization.ControlWrapper({{
-          'controlType': 'CategoryFilter',
-          'containerId': 'filter_div{year}',
-          'options': {{
-            'filterColumnLabel': 'Language',
-            'ui': {{
-                'caption': 'Выберите язык',
-                'selectedValuesLayout': 'belowStacked',
-                'labelStacking': 'vertical',
-                'label': 'Языки программирования',
-                'labelStacking': 'vertical'
-            }},
-            'useFormattedValue': true
-          }}
-        }});
-        
-        // Create a pie chart, passing some options
-        var pieChart{year} = new google.visualization.ChartWrapper({{
-          'chartType': 'PieChart',
-          'containerId': 'chart_div{year}',
-          'options': {{
-            'title':'{title} в {year} году.',
-            chartArea:{{width:'100%',height:'75%'}},
-            'height':500,
-            'pieSliceText': 'value',
-            'legend': 'right'
-          }}
-        }});
-
-        dashboard{year}.bind(CategoryFilter{year}, pieChart{year});
-        dashboard{year}.draw(data);
-      }}"""
-        # Генерация разделов в которые будут вставляться графики.
-        divs = divs + f'''
-        <div id="chart_div{year}"></div>
-        <div id="filter_div{year}"></div>'''
-    return charts, divs
 
 
 def get_salary_by_category_data():
@@ -542,7 +459,6 @@ def fill_skill_set_chart(update: bool) -> None:
         except KeyError:
             continue
 
-    # Sort dict
     key_skills_dict = dict(sorted(key_skills_dict.items(),
                                   key=lambda item: item[1],
                                   reverse=True))
@@ -551,7 +467,7 @@ def fill_skill_set_chart(update: bool) -> None:
     counter = 50
     for skill in key_skills_dict:
         print(skill, key_skills_dict[skill])
-        if update is True:
+        if update:
             db.update_charts(chart_name='key_skills', data=skill,
                              parent=None, year=None,
                              popularity=key_skills_dict[skill])
@@ -564,20 +480,16 @@ def fill_skill_set_chart(update: bool) -> None:
             break
 
 
-def fill_top_employers_chart(update: bool) -> None:
+def fill_top_employers_chart() -> None:
     """Заполнение данных для графика 'Топ 50 работодателей'."""
     current_year_vacancies = db.get_json_from_vacancies_by_year(config.YEARS[-1])
     # Delete employers data
     db.delete_chart_data(chart_name='top_employers')
-    # sql = f"""DELETE FROM charts WHERE chart_name = 'top_employers';"""
-    # cur.executescript(sql)
-    # conn.commit()
 
     # Populate employers set
     employers = set()
     for vacancy in current_year_vacancies:
-        # Convert JSON description to dict.
-        body = json.loads(vacancy)
+        body = json.loads(str(vacancy))
         try:
             employers.add(body['employer']['name'])
         except IndexError:
@@ -588,7 +500,7 @@ def fill_top_employers_chart(update: bool) -> None:
     # Count employers
     employers_dict = dict.fromkeys(employers, 0)  # Make dict from set
     for vacancy in current_year_vacancies:
-        body = json.loads(vacancy)
+        body = json.loads(str(vacancy))
         employer = body['employer']['name']
         if employer in employers_dict:
             employers_dict[employer] += 1
@@ -607,19 +519,6 @@ def fill_top_employers_chart(update: bool) -> None:
         db.insert_in_charts(chart_name='top_employers', data=employer,
                             parent=None, year=None,
                             popularity=employers_dict[employer])
-        # sql = f"""
-        # INSERT INTO charts(chart_name, data, popularity)
-        # VALUES("top_employers", "{employer}", {employers_dict[employer]});"""
-        # try:
-        #     cur.executescript(sql)
-        # except sqlite3.IntegrityError as error:
-        #     print("Error: ", error)
-        # sql = f"""
-        # UPDATE charts
-        # SET popularity = {employers_dict[employer]}
-        # WHERE data = '{employer}' AND chart_name = 'top_employers';"""
-        # cur.executescript(sql)
-        # conn.commit()
         counter -= 1
         if counter == 0:
             break
