@@ -18,10 +18,11 @@
     data.addRows({{  chart_data | safe  }});
 
     var options = {
-      legend:'none',
-      orientation: 'vertical',
-      bar: { groupWidth: '50%' },
-      tooltip: {isHtml: false, trigger: 'focus' },
+        title: "Уровень зарплаты в зависимости от упоминания языка",
+        legend:'none',
+        orientation: 'vertical',
+        bar: { groupWidth: '50%' },
+        tooltip: {isHtml: false, trigger: 'focus' },
     };
 
     var chart = new google.visualization.CandlestickChart(
