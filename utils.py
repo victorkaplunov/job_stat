@@ -2,7 +2,6 @@ import re
 import statistics
 from datetime import datetime, timedelta, date
 from calendar import isleap
-from operator import itemgetter
 import json
 
 import unicodedata
@@ -355,7 +354,8 @@ def get_data_for_horizontal_bar_chart(chart_name: str) -> list[list[str | int]]:
 
 
 def get_salary_data_per_year() -> list[list[str | int]]:
-    experience_ranges = dict(noExperience=[], between1And3=[], between3And6=[], moreThan6=[])
+    # Convert list to dict with empty lists values.
+    experience_ranges = {_type: list() for _type in config.EXPERIENCE}
 
     data = [['Range']]
     for year in config.YEARS:
@@ -370,22 +370,6 @@ def get_salary_data_per_year() -> list[list[str | int]]:
         rang_data.insert(0, config.TRANSLATIONS[i])
         data.append(rang_data)
     return data
-
-
-def get_data_per_year(year: int, chart_name: str, sort=True) -> list[list[str | int]]:
-    """Формирует данные для графиков по годам на основе запроса в БД."""
-    head = [['Type', 'Popularity']]
-    statistics_data = db.get_data_for_chart_per_year(year=year, chart_name=chart_name)
-    data_list = []
-    for i in statistics_data:
-        # Переводим параметры для перечисленных видов графиков
-        if chart_name in ['schedule_type', 'employment_type', 'experience', 'with_salary']:
-            row = [config.TRANSLATIONS[i.data], i.popularity]
-            data_list.append(row)
-        else:  # Для остальных не переводим
-            data_list.append([i.data, i.popularity])
-    data_list.sort(reverse=sort, key=itemgetter(1))
-    return head + data_list
 
 
 def get_vacancies_with_salary(experience: str) -> str:
