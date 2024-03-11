@@ -421,9 +421,10 @@ def get_salary_by_category_data() -> list[list]:
             continue
         if len(salary_list) < 10:
             continue
-        tooltip = f'минимум: {get_formatted_salary(round(min(salary_list)))}\xa0р.,\n ' \
-                  f'медиана: {get_formatted_salary(round(median))}\xa0р.,\n ' \
-                  f'максимум: {get_formatted_salary(round(max(salary_list)))}\xa0р.'
+        tooltip = f'минимум: {get_formatted_salary(round(min(salary_list)))}\xa0р.\n' \
+                  f'медиана: {get_formatted_salary(round(median))}\xa0р.\n' \
+                  f'максимум: {get_formatted_salary(round(max(salary_list)))}\xa0р.\n' \
+                  f'на данных {len(salary_list)} вакансий'
         data_list.append(
             [language, min(salary_list), median, median,  max(salary_list), tooltip])
         salary_list = []
