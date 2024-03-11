@@ -129,7 +129,6 @@ def salary():
 def top_employers():
     """Employers by vacancies quantity page"""
     key_skills_list = utils.get_data_for_horizontal_bar_chart('top_employers')
-    print(f'{key_skills_list=}')
     for i in key_skills_list:
         i.append(i[0])
     sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
