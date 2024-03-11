@@ -147,6 +147,7 @@ def salary_by_category():
     return render_template(
         '/candle.html',
         chart_data=utils.get_salary_by_category_data(),
+        year=config.YEARS[-1],
         title='Медианная зарплата в зависимости от упоминания языка.'
     )
 
