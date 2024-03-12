@@ -125,6 +125,17 @@ def salary():
         moreThan6e_salary=utils.get_vacancies_with_salary(experience='moreThan6'))
 
 
+@app.route('/salary_by_category')
+def salary_by_category():
+    """Salary by category"""
+    return render_template(
+        '/candle.html',
+        chart_data=utils.get_salary_by_category_data(),
+        year=config.YEARS[-1],
+        title='Медианная зарплата в зависимости от упоминания языка.'
+    )
+
+
 @app.route('/top_employers')
 def top_employers():
     """Employers by vacancies quantity page"""
@@ -138,17 +149,6 @@ def top_employers():
                            subtitle=chart.subtitle,
                            charts_function=chart.generate_script(chart_name=chart.chart_name),
                            divs=chart.generate_divs())
-
-
-@app.route('/salary_by_category')
-def salary_by_category():
-    """Salary by category"""
-    return render_template(
-        '/candle.html',
-        chart_data=utils.get_salary_by_category_data(),
-        year=config.YEARS[-1],
-        title='Медианная зарплата в зависимости от упоминания языка.'
-    )
 
 
 @app.route('/schedule')
