@@ -250,7 +250,7 @@ def unit_test_frameworks():
 
 
 @app.route('/load_testing_tools')
-def load_testing_tool():
+def load_testing_tools():
     """Load testing tools page"""
     chart = PieChart(chart_title='Популярность инструментов тестирования производительностия',
                      chart_name='load_testing_tools')
