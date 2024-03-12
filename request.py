@@ -29,7 +29,6 @@ for page_num in range(0, config.PAGES_QTY):
     search_url = config.BASE_URL + config.SEARCH_STRING.replace("page=0", "page=" + str(page_num))
     resp = requests.get(search_url)
     s = utils.write_vacancies(resp, config.BASE_URL)
-    print("Items on page: ", len(set(s)))
 
 for word in config.STOP_LIST:
     db.delete_vacancy_with_json_like(word=word)
@@ -94,7 +93,6 @@ base_url = f'https://www.pythonanywhere.com/api/v0/user/{username}/'
 # Get first webapps name
 response = requests.get(base_url + 'webapps/', headers=headers)
 domain_name = response.json()[0]['domain_name']
-print(domain_name)
 
 # Reload first webapps
 response = requests.post(base_url + f'webapps/{domain_name}/reload/', headers=headers)
