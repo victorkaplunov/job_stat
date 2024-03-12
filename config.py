@@ -18,7 +18,7 @@ class ConfigObj:
     YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
 
     STOP_LIST = ['Формовщик теста', 'тестомес', 'Тестомес',
-                 'Key Account Manager']
+                 'Key Account Manager', 'Комплектовщик-Тестировщик']
     # ToDo: Запрашивать в API, включая обменный курс.
     EXCHANGE_RATES = {'RUR': 1, 'EUR': 86,
                       'USD': 73, 'UAH': 2.58,
