@@ -3,6 +3,7 @@ import statistics
 from datetime import datetime, timedelta, date
 from calendar import isleap
 import json
+from operator import itemgetter
 
 import unicodedata
 import locale
@@ -350,7 +351,10 @@ def get_vacancies_qty_by_month_of_year() -> list[list]:
 def get_data_for_horizontal_bar_chart(chart_name: str) -> list[list[str | int]]:
     statistics_data = db.get_data_for_chart(chart_name=chart_name)
     data_list = [[i.data, i.popularity] for i in statistics_data]
-    return data_list
+    for i in data_list:
+        i.append(i[0])
+    sorted_list = sorted(data_list, key=itemgetter(1), reverse=True)
+    return sorted_list
 
 
 def get_salary_data_per_year() -> list[list[str | int]]:

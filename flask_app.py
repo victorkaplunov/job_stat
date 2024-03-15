@@ -129,16 +129,11 @@ def salary():
 def top_employers():
     """Employers by vacancies quantity page"""
     key_skills_list = utils.get_data_for_horizontal_bar_chart('top_employers')
-    for i in key_skills_list:
-        i.append(i[0])
-    sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
     current_year = config.YEARS[-1]
-    return render_template(
-        '/horizontal_bar.html',
-        title='Топ 50 работодателей',
-        subtitle=f'по количеству вакансий в {current_year} году.',
-        chart_data=sorted_key_skills_list
-    )
+    return render_template('/horizontal_bar.html',
+                           title='Топ 50 работодателей',
+                           subtitle=f'по количеству вакансий в {current_year} году.',
+                           chart_data=key_skills_list)
 
 
 @app.route('/salary_by_category')
@@ -206,15 +201,10 @@ def with_salary():
 def key_skills():
     """Key skills popularity page"""
     key_skills_list = utils.get_data_for_horizontal_bar_chart('key_skills')
-    for i in key_skills_list:
-        i.append(i[0])
-    sorted_key_skills_list = sorted(key_skills_list, key=itemgetter(1), reverse=True)
-    return render_template(
-        '/horizontal_bar.html',
-        title='Ключевые навыки.',
-        subtitle='Пятьдесят наиболее популярных тегов',
-        chart_data=sorted_key_skills_list[:50]
-    )
+    return render_template('/horizontal_bar.html',
+                           title='Ключевые навыки.',
+                           subtitle='Пятьдесят наиболее популярных тегов',
+                           chart_data=key_skills_list)
 
 
 @app.route('/programming_languages')
