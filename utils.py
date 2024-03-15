@@ -10,9 +10,9 @@ import locale
 from typing import NoReturn, Sequence, Any
 
 import requests
-from sqlalchemy import RowMapping, Row
+from sqlalchemy import RowMapping, Row, exc
 
-from db_client import Database
+from db.db_client import Database
 from config import ConfigObj
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
@@ -456,9 +456,15 @@ def fill_skill_set_chart(update: bool) -> None:
     counter = 50
     for skill in key_skills_dict:
         if update:
-            db.update_charts(chart_name='key_skills', data=skill,
-                             parent=None, year=None,
-                             popularity=key_skills_dict[skill])
+            try:
+                db.update_charts(chart_name='key_skills', data=skill,
+                                 parent=None, year=None,
+                                 popularity=key_skills_dict[skill])
+            except exc.NoResultFound:
+                db.insert_in_charts(chart_name='key_skills', data=skill,
+                                    parent=None, year=None,
+                                    popularity=key_skills_dict[skill])
+
         else:
             db.insert_in_charts(chart_name='key_skills', data=skill,
                                 parent=None, year=None,
