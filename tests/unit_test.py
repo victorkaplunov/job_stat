@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from db_client import Database
+from db.db_client import Database
 from config import ConfigObj
 
 db = Database()

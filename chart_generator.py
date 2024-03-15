@@ -1,7 +1,7 @@
 import copy
 from operator import itemgetter
 
-from db_client import Database
+from db.db_client import Database
 from config import ConfigObj
 
 

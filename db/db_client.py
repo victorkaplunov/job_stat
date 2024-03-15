@@ -4,7 +4,7 @@ from typing import Type, Sequence, Any, NoReturn
 from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc, text
 from sqlalchemy.orm import sessionmaker
 
-from models import Vacancies, Calendar, Charts, VacWithSalary
+from db.models import Vacancies, Calendar, Charts, VacWithSalary
 from config import ConfigObj
 
 

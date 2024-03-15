@@ -5,7 +5,7 @@ import requests
 
 import utils
 from config import ConfigObj
-import db_client
+from db import db_client
 
 db = db_client.Database()
 config = ConfigObj()

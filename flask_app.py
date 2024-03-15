@@ -1,5 +1,4 @@
 import os
-from operator import itemgetter
 import json
 from functools import lru_cache
 
@@ -7,7 +6,7 @@ from flask import Flask, send_from_directory, url_for, render_template
 from flask_bootstrap import Bootstrap
 
 import utils
-from db_client import Database
+from db.db_client import Database
 from config import ConfigObj
 from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter
 
