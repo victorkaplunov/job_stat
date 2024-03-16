@@ -55,9 +55,9 @@ def write_vacancies(response: requests, base_url: str) -> list[int]:
     return items
 
 
-def chart_with_category_filter(chart_name: str, param_list: list, update, year) -> NoReturn:
+def chart_with_category_filter(types: list, chart_name: str, update, year) -> NoReturn:
     """ Function count a number of entries of some string from param_list in all vacancies. """
-    for param in param_list:
+    for param in types:
         vac_qty = db.count_vacancy_by_search_phrase_and_year(search_phrase=param[0], year=year)
         if update:
             if param[0] == 'py.test':

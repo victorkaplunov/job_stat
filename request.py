@@ -70,11 +70,13 @@ for year in years_tuple:
                                all_vacancies=all_vacancies_jsons,
                                year=year, update=update)
 
-    utils.count_salary_types(config.WITH_SALARY, 'with_salary', year,
-                             all_vacancies_jsons, update)
+    utils.count_salary_types(types=config.WITH_SALARY, chart_name='with_salary',
+                             all_vacancies=all_vacancies_jsons,
+                             year=year, update=update)
 
-    utils.chart_with_category_filter(
-        'frameworks', config.UNIT_FRAMEWORKS, update, year)
+    utils.chart_with_category_filter(types=config.UNIT_FRAMEWORKS,
+                                     chart_name='frameworks',
+                                     year=year, update=update)
 
     utils.count_salary(year=year, update=update)
 
