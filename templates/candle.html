@@ -28,12 +28,6 @@
     var chart = new google.visualization.CandlestickChart(
     document.getElementById('chart_div')
     );
-<!--    // Wait for the chart to finish drawing before calling the getImageURI() method.-->
-<!--      google.visualization.events.addListener(chart, 'ready', function () {-->
-<!--        chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';-->
-<!--        console.log(chart_div.innerHTML);-->
-<!--      });-->
-
     chart.draw(data, options);
   }
     </script>
