@@ -204,14 +204,14 @@ def count_salary_median(experience: str, exchange_rate: list, year: int):
             elif salary['to'] is None:
                 calc_salary = salary['from'] * exchange_rate[salary['currency']] + average_delta_for_closed_salary/2
                 if calc_salary < config.MROT:
-                    calc_salary = config.MROT
+                    continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вниз
             elif salary['from'] is None:
                 calc_salary = salary['to'] * exchange_rate[salary['currency']] - average_delta_for_closed_salary/2
                 if calc_salary < config.MROT:
-                    calc_salary = config.MROT
+                    continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
 
@@ -222,7 +222,7 @@ def count_salary_median(experience: str, exchange_rate: list, year: int):
                 gross_salary = (salary['from'] + (salary['to'] - salary['from'])/2) * exchange_rate[salary['currency']]
                 calc_salary = gross_salary - gross_salary * 0.13
                 if calc_salary < config.MROT:
-                    calc_salary = config.MROT
+                    continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вверх
@@ -230,7 +230,7 @@ def count_salary_median(experience: str, exchange_rate: list, year: int):
                 gross_salary = (salary['from'] * exchange_rate[salary['currency']] + average_delta_for_closed_salary/2)
                 calc_salary = gross_salary - gross_salary * 0.13
                 if calc_salary < config.MROT:
-                    calc_salary = config.MROT
+                    continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вниз
@@ -238,7 +238,7 @@ def count_salary_median(experience: str, exchange_rate: list, year: int):
                 gross_salary = (salary['to'] * exchange_rate[salary['currency']] - average_delta_for_closed_salary/2)
                 calc_salary = gross_salary - gross_salary * 0.13
                 if calc_salary < config.MROT:
-                    calc_salary = config.MROT
+                    continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
 
