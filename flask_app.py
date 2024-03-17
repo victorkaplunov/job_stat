@@ -133,6 +133,7 @@ def top_employers():
         chart_subtitle=f'по количеству вакансий в {config.YEARS[-1]} году.',
         chart_name='top_employers')
     return render_template('/horizontal_bar.html',
+                           package=chart.package,
                            title=chart.title,
                            subtitle=chart.subtitle,
                            charts_function=chart.generate_script(chart_name=chart.chart_name),
@@ -157,6 +158,7 @@ def schedule():
                      chart_name='schedule')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Режимы работы.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -169,6 +171,7 @@ def employment():
                               chart_name='employment')
     return render_template(
         '/employment.html',
+        package=chart.package,
         title='Виды занятости.',
         charts_function=chart.generate_script() + chart.generate_table_script(),
         divs=chart.generate_divs()
@@ -182,6 +185,7 @@ def experience():
                      chart_name='experience')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Требуемый опыт работы.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -194,6 +198,7 @@ def with_salary():
                      chart_name='with_salary')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Количество вакансий с указанной зарплатой.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -208,6 +213,7 @@ def key_skills():
         chart_subtitle=f'Пятьдесят наиболее популярных тегов в {config.YEARS[-1]} году.',
         chart_name='key_skills')
     return render_template('/horizontal_bar.html',
+                           package=chart.package,
                            title=chart.title,
                            subtitle=chart.subtitle,
                            charts_function=chart.generate_script(chart_name=chart.chart_name),
@@ -221,6 +227,7 @@ def programming_languages():
                      chart_name='languages')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Популярность языков программирования.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -235,6 +242,7 @@ def unit_test_frameworks():
 
     return render_template(
         '/unittesting_frameworks_chart.html',
+        package=chart.package,
         title='Популярность фреймворков для юнит-тестирования.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -248,6 +256,7 @@ def load_testing_tool():
                      chart_name='load_testing_tools')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Средства нагрузочного тестирования.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -261,6 +270,7 @@ def monitoring_tools():
                      chart_name='monitoring')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Популярность различных средств мониторинга.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -274,6 +284,7 @@ def bdd_frameworks():
                      chart_name='bdd_frameworks')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Популярность фреймворков BDD.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -287,6 +298,7 @@ def web_ui_tools():
                      chart_name='web_ui_tools')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Популярность средства тестирования Web UI.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -300,6 +312,7 @@ def mobile_testing_frameworks():
                      chart_name='mobile_testing_frameworks')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Популярность инструментов тестирования мобильных приложений.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -313,6 +326,7 @@ def bugtracking_n_tms():
                      chart_name='bugtracking_n_tms')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Популярность систем управления тестированием, bugtracking system и т.п.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -326,6 +340,7 @@ def cvs():
                      chart_name='cvs')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Популярность систем управления версиями.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
@@ -339,6 +354,7 @@ def ci_cd():
                      chart_name='ci_cd')
     return render_template(
         '/pie_chart_with_year.html',
+        package=chart.package,
         title='Популярность средств CI/CD.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()

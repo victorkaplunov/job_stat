@@ -3,17 +3,12 @@
     {{ super() }}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-
-      // Load the Visualization API and the controls package.
-      google.charts.load('current', {'packages':['corechart', 'controls']});
-
-      // Set a callback to run when the Google Visualization API is loaded.
-    {{ charts_function | safe }}
+      google.charts.load('current', {'packages':{{ package | safe }}});
+      {{ charts_function | safe }}
     </script>
 {% endblock %}
-
-{% block title %}Home Page{% endblock %}
+  {% block title %}Home Page{% endblock %}
   {% block content %}
-  {{ divs | safe }}
+        {{ divs | safe }}
 {% endblock %}
 </html>

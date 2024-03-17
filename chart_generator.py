@@ -11,6 +11,7 @@ class BaseChartGenerator:
         self.title = chart_title
         self.subtitle = chart_subtitle
         self.chart_name = chart_name
+        self.package = []
         self.charts = ''
         self.divs = ''
         self.db = Database()
@@ -37,6 +38,9 @@ class BaseChartGenerator:
 
 class PieChart(BaseChartGenerator):
     """Класс генерации JS функций и данных для круговой диаграммы."""
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
+        super().__init__(chart_name, chart_title, chart_subtitle)
+        self.package = ['corechart']
 
     def generate_script(self):
         """Генерация функций JavaScript для отдельных графиков"""
@@ -64,6 +68,10 @@ class PieChart(BaseChartGenerator):
 
 class PieChartWithTable(PieChart):
     """Класс генерации JS функций и данных для круговой диаграммы с таблицей данных."""
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
+        super().__init__(chart_name, chart_title, chart_subtitle)
+        self.package = ['corechart', 'table']
+
     def generate_table_script(self):
         table = ''
         for year in self.reversed_years:
@@ -106,6 +114,9 @@ class PieChartWithTable(PieChart):
 
 
 class PieChartWithFilter(BaseChartGenerator):
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
+        super().__init__(chart_name, chart_title, chart_subtitle)
+        self.package = ['corechart', 'controls']
 
     def get_data_per_year(self, year: int, chart_name: str, sort=True) -> list[list[str | int]]:
         """Формирует данные для графика популярности фреймворков юнит-тестирования по годам."""
@@ -173,6 +184,10 @@ class PieChartWithFilter(BaseChartGenerator):
 
 
 class HorizontalBarChart(BaseChartGenerator):
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
+        super().__init__(chart_name, chart_title, chart_subtitle)
+        self.package = ['bar']
+
     def get_data_for_chart(self, chart_name: str) -> list[list[str | int]]:
         """Формирует данные для графика с горизонтальным столбцами."""
         statistics_data = self.db.get_data_for_chart(chart_name=chart_name)
