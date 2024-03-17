@@ -7,8 +7,9 @@ from config import ConfigObj
 
 class BaseChartGenerator:
     """Базовый класс генерации JS-скриптов графиков."""
-    def __init__(self, chart_name: str, chart_title: str):
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
         self.title = chart_title
+        self.subtitle = chart_subtitle
         self.chart_name = chart_name
         self.charts = ''
         self.divs = ''
@@ -36,6 +37,7 @@ class BaseChartGenerator:
 
 class PieChart(BaseChartGenerator):
     """Класс генерации JS функций и данных для круговой диаграммы."""
+
     def generate_script(self):
         """Генерация функций JavaScript для отдельных графиков"""
         for year in self.reversed_years:
@@ -168,3 +170,46 @@ class PieChartWithFilter(BaseChartGenerator):
         <div id="chart_div{year}"></div>
         <div id="filter_div{year}"></div>'''
         return self.divs
+
+
+class HorizontalBarChart(BaseChartGenerator):
+    def get_data_for_chart(self, chart_name: str) -> list[list[str | int]]:
+        """Формирует данные для графика с горизонтальным столбцами."""
+        statistics_data = self.db.get_data_for_chart(chart_name=chart_name)
+        data_list = [[i.data, i.popularity] for i in statistics_data]
+        for i in data_list:
+            i.append(i[0])
+        sorted_list = sorted(data_list, key=itemgetter(1), reverse=True)
+        return sorted_list
+
+    def generate_script(self, chart_name: str):
+        """Генерация функций JavaScript для отдельных графиков"""
+        chart_data = self.get_data_for_chart(chart_name=chart_name)
+        self.charts = f"""
+                google.charts.setOnLoadCallback(drawStuff);
+
+              function drawStuff() {{
+                var head = [['', 'количество', {{ role: 'annotation' }}]]
+                head = head.concat({ chart_data});
+                var data = new google.visualization.arrayToDataTable(head);
+    
+                var options = {{
+                  title: '{self.title}',
+                  width: '10%',
+                  legend: {{ position: 'none' }},
+                  chart: {{ title: '{self.title}',
+                           subtitle: '{self.subtitle}' }},
+                  bars: 'horizontal', // Required for Material Bar Charts.
+                  hAxes: {{textPosition: 'in' }},
+                  bar: {{ groupWidth: "90%" }}
+               }};
+        
+                var chart = new google.charts.Bar(document.getElementById('chart'));
+                chart.draw(data, options);
+                }}"""
+        return self.charts
+
+    @staticmethod
+    def generate_divs():
+        """Генерация разделов в которые будут вставляться графики."""
+        return '''<div id="chart" style="height: 1000px;"></div>'''

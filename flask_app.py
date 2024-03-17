@@ -8,7 +8,8 @@ from flask_bootstrap import Bootstrap
 import utils
 from db.db_client import Database
 from config import ConfigObj
-from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter
+from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter,\
+    HorizontalBarChart
 
 db = Database()
 config = ConfigObj()
@@ -127,12 +128,15 @@ def salary():
 @app.route('/top_employers')
 def top_employers():
     """Employers by vacancies quantity page"""
-    key_skills_list = utils.get_data_for_horizontal_bar_chart('top_employers')
-    current_year = config.YEARS[-1]
+    chart = HorizontalBarChart(
+        chart_title='Топ 50 работодателей',
+        chart_subtitle=f'по количеству вакансий в {config.YEARS[-1]} году.',
+        chart_name='top_employers')
     return render_template('/horizontal_bar.html',
-                           title='Топ 50 работодателей',
-                           subtitle=f'по количеству вакансий в {current_year} году.',
-                           chart_data=key_skills_list)
+                           title=chart.title,
+                           subtitle=chart.subtitle,
+                           charts_function=chart.generate_script(chart_name=chart.chart_name),
+                           divs=chart.generate_divs())
 
 
 @app.route('/salary_by_category')
@@ -199,11 +203,15 @@ def with_salary():
 @app.route('/key_skills')
 def key_skills():
     """Key skills popularity page"""
-    key_skills_list = utils.get_data_for_horizontal_bar_chart('key_skills')
+    chart = HorizontalBarChart(
+        chart_title='Ключевые навыки.',
+        chart_subtitle=f'Пятьдесят наиболее популярных тегов в {config.YEARS[-1]} году.',
+        chart_name='key_skills')
     return render_template('/horizontal_bar.html',
-                           title='Ключевые навыки.',
-                           subtitle='Пятьдесят наиболее популярных тегов',
-                           chart_data=key_skills_list)
+                           title=chart.title,
+                           subtitle=chart.subtitle,
+                           charts_function=chart.generate_script(chart_name=chart.chart_name),
+                           divs=chart.generate_divs())
 
 
 @app.route('/programming_languages')
