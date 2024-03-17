@@ -132,7 +132,7 @@ def top_employers():
         chart_title='Топ 50 работодателей',
         chart_subtitle=f'по количеству вакансий в {config.YEARS[-1]} году.',
         chart_name='top_employers')
-    return render_template('/horizontal_bar.html',
+    return render_template('/simple_chart.html',
                            package=chart.package,
                            title=chart.title,
                            subtitle=chart.subtitle,
@@ -157,7 +157,7 @@ def schedule():
     chart = PieChart(chart_title='Популярность режимов работы',
                      chart_name='schedule')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Режимы работы.',
         charts_function=chart.generate_script(),
@@ -170,7 +170,7 @@ def employment():
     chart = PieChartWithTable(chart_title='Виды занятости',
                               chart_name='employment')
     return render_template(
-        '/employment.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Виды занятости.',
         charts_function=chart.generate_script() + chart.generate_table_script(),
@@ -184,7 +184,7 @@ def experience():
     chart = PieChart(chart_title='Требования к опыту ',
                      chart_name='experience')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Требуемый опыт работы.',
         charts_function=chart.generate_script(),
@@ -197,7 +197,7 @@ def with_salary():
     chart = PieChart(chart_title='Количество вакансий с указанной зарплатой',
                      chart_name='with_salary')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Количество вакансий с указанной зарплатой.',
         charts_function=chart.generate_script(),
@@ -212,7 +212,7 @@ def key_skills():
         chart_title='Ключевые навыки.',
         chart_subtitle=f'Пятьдесят наиболее популярных тегов в {config.YEARS[-1]} году.',
         chart_name='key_skills')
-    return render_template('/horizontal_bar.html',
+    return render_template('/simple_chart.html',
                            package=chart.package,
                            title=chart.title,
                            subtitle=chart.subtitle,
@@ -226,7 +226,7 @@ def programming_languages():
     chart = PieChart(chart_title='Популярность языков программирования',
                      chart_name='languages')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность языков программирования.',
         charts_function=chart.generate_script(),
@@ -241,7 +241,7 @@ def unit_test_frameworks():
                                chart_name='frameworks')
 
     return render_template(
-        '/unittesting_frameworks_chart.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность фреймворков для юнит-тестирования.',
         charts_function=chart.generate_script(),
@@ -255,7 +255,7 @@ def load_testing_tool():
     chart = PieChart(chart_title='Популярность инструментов тестирования производительностия',
                      chart_name='load_testing_tools')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Средства нагрузочного тестирования.',
         charts_function=chart.generate_script(),
@@ -269,7 +269,7 @@ def monitoring_tools():
     chart = PieChart(chart_title='Популярность различных средств мониторинга',
                      chart_name='monitoring')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность различных средств мониторинга.',
         charts_function=chart.generate_script(),
@@ -283,7 +283,7 @@ def bdd_frameworks():
     chart = PieChart(chart_title='Популярность фреймворков BDD',
                      chart_name='bdd_frameworks')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность фреймворков BDD.',
         charts_function=chart.generate_script(),
@@ -297,7 +297,7 @@ def web_ui_tools():
     chart = PieChart(chart_title='Популярность средства тестирования Web UI',
                      chart_name='web_ui_tools')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность средства тестирования Web UI.',
         charts_function=chart.generate_script(),
@@ -311,7 +311,7 @@ def mobile_testing_frameworks():
     chart = PieChart(chart_title='Популярность инструментов тестирования мобильных приложений',
                      chart_name='mobile_testing_frameworks')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность инструментов тестирования мобильных приложений.',
         charts_function=chart.generate_script(),
@@ -325,7 +325,7 @@ def bugtracking_n_tms():
     chart = PieChart(chart_title='Популярность систем управления тестированием, bugtracking system и т.п.',
                      chart_name='bugtracking_n_tms')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность систем управления тестированием, bugtracking system и т.п.',
         charts_function=chart.generate_script(),
@@ -339,7 +339,7 @@ def cvs():
     chart = PieChart(chart_title='Популярность систем управления версиями',
                      chart_name='cvs')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность систем управления версиями.',
         charts_function=chart.generate_script(),
@@ -353,7 +353,7 @@ def ci_cd():
     chart = PieChart(chart_title='Популярность средств CI/CD',
                      chart_name='ci_cd')
     return render_template(
-        '/pie_chart_with_year.html',
+        '/simple_chart.html',
         package=chart.package,
         title='Популярность средств CI/CD.',
         charts_function=chart.generate_script(),
