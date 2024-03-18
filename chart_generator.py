@@ -7,11 +7,12 @@ from config import ConfigObj
 
 class BaseChartGenerator:
     """Базовый класс генерации JS-скриптов графиков."""
-    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
-        self.title = chart_title
-        self.subtitle = chart_subtitle
-        self.chart_name = chart_name
-        self.package = []
+    def __init__(self, name: str, title: str, package=None, subtitle=''):
+        if package is None:
+            self.package = []
+        self.title = title
+        self.subtitle = subtitle
+        self.name = name
         self.charts = ''
         self.divs = ''
         self.db = Database()
@@ -38,14 +39,14 @@ class BaseChartGenerator:
 
 class PieChart(BaseChartGenerator):
     """Класс генерации JS функций и данных для круговой диаграммы."""
-    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
-        super().__init__(chart_name, chart_title, chart_subtitle)
+    def __init__(self, name: str, title: str, subtitle=''):
+        super().__init__(name, title, subtitle)
         self.package = ['corechart']
 
     def generate_script(self):
         """Генерация функций JavaScript для отдельных графиков"""
         for year in self.reversed_years:
-            chart_data = self.get_data_per_year(year, self.chart_name)
+            chart_data = self.get_data_per_year(year, self.name)
             self.charts = self.charts + f'''
                 google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
                 function drawScheduleTypeChart{year}() {{
@@ -68,14 +69,14 @@ class PieChart(BaseChartGenerator):
 
 class PieChartWithTable(PieChart):
     """Класс генерации JS функций и данных для круговой диаграммы с таблицей данных."""
-    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
-        super().__init__(chart_name, chart_title, chart_subtitle)
+    def __init__(self, name: str, title: str, subtitle=''):
+        super().__init__(name, title, subtitle)
         self.package = ['corechart', 'table']
 
     def generate_table_script(self):
         table = ''
         for year in self.reversed_years:
-            table_data = self.get_data_per_year(year, self.chart_name)
+            table_data = self.get_data_per_year(year, self.name)
             table_data = copy.deepcopy(table_data)
             table_data.remove(['Type', 'Popularity'])
             sum_vac = 0
@@ -114,8 +115,9 @@ class PieChartWithTable(PieChart):
 
 
 class PieChartWithFilter(BaseChartGenerator):
-    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
-        super().__init__(chart_name, chart_title, chart_subtitle)
+    """Секторная диаграмма с фильтром"""
+    def __init__(self, name: str, title: str, subtitle=''):
+        super().__init__(name, title, subtitle)
         self.package = ['corechart', 'controls']
 
     def get_data_per_year(self, year: int, chart_name: str, sort=True) -> list[list[str | int]]:
@@ -131,7 +133,7 @@ class PieChartWithFilter(BaseChartGenerator):
     def generate_script(self):
         """Генерация функций JavaScript для отдельных графиков"""
         for year in self.reversed_years:
-            chart_data = self.get_data_per_year(year, self.chart_name)
+            chart_data = self.get_data_per_year(year, self.name)
             self.charts = self.charts + f"""
         google.charts.setOnLoadCallback(Chart{year});
         function Chart{year}() {{
@@ -184,8 +186,9 @@ class PieChartWithFilter(BaseChartGenerator):
 
 
 class HorizontalBarChart(BaseChartGenerator):
-    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
-        super().__init__(chart_name, chart_title, chart_subtitle)
+    """График с горизонтальным столбцами."""
+    def __init__(self, name: str, title: str, subtitle=''):
+        super().__init__(name, title, subtitle)
         self.package = ['bar']
 
     def get_data_for_chart(self, chart_name: str) -> list[list[str | int]]:
@@ -199,13 +202,13 @@ class HorizontalBarChart(BaseChartGenerator):
 
     def generate_script(self, chart_name: str):
         """Генерация функций JavaScript для отдельных графиков"""
-        chart_data = self.get_data_for_chart(chart_name=chart_name)
+        data = self.get_data_for_chart(chart_name=chart_name)
         self.charts = f"""
                 google.charts.setOnLoadCallback(drawStuff);
 
               function drawStuff() {{
                 var head = [['', 'количество', {{ role: 'annotation' }}]]
-                head = head.concat({ chart_data});
+                head = head.concat({data});
                 var data = new google.visualization.arrayToDataTable(head);
     
                 var options = {{
