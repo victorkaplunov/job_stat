@@ -77,7 +77,7 @@ for year in years_tuple:
                                      chart_name='frameworks',
                                      year=year, update=update)
 
-    utils.count_salary(year=year, update=update)
+    utils.count_salary(year=year, update=update, vacancies=all_vacancies_jsons)
 
 
 # Count data for current year only charts

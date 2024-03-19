@@ -80,7 +80,8 @@ def chart_with_category_filter(types: list, chart_name: str, update, year) -> No
 def count_per_year(chart_name: str, categories: list, year: int, update=True) -> NoReturn:
     """ Function count a number of entries of some string from param_list
      in the JSON of all vacancies. """
-    categories_dict = {i: 0 for i in categories}  # Convert list to dictionary
+    # Convert list to dictionary and set values to 0
+    categories_dict = {_type: 0 for _type in categories}
     for param_type in categories_dict:
         type_count = db.count_vacancy_by_search_phrase_and_year(search_phrase=param_type, year=year)
         if update:
@@ -95,7 +96,7 @@ def count_types_per_year(types: list, chart_name: str,
                          all_vacancies:  Sequence[Row[Any] | RowMapping],
                          year: int, update: bool) -> NoReturn:
     # Convert list to dict with zero values.
-    types = {item: 0 for item in types}
+    types = {_type: 0 for _type in types}
     # Count vacancies with given type in current year.
     for vacancy in all_vacancies:
         body = json.loads(str(vacancy))
@@ -139,10 +140,10 @@ def count_salary_types(types: list, chart_name: str, year: int,
                                 popularity=types[_type], year=year)
 
 
-def count_salary(year: int, update: bool) -> NoReturn:
+def count_salary(year: int, update: bool, vacancies: Sequence[Row[Any] | RowMapping]) -> NoReturn:
     """Заполняет таблицу данными для графика зарплат в зависимости от опыта."""
     for experience in config.EXPERIENCE:
-        median = count_salary_median(experience, config.EXCHANGE_RATES, year)
+        median = count_salary_median(vacancies, experience, config.EXCHANGE_RATES)
         if update:
             db.update_charts(chart_name='salary', data=experience,
                              year=year, popularity=median)
@@ -151,10 +152,10 @@ def count_salary(year: int, update: bool) -> NoReturn:
                                 year=year, popularity=median)
 
 
-def count_salary_median(experience: str, exchange_rate: list, year: int):
+def count_salary_median(vacancies: Sequence[Row[Any] | RowMapping],
+                        experience: str, exchange_rate: dict) -> int:
     """Приводит зарплаты к общему виду (нетто, руб.) и записывает в отдельную таблицу для быстрого
     отображения на графике."""
-    vacancies = db.get_json_from_vacancies_by_year(year=year)
     # Отбираем вакансии с нужным опытом и собираем зарплаты в список
     salary_list = []
     for vacancy in vacancies:
