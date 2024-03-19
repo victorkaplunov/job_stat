@@ -30,7 +30,6 @@ def write_vacancies(response: requests, base_url: str) -> list[int]:
     Get list of vacancies from response and write to "calendar" and "vacancies" tables.
     Return list of vacancies ID.
     """
-
     vac_list = response.json()["items"]
     items = []
     for vacancy in vac_list:
@@ -82,7 +81,6 @@ def count_per_year(chart_name: str, categories: list, year: int, update=True) ->
     """ Function count a number of entries of some string from param_list
      in the JSON of all vacancies. """
     categories_dict = {i: 0 for i in categories}  # Convert list to dictionary
-    categories_dict = categories_dict.fromkeys(categories_dict, 0)  # Reset all values to zero
     for param_type in categories_dict:
         type_count = db.count_vacancy_by_search_phrase_and_year(search_phrase=param_type, year=year)
         if update:
