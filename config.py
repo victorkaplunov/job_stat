@@ -1,5 +1,7 @@
 class ConfigObj:
 
+    PA_USERNAME = 'clingon'
+
     LOCAL_HOST_BASE_URL = 'http://127.0.0.1:5000'
 
     BASE_URL = 'http://api.hh.ru/vacancies/'

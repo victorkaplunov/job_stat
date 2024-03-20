@@ -87,9 +87,8 @@ utils.fill_skill_set_chart(update=update)
 utils.fill_top_employers_chart()
 db.vacuum_db()
 
-username = 'clingon'
-TOKEN = os.getenv('PA_TOKEN')
-headers = {'Authorization': f'Token {TOKEN}'}
+username = config.PA_USERNAME
+headers = {'Authorization': f'Token {os.getenv("PA_TOKEN")}'}
 base_url = f'https://www.pythonanywhere.com/api/v0/user/{username}/'
 
 # Get first webapps name
