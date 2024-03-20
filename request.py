@@ -87,9 +87,8 @@ utils.fill_skill_set_chart(update=update)
 utils.fill_top_employers_chart()
 db.vacuum_db()
 
-username = config.PA_USERNAME
 headers = {'Authorization': f'Token {os.getenv("PA_TOKEN")}'}
-base_url = f'https://www.pythonanywhere.com/api/v0/user/{username}/'
+base_url = f'https://www.pythonanywhere.com/api/v0/user/{config.PA_USERNAME}/'
 
 # Get first webapps name
 response = requests.get(base_url + 'webapps/', headers=headers)
