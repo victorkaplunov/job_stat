@@ -37,39 +37,40 @@ db.drop_and_recreate_vac_with_salary_table()
 if update is False:
     db.drop_and_recreate_charts_table()
 
-
-# Count data for chart per year.
+# Count data for charts per year.
 for year in years_tuple:
     all_vacancies_jsons = db.get_json_from_vacancies_by_year(year=year)
 
-    pie_diagrams = {'languages': config.PROGRAM_LANGUAGES,
-                    'bdd_frameworks': config.BDD_FRAMEWORKS,
-                    'load_testing_tools': config.LOAD_TESTING_TOOLS,
-                    'ci_cd': config.CI_CD,
-                    'monitoring': config.MONITORING,
-                    'web_ui_tools': config.WEB_UI_TOOLS,
-                    'mobile_testing_frameworks': config.MOBILE_TESTING_FRAMEWORKS,
-                    'bugtracking_n_tms': config.BUGTRACKING_N_TMS,
-                    'cvs': config.CVS}
+    pie_charts = {
+        'languages': config.PROGRAM_LANGUAGES,
+        'bdd_frameworks': config.BDD_FRAMEWORKS,
+        'load_testing_tools': config.LOAD_TESTING_TOOLS,
+        'ci_cd': config.CI_CD,
+        'monitoring': config.MONITORING,
+        'web_ui_tools': config.WEB_UI_TOOLS,
+        'mobile_testing_frameworks': config.MOBILE_TESTING_FRAMEWORKS,
+        'bugtracking_n_tms': config.BUGTRACKING_N_TMS,
+        'cvs': config.CVS
+    }
 
-    for chart_name, categories in pie_diagrams.items():
+    for chart_name, categories in pie_charts.items():
         utils.count_per_year(chart_name=chart_name,
                              categories=categories,
                              year=year, update=update)
 
-    utils.count_types_per_year(types=config.SCHEDULE, chart_name='schedule',
-                               all_vacancies=all_vacancies_jsons,
-                               year=year, update=update)
+    pie_charts_for_types = {
+        'schedule': config.SCHEDULE,
+        'experience': config.EXPERIENCE,
+        'employment': config.EMPLOYMENT,
+    }
+    for chart_name, types in pie_charts_for_types.items():
+        utils.count_types_per_year(types=types,
+                                   chart_name=chart_name,
+                                   all_vacancies=all_vacancies_jsons,
+                                   year=year, update=update)
 
-    utils.count_types_per_year(types=config.EXPERIENCE, chart_name='experience',
-                               all_vacancies=all_vacancies_jsons,
-                               year=year, update=update)
-
-    utils.count_types_per_year(types=config.EMPLOYMENT, chart_name='employment',
-                               all_vacancies=all_vacancies_jsons,
-                               year=year, update=update)
-
-    utils.count_salary_types(types=config.WITH_SALARY, chart_name='with_salary',
+    utils.count_salary_types(types=config.WITH_SALARY,
+                             chart_name='with_salary',
                              all_vacancies=all_vacancies_jsons,
                              year=year, update=update)
 
@@ -77,7 +78,8 @@ for year in years_tuple:
                                      chart_name='frameworks',
                                      year=year, update=update)
 
-    utils.count_salary(year=year, update=update, vacancies=all_vacancies_jsons)
+    utils.count_salary(year=year, update=update,
+                       vacancies=all_vacancies_jsons)
 
 
 # Count data for current year only charts
