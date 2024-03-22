@@ -21,10 +21,6 @@ config = ConfigObj()
 first_day_of_current_year = date(date.today().year, 1, 1)
 
 
-def reversed_years():
-    return config.YEARS[::-1]
-
-
 def write_vacancies(response: requests, base_url: str) -> list[int]:
     """
     Get list of vacancies from response and write to "calendar" and "vacancies" tables.
