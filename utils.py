@@ -3,7 +3,6 @@ import statistics
 from datetime import datetime, timedelta, date
 from calendar import isleap
 import json
-from operator import itemgetter
 
 import unicodedata
 import locale
