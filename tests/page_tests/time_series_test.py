@@ -18,7 +18,7 @@ def test_week_chart_legend_title(charts_data, chart_number, expected_title):
 
 @pytest.mark.parametrize('chart_number,subtitle',
                          [(0, 'количество вакансий'),
-                          (1, '2019'), (2, 'текущая неделя')],
+                          (1, '2020'), (2, 'текущая неделя')],
                          ids=chart_names)
 def test_week_chart_legend_subtitle(charts_data, chart_number, subtitle):
     assert charts_data(rout=rout)[chart_number][0][1] == subtitle,\

@@ -10,7 +10,7 @@ config = ConfigObj()
 
 
 @pytest.mark.parametrize('test_input, expect',
-                         [(date(2019, 3, 17), 12),
+                         [(date(2020, 1, 1), 40),
                           (date(2024, 2, 22), 200)],
                          ids=['2019-3-17', '2024-2-22'])
 def test_get_vacancy_qty_by_day(test_input, expect):
