@@ -17,12 +17,13 @@ class ConfigObj:
 
     DB_FILE_NAME = 'testdb.db'
 
-    YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+    YEARS = [2020, 2021, 2022, 2023, 2024]
 
     STOP_LIST = ['Формовщик теста', 'тестомес', 'Тестомес',
                  'Key Account Manager', 'Комплектовщик-Тестировщик',
                  'Специалист по подбору материалов для учебных курсов',
-                 'Составитель теста и фарша', '(Ввод в гражданский оборот)']
+                 'Составитель теста и фарша', '(Ввод в гражданский оборот)',
+                 'Центр тестирования иностранных граждан']
     # ToDo: Запрашивать в API, включая обменный курс.
     EXCHANGE_RATES = {'RUR': 1, 'EUR': 86,
                       'USD': 73, 'UAH': 2.58,
@@ -58,6 +59,8 @@ class ConfigObj:
     LOAD_TESTING_TOOLS = ['JMeter', 'LoadRunner', 'Locust', 'Gatling',
                           'Yandex.Tank', 'ApacheBench', 'Grinder',
                           'Performance Center', 'IBM Rational Performance', 'K6']
+
+    API_TESTING_TOOLS = ['Postman', 'Insomnia', 'SoapUI', 'Swagger']
 
     CI_CD = ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
              'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity']
