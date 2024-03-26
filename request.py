@@ -45,6 +45,7 @@ for year in years_tuple:
         'languages': config.PROGRAM_LANGUAGES,
         'bdd_frameworks': config.BDD_FRAMEWORKS,
         'load_testing_tools': config.LOAD_TESTING_TOOLS,
+        'api_testing_tools': config.API_TESTING_TOOLS,
         'ci_cd': config.CI_CD,
         'monitoring': config.MONITORING,
         'web_ui_tools': config.WEB_UI_TOOLS,

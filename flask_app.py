@@ -252,12 +252,26 @@ def unit_test_frameworks():
 @app.route('/load_testing_tools')
 def load_testing_tools():
     """Load testing tools page"""
-    chart = PieChart(chart_title='Популярность инструментов тестирования производительностия',
+    chart = PieChart(chart_title='Популярность инструментов тестирования производительности',
                      chart_name='load_testing_tools')
     return render_template(
         '/simple_chart.html',
         package=chart.package,
         title='Средства нагрузочного тестирования.',
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
+    )
+
+
+@app.route('/api_testing_tools')
+def api_testing_tools():
+    """Load testing tools page"""
+    chart = PieChart(chart_title='Популярность инструментов тестирования Web API',
+                     chart_name='api_testing_tools')
+    return render_template(
+        '/simple_chart.html',
+        package=chart.package,
+        title='Средства тестирования Web API.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
     )
