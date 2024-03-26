@@ -309,6 +309,9 @@ def get_vacancies_qty_by_month_of_year() -> list[list]:
     years = config.YEARS
     head_time_series = [['Месяц']]
     output_list = []
+    for month in month_tuples:
+        output_list.append([month[1]])
+
     for year in years:
         head_time_series[0].append(str(year))
         for n, month in enumerate(month_tuples):
