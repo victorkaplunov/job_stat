@@ -60,7 +60,7 @@ class ConfigObj:
                           'Yandex.Tank', 'ApacheBench', 'Grinder',
                           'Performance Center', 'IBM Rational Performance', 'K6']
 
-    API_TESTING_TOOLS = ['Postman', 'Insomnia', 'SoapUI', 'Swagger']
+    API_TESTING_TOOLS = ['Postman', 'Insomnia', 'SoapUI', 'cURL', 'Swagger']
 
     CI_CD = ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
              'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity']
