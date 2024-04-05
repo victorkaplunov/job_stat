@@ -72,7 +72,7 @@ def chart_with_category_filter(types: list, chart_name: str, update, year) -> No
                                     parent=param[1], year=year)
 
 
-def count_per_year(chart_name: str, categories: list, year: int, update=True) -> NoReturn:
+def count_per_year(chart_name: str, categories: list, year: int, update: bool = True) -> NoReturn:
     """ Function count a number of entries of some string from param_list
      in the JSON of all vacancies. """
     # Convert list to dictionary and set values to 0
