@@ -1,7 +1,6 @@
 import pytest
-from config import ConfigObj
+from config import Config
 
-config = ConfigObj()
 
 rout = 'time_series'
 chart_names = ['по неделям года', 'по месяцам', 'по дням недели']
@@ -49,7 +48,7 @@ def test_month_by_year_data_types(charts_data):
     for i in charts_data(rout=rout)[1][0]:
         assert isinstance(i, str),\
             'Тип данных для элемента легенды не совпадает с ожидаемым.'
-    for n, i in enumerate(config.YEARS):
+    for n, i in enumerate(Config.YEARS):
         assert str(i) == charts_data(rout=rout)[1][0][1:][n], \
             "Год из заголовка графика не совпадает с годом из конфигурационного файла."
     for i in charts_data(rout=rout)[1][1:]:

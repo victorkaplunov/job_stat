@@ -4,11 +4,10 @@ from argparse import ArgumentParser
 import requests
 
 import utils
-from config import ConfigObj
+from config import Config
 from db import db_client
 
 db = db_client.Database()
-config = ConfigObj()
 
 parser = ArgumentParser()
 parser.add_argument("-r", "--rebuild", dest='rebuild', action="store_true",
@@ -17,20 +16,20 @@ args = parser.parse_args()
 
 # По умолчанию значения в данных обновляются только за последний год.
 update = True
-years_tuple = (config.YEARS[-1],)
+years_tuple = (Config.YEARS[-1],)
 
 # При опции CLI "-r" или "--rebuild", старые данные удаляются и пересчитываются за все годы.
 if args.rebuild:
     update = False
-    years_tuple = tuple(config.YEARS)
+    years_tuple = tuple(Config.YEARS)
 
 # Put new vacancies to DB
-for page_num in range(0, config.PAGES_QTY):
-    search_url = config.BASE_URL + config.SEARCH_STRING.replace("page=0", "page=" + str(page_num))
+for page_num in range(0, Config.PAGES_QTY):
+    search_url = Config.BASE_URL + Config.SEARCH_STRING.replace("page=0", "page=" + str(page_num))
     resp = requests.get(search_url)
-    s = utils.write_vacancies(resp, config.BASE_URL)
+    s = utils.write_vacancies(resp, Config.BASE_URL)
 
-for word in config.STOP_LIST:
+for word in Config.STOP_LIST:
     db.delete_vacancy_with_json_like(word=word)
 
 db.drop_and_recreate_vac_with_salary_table()
@@ -42,16 +41,16 @@ for year in years_tuple:
     all_vacancies_jsons = db.get_json_from_vacancies_by_year(year=year)
 
     pie_charts = {
-        'languages': config.PROGRAM_LANGUAGES,
-        'bdd_frameworks': config.BDD_FRAMEWORKS,
-        'load_testing_tools': config.LOAD_TESTING_TOOLS,
-        'api_testing_tools': config.API_TESTING_TOOLS,
-        'ci_cd': config.CI_CD,
-        'monitoring': config.MONITORING,
-        'web_ui_tools': config.WEB_UI_TOOLS,
-        'mobile_testing_frameworks': config.MOBILE_TESTING_FRAMEWORKS,
-        'bugtracking_n_tms': config.BUGTRACKING_N_TMS,
-        'cvs': config.CVS
+        'languages': Config.PROGRAM_LANGUAGES,
+        'bdd_frameworks': Config.BDD_FRAMEWORKS,
+        'load_testing_tools': Config.LOAD_TESTING_TOOLS,
+        'api_testing_tools': Config.API_TESTING_TOOLS,
+        'ci_cd': Config.CI_CD,
+        'monitoring': Config.MONITORING,
+        'web_ui_tools': Config.WEB_UI_TOOLS,
+        'mobile_testing_frameworks': Config.MOBILE_TESTING_FRAMEWORKS,
+        'bugtracking_n_tms': Config.BUGTRACKING_N_TMS,
+        'cvs': Config.CVS
     }
 
     for chart_name, categories in pie_charts.items():
@@ -60,9 +59,9 @@ for year in years_tuple:
                              year=year, update=update)
 
     pie_charts_for_types = {
-        'schedule': config.SCHEDULE,
-        'experience': config.EXPERIENCE,
-        'employment': config.EMPLOYMENT,
+        'schedule': Config.SCHEDULE,
+        'experience': Config.EXPERIENCE,
+        'employment': Config.EMPLOYMENT,
     }
     for chart_name, types in pie_charts_for_types.items():
         utils.count_types_per_year(types=types,
@@ -70,12 +69,12 @@ for year in years_tuple:
                                    all_vacancies=all_vacancies_jsons,
                                    year=year, update=update)
 
-    utils.count_salary_types(types=config.WITH_SALARY,
+    utils.count_salary_types(types=Config.WITH_SALARY,
                              chart_name='with_salary',
                              all_vacancies=all_vacancies_jsons,
                              year=year, update=update)
 
-    utils.chart_with_category_filter(types=config.UNIT_FRAMEWORKS,
+    utils.chart_with_category_filter(types=Config.UNIT_FRAMEWORKS,
                                      chart_name='frameworks',
                                      year=year, update=update)
 
@@ -89,7 +88,7 @@ utils.fill_top_employers_chart()
 db.vacuum_db()
 
 headers = {'Authorization': f'Token {os.getenv("PA_TOKEN")}'}
-base_url = f'https://www.pythonanywhere.com/api/v0/user/{config.PA_USERNAME}/'
+base_url = f'https://www.pythonanywhere.com/api/v0/user/{Config.PA_USERNAME}/'
 
 # Get first webapps name
 response = requests.get(base_url + 'webapps/', headers=headers)

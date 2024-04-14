@@ -3,10 +3,9 @@ from datetime import date
 import pytest
 
 from db.db_client import Database
-from config import ConfigObj
 
 db = Database()
-config = ConfigObj()
+
 
 
 @pytest.mark.parametrize('test_input, expect',

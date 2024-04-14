@@ -1,4 +1,4 @@
-class ConfigObj:
+class Config:
 
     PA_USERNAME = 'clingon'
 

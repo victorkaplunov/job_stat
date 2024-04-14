@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-import config
+from config import Config
 from flask_app import app
 
 
@@ -29,7 +29,7 @@ exceptions_list = ['favicon', 'starter_template', 'show_vac_top_new_by_id',
 def test_routs_status_code(charts_data, rout):
     """Request all routs and check status code."""
     print(rout)
-    response = requests.get(url=config.ConfigObj.LOCAL_HOST_BASE_URL + '/' + rout)
+    response = requests.get(url=Config.LOCAL_HOST_BASE_URL + '/' + rout)
     if rout in exceptions_list:
         assert response.status_code == 404
     else:

@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc, text
 from sqlalchemy.orm import sessionmaker
 
 from db.models import Vacancies, Calendar, Charts, VacWithSalary
-from config import ConfigObj
+from config import Config
 
 
 class SingletonMeta(type):
@@ -22,7 +22,7 @@ class Database(metaclass=SingletonMeta):
     _session = None
 
     def __init__(self):
-        self._db_engine = create_engine(f"sqlite:///{ConfigObj.DB_FILE_NAME}")
+        self._db_engine = create_engine(f"sqlite:///{Config.DB_FILE_NAME}")
         self._session = sessionmaker(bind=self._db_engine)()
 
     def get_date_from_calendar_by_vacancy(

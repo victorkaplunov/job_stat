@@ -2,7 +2,7 @@ import copy
 from operator import itemgetter
 
 from db.db_client import Database
-from config import ConfigObj
+from config import Config
 
 
 class BaseChartGenerator:
@@ -15,7 +15,7 @@ class BaseChartGenerator:
         self.charts = ''
         self.divs = ''
         self.db = Database()
-        self.config = ConfigObj()
+        self.config = Config
         self.translations = self.config.TRANSLATIONS
         self.years = self.config.YEARS
         self.reversed_years = self.config.YEARS[::-1]

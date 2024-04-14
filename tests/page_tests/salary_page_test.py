@@ -1,6 +1,5 @@
-from config import ConfigObj
+from config import Config
 
-config = ConfigObj()
 rout = 'salary'
 
 
@@ -17,7 +16,7 @@ def test_annotation_row_in_salary_chart_data(charts_data):
     """Тне annotation row contain 'Range' and years value."""
     title_row = charts_data(rout=rout)[0][0]
     assert title_row[0] == 'Range', 'Первый элемент аннотации имеет неверное значение.'
-    for n, i in enumerate(config.YEARS):
+    for n, i in enumerate(Config.YEARS):
         assert str(i) == title_row[1:][n],\
             "Год из заголовка графика не совпадает с годом из конфигурационного файла."
 

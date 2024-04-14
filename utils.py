@@ -12,11 +12,10 @@ import requests
 from sqlalchemy import RowMapping, Row, exc
 
 from db.db_client import Database
-from config import ConfigObj
+from config import Config
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 db = Database()
-config = ConfigObj()
 first_day_of_current_year = date(date.today().year, 1, 1)
 
 
@@ -137,8 +136,8 @@ def count_salary_types(types: list, chart_name: str, year: int,
 
 def count_salary(year: int, update: bool, vacancies: Sequence[Row[Any] | RowMapping]) -> NoReturn:
     """Заполняет таблицу данными для графика зарплат в зависимости от опыта."""
-    for experience in config.EXPERIENCE:
-        median = count_salary_median(vacancies, experience, config.EXCHANGE_RATES)
+    for experience in Config.EXPERIENCE:
+        median = count_salary_median(vacancies, experience, Config.EXCHANGE_RATES)
         if update:
             db.update_charts(chart_name='salary', data=experience,
                              year=year, popularity=median)
@@ -190,21 +189,21 @@ def count_salary_median(vacancies: Sequence[Row[Any] | RowMapping],
             # закрытый диапазон
             if (salary['from'] is not None) and (salary['to'] is not None):
                 calc_salary = (salary['from'] + (salary['to'] - salary['from'])/2) * exchange_rate[salary['currency']]
-                if calc_salary < config.MROT:   # Пишем в базу МРОТ, если расчетная ЗП меньше минимальной.
-                    calc_salary = config.MROT
+                if calc_salary < Config.MROT:   # Пишем в базу МРОТ, если расчетная ЗП меньше минимальной.
+                    calc_salary = Config.MROT
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вверх
             elif salary['to'] is None:
                 calc_salary = salary['from'] * exchange_rate[salary['currency']] + average_delta_for_closed_salary/2
-                if calc_salary < config.MROT:
+                if calc_salary < Config.MROT:
                     continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
             # открытый вниз
             elif salary['from'] is None:
                 calc_salary = salary['to'] * exchange_rate[salary['currency']] - average_delta_for_closed_salary/2
-                if calc_salary < config.MROT:
+                if calc_salary < Config.MROT:
                     continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
@@ -215,7 +214,7 @@ def count_salary_median(vacancies: Sequence[Row[Any] | RowMapping],
             if (salary['from'] is not None) and (salary['to'] is not None):
                 gross_salary = (salary['from'] + (salary['to'] - salary['from'])/2) * exchange_rate[salary['currency']]
                 calc_salary = gross_salary - gross_salary * 0.13
-                if calc_salary < config.MROT:
+                if calc_salary < Config.MROT:
                     continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
@@ -223,7 +222,7 @@ def count_salary_median(vacancies: Sequence[Row[Any] | RowMapping],
             elif salary['to'] is None:
                 gross_salary = (salary['from'] * exchange_rate[salary['currency']] + average_delta_for_closed_salary/2)
                 calc_salary = gross_salary - gross_salary * 0.13
-                if calc_salary < config.MROT:
+                if calc_salary < Config.MROT:
                     continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
@@ -231,7 +230,7 @@ def count_salary_median(vacancies: Sequence[Row[Any] | RowMapping],
             elif salary['from'] is None:
                 gross_salary = (salary['to'] * exchange_rate[salary['currency']] - average_delta_for_closed_salary/2)
                 calc_salary = gross_salary - gross_salary * 0.13
-                if calc_salary < config.MROT:
+                if calc_salary < Config.MROT:
                     continue
                 all_salaries.append(calc_salary)
                 db.insert_in_vac_with_salary(salary, calc_salary)
@@ -293,7 +292,7 @@ def get_vacancies_qty_week_by_week() -> list[list[str | int | dict]]:
         return monday, monday + timedelta(days=6.9)
 
     for week in output_list[1:]:
-        start_n_end = get_start_and_finish_of_calendar_week(config.YEARS[-1], int(week[0]))
+        start_n_end = get_start_and_finish_of_calendar_week(Config.YEARS[-1], int(week[0]))
         week.append(f'{start_n_end[0].strftime("%Y.%m.%d")} - ' +
                     f'{start_n_end[1].strftime("%Y.%m.%d")}' +
                     f'\nКоличество вакансий: {week[1]}')
@@ -305,7 +304,7 @@ def get_vacancies_qty_by_month_of_year() -> list[list]:
                     (4, 'апрель', 30), (5, 'май', 31), (6, 'июнь', 30),
                     (7, 'июль', 31), (8, 'август', 31), (9, 'сентябрь', 30),
                     (10, 'октябрь', 31), (11, 'ноябрь', 30), (12, 'декабрь', 31))
-    years = config.YEARS
+    years = Config.YEARS
     head_time_series = [['Месяц']]
     output_list = [[i[1]] for i in month_tuples]
 
@@ -344,10 +343,10 @@ def get_vacancies_qty_by_month_of_year() -> list[list]:
 
 def get_salary_data_per_year() -> list[list[str | int]]:
     # Convert list to dict with empty lists values.
-    experience_ranges = {_type: list() for _type in config.EXPERIENCE}
+    experience_ranges = {_type: list() for _type in Config.EXPERIENCE}
 
     data = [['Range']]
-    for year in config.YEARS:
+    for year in Config.YEARS:
         data[0].append(str(year))  # Добавляем года в колонку легенды.
         # Добавляем расчетные зарплаты в соответствии с диапазоном опыта.
         statistics_data = db.get_data_for_chart_per_year(year=year, chart_name='salary')
@@ -356,7 +355,7 @@ def get_salary_data_per_year() -> list[list[str | int]]:
     # Переводим названия диапазонов на русский
     for i in experience_ranges:
         rang_data = experience_ranges[i]
-        rang_data.insert(0, config.TRANSLATIONS[i])
+        rang_data.insert(0, Config.TRANSLATIONS[i])
         data.append(rang_data)
     return data
 
@@ -381,7 +380,7 @@ def get_formatted_salary(salary: int) -> str:
 
 
 def get_salary_by_category_data() -> list[list]:
-    languages = config.PROGRAM_LANGUAGES
+    languages = Config.PROGRAM_LANGUAGES
     data_list = []
     salary_list = []
     for language in languages:
@@ -408,7 +407,7 @@ def get_salary_by_category_data() -> list[list]:
 
 def fill_skill_set_chart(update: bool) -> None:
     """Заполнение данных для графика 'Ключевые навыки'."""
-    current_year_vacancies = db.get_json_from_vacancies_by_year(config.YEARS[-1])
+    current_year_vacancies = db.get_json_from_vacancies_by_year(Config.YEARS[-1])
     # Populate skills set
     key_skills = set()
     for vacancy in current_year_vacancies:
@@ -461,7 +460,7 @@ def fill_skill_set_chart(update: bool) -> None:
 
 def fill_top_employers_chart() -> None:
     """Заполнение данных для графика 'Топ 50 работодателей'."""
-    current_year_vacancies = db.get_json_from_vacancies_by_year(config.YEARS[-1])
+    current_year_vacancies = db.get_json_from_vacancies_by_year(Config.YEARS[-1])
     # Delete employers data
     db.delete_chart_data(chart_name='top_employers')
 

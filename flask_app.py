@@ -7,12 +7,11 @@ from flask_bootstrap import Bootstrap
 
 import utils
 from db.db_client import Database
-from config import ConfigObj
+from config import Config
 from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter,\
     HorizontalBarChart
 
 db = Database()
-config = ConfigObj()
 
 
 def create_app():
@@ -131,7 +130,7 @@ def salary_by_category():
     return render_template(
         '/candle.html',
         chart_data=utils.get_salary_by_category_data(),
-        year=config.YEARS[-1],
+        year=Config.YEARS[-1],
         title='Медианная зарплата в зависимости от упоминания языка.'
     )
 
@@ -141,7 +140,7 @@ def top_employers():
     """Employers by vacancies quantity page"""
     chart = HorizontalBarChart(
         chart_title='Топ 50 работодателей',
-        chart_subtitle=f'по количеству вакансий в {config.YEARS[-1]} году.',
+        chart_subtitle=f'по количеству вакансий в {Config.YEARS[-1]} году.',
         chart_name='top_employers')
     return render_template('/simple_chart.html',
                            package=chart.package,
@@ -210,7 +209,7 @@ def key_skills():
     """Key skills popularity page"""
     chart = HorizontalBarChart(
         chart_title='Ключевые навыки.',
-        chart_subtitle=f'Пятьдесят наиболее популярных тегов в {config.YEARS[-1]} году.',
+        chart_subtitle=f'Пятьдесят наиболее популярных тегов в {Config.YEARS[-1]} году.',
         chart_name='key_skills')
     return render_template('/simple_chart.html',
                            package=chart.package,
