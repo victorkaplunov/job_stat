@@ -7,7 +7,6 @@ from db.db_client import Database
 db = Database()
 
 
-
 @pytest.mark.parametrize('test_input, expect',
                          [(date(2020, 1, 1), 40),
                           (date(2024, 2, 22), 200)],
