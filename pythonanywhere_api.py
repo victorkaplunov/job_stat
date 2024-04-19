@@ -19,7 +19,7 @@ command = {'input': 'cd /home/clingon/job_stat\n git pull --rebase\n'}
 response = requests.post(base_url + f'consoles/{str(console_id)}/send_input/',
                          json=command, headers=headers)
 print('send_input: ', command['input'])
-print(f"{response.status_code=}")
+print(response.status_code)
 print(response.text)
 
 # Get first webapps name
