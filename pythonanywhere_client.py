@@ -57,14 +57,14 @@ class PythonAnywhereClient:
         response = requests.get(url, headers=self.headers)
         return response.json()[0]['id']
 
-    def send_command_to_console(self, console_id: int, command: dict) -> int:
+    def send_command_to_console(self, console_id: int, command: str) -> int:
         """
-        Input format: {'input': 'pwd\n ls\n'}
+        Input format: 'pwd\n ls\n'
         Add a "\n" to the command line end for return.
         """
+        command_json = {'input': f'{command}'}
         url = posixpath.join(self.base_url, f'consoles/{str(console_id)}/send_input/')
-        response = requests.post(url=url, json=command, headers=self.headers)
-        print(f'send command {command} to console, get response:', response.status_code)
+        response = requests.post(url=url, json=command_json, headers=self.headers)
         return response.status_code
 
     def get_latest_output(self, console_id: int) -> str:
