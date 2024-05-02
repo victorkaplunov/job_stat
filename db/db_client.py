@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta
 from typing import Type, Sequence, Any, NoReturn
 
@@ -22,7 +23,8 @@ class Database(metaclass=SingletonMeta):
     _session = None
 
     def __init__(self):
-        self._db_engine = create_engine(f"sqlite:///{Config.DB_FILE_NAME}")
+        self._db_engine = create_engine(
+            'sqlite:///' + os.path.join(Config.basedir, Config.DB_FILE_NAME))
         self._session = sessionmaker(bind=self._db_engine)()
 
     def get_date_from_calendar_by_vacancy(
@@ -179,3 +181,7 @@ class Database(metaclass=SingletonMeta):
     def vacuum_db(self) -> NoReturn:
         """ Очистка БД, для уменьшения ее размера."""
         self._session.execute(text('VACUUM'))
+
+    def close_session(self) -> NoReturn:
+        self._session.close()
+        self._db_engine.dispose()

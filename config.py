@@ -1,5 +1,8 @@
-class Config:
+import os
 
+
+class Config:
+    basedir = os.path.abspath(os.path.dirname(__file__))
     # PythonAnywhere params
     PA_USERNAME = 'clingon'
     PA_APP_DIR = 'job_stat'
