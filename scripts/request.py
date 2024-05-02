@@ -86,14 +86,4 @@ for year in years_tuple:
 utils.fill_skill_set_chart(update=update)
 utils.fill_top_employers_chart()
 db.vacuum_db()
-
-headers = {'Authorization': f'Token {os.getenv("PA_TOKEN")}'}
-base_url = f'https://www.pythonanywhere.com/api/v0/user/{Config.PA_USERNAME}/'
-
-# Get first webapps name
-response = requests.get(base_url + 'webapps/', headers=headers)
-domain_name = response.json()[0]['domain_name']
-
-# Reload first webapps
-response = requests.post(base_url + f'webapps/{domain_name}/reload/', headers=headers)
-print(response.status_code)
+db.close_session()
