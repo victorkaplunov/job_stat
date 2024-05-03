@@ -65,7 +65,8 @@ class Config:
 
     LOAD_TESTING_TOOLS = ['JMeter', 'LoadRunner', 'Locust', 'Gatling',
                           'Yandex.Tank', 'ApacheBench', 'Grinder',
-                          'Performance Center', 'IBM Rational Performance', 'K6']
+                          'Performance Center', 'IBM Rational Performance',
+                          'K6', 'TRex', 'IXIA', 'pktgen']
 
     API_TESTING_TOOLS = ['Postman', 'Insomnia', 'SoapUI', 'cURL', 'Swagger']
 
