@@ -8,8 +8,8 @@ from flask_bootstrap import Bootstrap
 import utils
 from db.db_client import Database
 from config import Config
-from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter,\
-    HorizontalBarChart
+from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter, \
+    HorizontalBarChart, PieChartTmp
 
 db = Database()
 
@@ -380,3 +380,18 @@ def word_cloud():
     return render_template('/word_cloud.html',
                            title='"Облако слов" на основе текстов вакансий.'
                            )
+
+
+@app.route('/tmp')
+def tmp():
+    """Chart page"""
+    chart = PieChartTmp(chart_title='Популярность средств CI/CD',
+                        chart_name='load_testing_tools')
+    return render_template(
+        '/simple_chart.html',
+        package=chart.package,
+        title='Популярность средств CI/CD.',
+        charts_function=chart.generate_script(),
+        divs=chart.generate_divs()
+    )
+

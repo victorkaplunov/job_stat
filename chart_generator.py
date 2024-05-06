@@ -228,3 +228,50 @@ class HorizontalBarChart(BaseChartGenerator):
     def generate_divs():
         """Генерация разделов в которые будут вставляться графики."""
         return '''<div id="chart" style="height: 1000px;"></div>'''
+
+
+class PieChartTmp(BaseChartGenerator):
+    """Класс генерации JS функций и данных для круговой диаграммы."""
+
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
+        super().__init__(chart_name, chart_title, chart_subtitle)
+        self.package = ['corechart']
+
+    def generate_script(self):
+        """Генерация функций JavaScript для отдельных графиков"""
+        for year in self.reversed_years:
+            chart_data = self.get_data_per_year(year, self.chart_name)
+            self.charts = self.charts + f'''
+                google.charts.setOnLoadCallback(drawScheduleTypeChart{year});
+                function drawScheduleTypeChart{year}() {{
+                var data = google.visualization.arrayToDataTable({chart_data});
+                var options = {{
+                chartArea:{{width:'90%',height:'80%'}},
+                pieSliceTextStyle: {{fontSize: 11}}
+                }};
+                var chart = new google.visualization.PieChart(document.getElementById('chart_for_{year}'));
+                chart.draw(data, options);
+                }}'''
+        return self.charts
+
+    def generate_divs(self):
+        """Генерация разделов в которые будут вставляться графики."""
+        for year in self.reversed_years:
+            self.divs = self.divs + f'''
+                <div class="col-sm-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <a class="card-link" data-toggle="collapse" href="#chart_for_{year}">
+                        {year}
+                      </a>
+                    </div>
+                    <div id="chart_for_{year}" class="collapse show" style="height: 280px;">
+                      <div class="card-body">
+                        Lorem ipsum..
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                '''
+        self.divs = f'<h3>{self.title}.</h3><div class="row">' + self.divs + '</div>'
+        return self.divs
