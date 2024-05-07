@@ -9,7 +9,7 @@ import utils
 from db.db_client import Database
 from config import Config
 from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter, \
-    HorizontalBarChart, PieChartTmp
+    HorizontalBarChart, StackedColumnChart
 
 db = Database()
 
@@ -378,20 +378,22 @@ def ci_cd():
 def word_cloud():
     """Chart page"""
     return render_template('/word_cloud.html',
-                           title='"Облако слов" на основе текстов вакансий.'
-                           )
+                           title='"Облако слов" на основе текстов вакансий.')
 
 
 @app.route('/tmp')
 def tmp():
     """Chart page"""
-    chart = PieChartTmp(chart_title='Популярность средств CI/CD',
-                        chart_name='load_testing_tools')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность средств CI/CD.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
+    chart_1 = StackedColumnChart(chart_title='Инструменты тестирования производительности',
+                                 chart_name='load_testing_tools')
+    chart_2 = StackedColumnChart(chart_title='Популярность генераторов сетевого трафика',
+                                 chart_name='traffic_generators')
+    return render_template('2_charts.html',
+                           package_1=chart_1.package,
+                           title='Средства нагрузочного тестирования.',
+                           charts_function_1=chart_1.generate_script(),
+                           div_1=chart_1.generate_divs(),
+                           package_2=chart_2.package,
+                           charts_function_2=chart_2.generate_script(),
+                           div_2=chart_2.generate_divs()
+                           )
