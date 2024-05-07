@@ -2,7 +2,7 @@ import os
 from datetime import date, timedelta
 from typing import Type, Sequence, Any, NoReturn
 
-from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc, text
+from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc, asc, text
 from sqlalchemy.orm import sessionmaker
 
 from db.models import Vacancies, Calendar, Charts, VacWithSalary
@@ -112,6 +112,11 @@ class Database(metaclass=SingletonMeta):
     def get_data_for_chart_per_year(
             self, year: int, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter(
+            and_(Charts.year == year, Charts.chart_name == chart_name)).all()
+
+    def get_sorted_data_for_chart_per_year(
+            self, year: int, chart_name: str) -> list[Type[Charts]]:
+        return self._session.query(Charts).order_by(Charts.data).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name)).all()
 
     def get_pytest_data(self, year: int) -> int:
