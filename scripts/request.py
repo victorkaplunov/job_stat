@@ -44,6 +44,7 @@ for year in years_tuple:
         'languages': Config.PROGRAM_LANGUAGES,
         'bdd_frameworks': Config.BDD_FRAMEWORKS,
         'load_testing_tools': Config.LOAD_TESTING_TOOLS,
+        'traffic_generators': Config.TRAFFIC_GENERATORS,
         'api_testing_tools': Config.API_TESTING_TOOLS,
         'ci_cd': Config.CI_CD,
         'monitoring': Config.MONITORING,
