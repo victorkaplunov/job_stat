@@ -63,10 +63,11 @@ class Config:
                       'behave', 'Fitnesse', 'Cucumber-JVM',
                       'pytest-bdd', 'NSpec', 'Serenity BDD']
 
-    LOAD_TESTING_TOOLS = ['JMeter', 'LoadRunner', 'Locust', 'Gatling',
-                          'Yandex.Tank', 'ApacheBench', 'Grinder',
-                          'Performance Center', 'IBM Rational Performance',
-                          'K6', 'TRex', 'IXIA', 'pktgen']
+    LOAD_TESTING_TOOLS = ['JMeter', 'LoadRunner', 'Performance Center', 'K6',
+                          'Locust', 'Gatling', 'Grinder', 'Yandex.Tank',
+                          'ApacheBench', 'IBM Rational Performance']
+
+    TRAFFIC_GENERATORS = ['TRex', 'IXIA', 'pktgen']
 
     API_TESTING_TOOLS = ['Postman', 'Insomnia', 'SoapUI', 'cURL', 'Swagger']
 
