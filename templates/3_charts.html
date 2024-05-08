@@ -6,6 +6,7 @@
       google.charts.load('current', {'packages':{{ package | safe }}});
       {{ charts_function_1 | safe }}
       {{ charts_function_2 | safe }}
+      {{ charts_function_3 | safe }}
     </script>
 {% endblock %}
 
@@ -15,6 +16,7 @@
 <h3>{{title}}</h3>
         {{ div_1 | safe }}
         {{ div_2 | safe }}
+        {{ div_3 | safe }}
 
     {% endblock %}
 </html>

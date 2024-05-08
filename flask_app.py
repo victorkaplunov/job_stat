@@ -251,15 +251,22 @@ def unit_test_frameworks():
 @app.route('/load_testing_tools')
 def load_testing_tools():
     """Load testing tools page"""
-    chart = PieChart(chart_title='Популярность инструментов тестирования производительности',
-                     chart_name='load_testing_tools')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Средства нагрузочного тестирования.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
+    chart_1 = StackedColumnChart(chart_title='Инструменты тестирования производительности',
+                                 chart_name='load_testing_tools')
+    chart_2 = StackedColumnChart(chart_title='Популярность генераторов сетевого трафика',
+                                 chart_name='traffic_generators')
+    chart_3 = StackedColumnChart(chart_title='Системы трассировки',
+                                 chart_name='tracing_system')
+    return render_template('3_charts.html',
+                           package=chart_1.package,
+                           title='Средства нагрузочного тестирования.',
+                           charts_function_1=chart_1.generate_script(),
+                           div_1=chart_1.generate_divs(),
+                           charts_function_2=chart_2.generate_script(),
+                           div_2=chart_2.generate_divs(),
+                           charts_function_3=chart_3.generate_script(),
+                           div_3=chart_3.generate_divs()
+                           )
 
 
 @app.route('/api_testing_tools')
@@ -388,12 +395,15 @@ def tmp():
                                  chart_name='load_testing_tools')
     chart_2 = StackedColumnChart(chart_title='Популярность генераторов сетевого трафика',
                                  chart_name='traffic_generators')
-    return render_template('2_charts.html',
-                           package_1=chart_1.package,
+    chart_3 = StackedColumnChart(chart_title='Системы трассировки',
+                                 chart_name='tracing_system')
+    return render_template('3_charts.html',
+                           package=chart_1.package,
                            title='Средства нагрузочного тестирования.',
                            charts_function_1=chart_1.generate_script(),
                            div_1=chart_1.generate_divs(),
-                           package_2=chart_2.package,
                            charts_function_2=chart_2.generate_script(),
-                           div_2=chart_2.generate_divs()
+                           div_2=chart_2.generate_divs(),
+                           charts_function_3=chart_3.generate_script(),
+                           div_3=chart_3.generate_divs()
                            )

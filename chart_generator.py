@@ -253,7 +253,6 @@ class StackedColumnChart(BaseChartGenerator):
         tool_list.sort()
         head = ['Год'] + tool_list
         data_list.insert(0, head)
-        print(f"{data_list=}")
         return data_list
 
     def generate_script(self):
