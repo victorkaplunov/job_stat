@@ -69,14 +69,16 @@ class Config:
 
     TRAFFIC_GENERATORS = ['TRex', 'IXIA', 'pktgen']
 
+    TRACING_SYSTEM = ['DynaTrace', 'Jaeger', 'Zipkin']
+
+    MONITORING = ['CloudWatch', 'Grafana', 'Zabbix', 'Tabix',
+                  'Prometheus', 'VictoriaMetrics',
+                  'InfluxDB', 'Graphite', 'ClickHouse']
+
     API_TESTING_TOOLS = ['Postman', 'Insomnia', 'SoapUI', 'cURL', 'Swagger']
 
     CI_CD = ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
              'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity']
-
-    MONITORING = ['CloudWatch', 'Grafana', 'Zabbix',
-                  'Prometheus', 'VictoriaMetrics',
-                  'InfluxDB', 'Graphite', 'ClickHouse']
 
     WEB_UI_TOOLS = ['Selenium', 'Ranorex', 'Selenide', 'Selenoid', 'Selene',
                     'Cypress', 'Splinter', 'Puppeteer', 'WebDriverIO', 'Galen',
