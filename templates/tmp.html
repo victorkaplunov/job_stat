@@ -18,7 +18,7 @@ var myChart = echarts.init(document.querySelector('#main'), null,
 
 function autoFontSize() {
   let width = document.getElementById('main').offsetWidth;
-  let newFontSize = Math.round(width /40);
+  let newFontSize = Math.round(width /50);
   return newFontSize;
 };
 
@@ -98,15 +98,15 @@ window.addEventListener('resize', function() {
      {width: 'auto',
       height: 'auto'}
     );
-<!--    myChart.setOption({-->
-<!--      series: {-->
-<!--        label: {-->
-<!--          textStyle: {-->
-<!--            fontSize: autoFontSize()-->
-<!--          }-->
-<!--        }-->
-<!--      }-->
-<!--    })-->
+    myChart.setOption({
+      series: {
+        label: {
+          textStyle: {
+            fontSize: autoFontSize()
+          }
+        }
+      }
+    })
 }
      });
 
