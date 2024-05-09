@@ -9,25 +9,29 @@
   <body>
 
     <!-- Prepare a DOM with a defined width and height for ECharts -->
-<div id="main" style="width: 100%;height:400px;"></div>
-<!--    <div id="main"></div>-->
-    <script type="text/javascript">
-     var chartDom = document.getElementById('main');
-var myChart = echarts.init(document.querySelector('#main'), null, {
-    width: 1200,
-    height: 800
-  });
-<!--var myChart = echarts.init(chartDom);-->
+<div id="main" style="width: 100%; height:800px;"></div>
+
+<script type="text/javascript">
+var chartDom = document.getElementById('main');
+var myChart = echarts.init(document.querySelector('#main'), null,
+  );
+
+function autoFontSize() {
+  let width = document.getElementById('main').offsetWidth;
+  let newFontSize = Math.round(width /40);
+  return newFontSize;
+};
+
 
 var option;
 
 // There should not be negative values in rawData
 const rawData = [
-  [100, 302, 301, 334, 390, 330, 320],
-  [320, 132, 101, 134, 90, 230, 210],
-  [220, 182, 191, 234, 290, 330, 310],
-  [150, 212, 201, 154, 190, 330, 410],
-  [820, 832, 901, 934, 1290, 1330, 1320]
+  [100, 302, 301, 334, 390],
+  [320, 132, 101, 134, 90],
+  [220, 182, 191, 234, 290],
+  [150, 212, 201, 154, 190],
+  [820, 832, 901, 934, 1290]
 ];
 const totalData = [];
 for (let i = 0; i < rawData[0].length; ++i) {
@@ -57,6 +61,10 @@ const series = [
     barWidth: '60%',
     label: {
       show: true,
+      textStyle: {
+        fontSize: autoFontSize(),
+        fontStyle: 'bold',
+      },
       formatter: (params) => Math.round(params.value * 1000) / 10 + '%'
     },
     data: rawData[sid].map((d, did) =>
@@ -65,8 +73,10 @@ const series = [
   };
 });
 option = {
+  textStyle: {fontSize: 11},
   legend: {
-    selectedMode: false
+    selectedMode: false,
+    textStyle: {fontSize: autoFontSize()}
   },
   grid,
   yAxis: {
@@ -74,16 +84,32 @@ option = {
   },
   xAxis: {
     type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+<!--    nameTextStyle: {fontSize: autoFontSize()},-->
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
   },
   series
 };
 
 myChart.setOption(option);
-myChart.resize({
-  width: 800,
-  height: 400
-});
+
+window.addEventListener('resize', function() {
+ if (myChart != null && myChart != undefined) {
+     myChart.resize(
+     {width: 'auto',
+      height: 'auto'}
+    );
+<!--    myChart.setOption({-->
+<!--      series: {-->
+<!--        label: {-->
+<!--          textStyle: {-->
+<!--            fontSize: autoFontSize()-->
+<!--          }-->
+<!--        }-->
+<!--      }-->
+<!--    })-->
+}
+     });
+
     </script>
   </body>
 </html>
