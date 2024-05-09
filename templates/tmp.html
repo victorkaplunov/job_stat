@@ -9,7 +9,7 @@
   <body>
 
     <!-- Prepare a DOM with a defined width and height for ECharts -->
-<div id="main" style="width: 100%; height:800px;"></div>
+<div id="main" style="width: 900px; height:800px;"></div>
 
 <script type="text/javascript">
 var chartDom = document.getElementById('main');
@@ -18,7 +18,7 @@ var myChart = echarts.init(document.querySelector('#main'), null,
 
 function autoFontSize() {
   let width = document.getElementById('main').offsetWidth;
-  let newFontSize = Math.round(width /50);
+  let newFontSize = Math.round(width /40);
   return newFontSize;
 };
 
