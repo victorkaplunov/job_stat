@@ -248,8 +248,8 @@ def unit_test_frameworks():
     )
 
 
-@app.route('/load_testing_tools')
-def load_testing_tools():
+@app.route('/load_testing_and_monitoring_tools')
+def load_testing_and_monitoring_tools():
     """Load testing tools page"""
     chart_1 = StackedColumnChart(chart_title='Инструменты тестирования производительности',
                                  chart_name='load_testing_tools')
@@ -257,15 +257,19 @@ def load_testing_tools():
                                  chart_name='traffic_generators')
     chart_3 = StackedColumnChart(chart_title='Системы трассировки',
                                  chart_name='tracing_system')
-    return render_template('3_charts.html',
+    chart_4 = StackedColumnChart(chart_title='Средства мониторинга',
+                                 chart_name='monitoring')
+    return render_template('4_charts.html',
                            package=chart_1.package,
-                           title='Средства нагрузочного тестирования.',
+                           title='Средства нагрузочного тестирования и мониторинга.',
                            charts_function_1=chart_1.generate_script(),
                            div_1=chart_1.generate_divs(),
                            charts_function_2=chart_2.generate_script(),
                            div_2=chart_2.generate_divs(),
                            charts_function_3=chart_3.generate_script(),
-                           div_3=chart_3.generate_divs()
+                           div_3=chart_3.generate_divs(),
+                           charts_function_4=chart_4.generate_script(),
+                           div_4=chart_4.generate_divs()
                            )
 
 
@@ -278,20 +282,6 @@ def api_testing_tools():
         '/simple_chart.html',
         package=chart.package,
         title='Средства тестирования Web API.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
-
-@app.route('/monitoring_tools')
-def monitoring_tools():
-    """ Monitoring tools page"""
-    chart = PieChart(chart_title='Популярность различных средств мониторинга',
-                     chart_name='monitoring')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность различных средств мониторинга.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
     )
@@ -391,19 +381,5 @@ def word_cloud():
 @app.route('/tmp')
 def tmp():
     """Chart page"""
-    chart_1 = StackedColumnChart(chart_title='Инструменты тестирования производительности',
-                                 chart_name='load_testing_tools')
-    chart_2 = StackedColumnChart(chart_title='Популярность генераторов сетевого трафика',
-                                 chart_name='traffic_generators')
-    chart_3 = StackedColumnChart(chart_title='Системы трассировки',
-                                 chart_name='tracing_system')
-    return render_template('3_charts.html',
-                           package=chart_1.package,
-                           title='Средства нагрузочного тестирования.',
-                           charts_function_1=chart_1.generate_script(),
-                           div_1=chart_1.generate_divs(),
-                           charts_function_2=chart_2.generate_script(),
-                           div_2=chart_2.generate_divs(),
-                           charts_function_3=chart_3.generate_script(),
-                           div_3=chart_3.generate_divs()
-                           )
+
+    return render_template('tmp.html')
