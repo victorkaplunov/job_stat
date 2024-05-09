@@ -267,7 +267,56 @@ class StackedColumnChart(BaseChartGenerator):
                 legend: {{position: 'top', maxLines: 10 }},
                 isStacked: 'percent',
                 vAxis: {{direction: 1}},
-                chartArea: {{height: "60%"}}
+                chartArea: {{height: "55%"}}
+            }};
+            var {self.chart_name} = new google.visualization.ColumnChart(document.getElementById('{self.chart_name}'));
+            {self.chart_name}.draw(data, options);
+            }}'''
+        return self.charts
+
+    def generate_divs(self):
+        """Генерация раздела в который будут вставляться график."""
+        return f'''<div id="{self.chart_name}" style="height: 650px;"></div>'''
+
+
+class EChartStackedColumnChart(BaseChartGenerator):
+    """Класс генерации столбчатой диаграммы."""
+
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
+        super().__init__(chart_name, chart_title, chart_subtitle)
+        self.package = ['corechart']
+
+    def get_data_for_chart(self, chart_name: str) -> list[list[str | int]]:
+        """Формирует данные для столбчатой диаграммы."""
+        data_list = []
+        tool_set = set()
+        for year in Config.YEARS:
+            year_data = [str(year)]
+            data_per_year = self.db.get_sorted_data_for_chart_per_year(year=year,
+                                                                       chart_name=chart_name)
+            for i in data_per_year:
+                year_data.append(i.popularity)
+                tool_set.add(i.data)
+            data_list.append(year_data)
+        tool_list = list(tool_set)
+        tool_list.sort()
+        head = ['Год'] + tool_list
+        data_list.insert(0, head)
+        return data_list
+
+    def generate_script(self):
+        """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
+        chart_data = self.get_data_for_chart(self.chart_name)
+        self.charts = self.charts + f'''
+            google.charts.setOnLoadCallback(drawChart{self.chart_name});
+            function drawChart{self.chart_name}() {{
+            var data = google.visualization.arrayToDataTable({chart_data});
+            var options = {{
+            title: '{self.title}',
+                legend: {{position: 'top', maxLines: 10 }},
+                isStacked: 'percent',
+                vAxis: {{direction: 1}},
+                chartArea: {{height: "55%"}}
             }};
             var {self.chart_name} = new google.visualization.ColumnChart(document.getElementById('{self.chart_name}'));
             {self.chart_name}.draw(data, options);
