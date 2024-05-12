@@ -54,7 +54,7 @@ const series = {{ series | safe }}.map((name, sid) => {
 option = {
 tooltip: {
     show: true,
-    trigger: 'item',
+    trigger: 'axis',
     textStyle: {fontSize: autoFontSize()},
     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
   },
