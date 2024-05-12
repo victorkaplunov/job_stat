@@ -2,19 +2,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>ECharts</title>
-    <!-- Include the ECharts file you just downloaded -->
+    <title>Performance testing</title>
     <script src="/static/echarts.js"></script>
   </head>
   <body>
-
-    <!-- Prepare a DOM with a defined width and height for ECharts -->
-<div id="main" style="width: 1000px; height:800px;"></div>
-
+  <div id="main" style="width:100%;; height:800px;"></div>
+  </body>
+</html>
 <script type="text/javascript">
 var chartDom = document.getElementById('main');
-var myChart = echarts.init(document.querySelector('#main'), null, { renderer: 'svg' }
-  );
+var myChart = echarts.init(document.querySelector('#main'), null, { renderer: 'svg' });
 
 function autoFontSize() {
   let width = document.getElementById('main').offsetWidth;
@@ -22,9 +19,7 @@ function autoFontSize() {
   return newFontSize;
 };
 
-
 var option;
-
 const rawData = {{ raw_data | safe }};
 const totalData = [];
 for (let i = 0; i < rawData[0].length; ++i) {
@@ -112,5 +107,3 @@ window.addEventListener('resize', function() {
      });
 
     </script>
-  </body>
-</html>
