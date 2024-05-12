@@ -59,21 +59,21 @@ tooltip: {
     width: '80%',
   },
   grid,
-    yAxis: {
-             type: 'value',
-             splitNumber: 10,
-             boundaryGap: ['0', '100%'],
-             min:0,
-             max:1,
-             scale:true,
-             splitArea : {show : true},
-             axisLabel: {
-                  show: true,
-                  fontSize: autoFontSize(),
-                  fontStyle: 'bold',
-                  formatter: value => value * 100 + '%'
-                     }
-          },
+  yAxis: {
+           type: 'value',
+           splitNumber: 10,
+           boundaryGap: ['0', '100%'],
+           min:0,
+           max:1,
+           scale:true,
+           splitArea : {show : true},
+           axisLabel: {
+                show: true,
+                fontSize: autoFontSize(),
+                fontStyle: 'bold',
+                formatter: value => value * 100 + '%'
+                   }
+        },
   xAxis: {
     type: 'category',
     data: {{ category | safe }},
@@ -81,6 +81,7 @@ tooltip: {
           show: true,
           fontSize: autoFontSize(),
           fontStyle: 'bold',
+          formatter: value => value + ' г.'
     },
   },
   series
@@ -95,6 +96,19 @@ window.addEventListener('resize', function() {
       height: 'auto'}
     );
     myChart.setOption({
+      legend: {
+        textStyle: {fontSize: autoFontSize()},
+        },
+      xAxis: {
+        axisLabel: {
+          fontSize: autoFontSize(),
+          },
+        },
+      yAxis: {
+        axisLabel: {
+          fontSize: autoFontSize(),
+          },
+        },
       series: {
         label: {
           textStyle: {
@@ -105,5 +119,4 @@ window.addEventListener('resize', function() {
     })
 }
      });
-
-    </script>
+ </script>
