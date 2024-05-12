@@ -65,7 +65,7 @@ class Config:
 
     LOAD_TESTING_TOOLS = ['JMeter', 'LoadRunner', 'Performance Center', 'K6',
                           'Locust', 'Gatling', 'Grinder', 'Yandex.Tank',
-                          'ApacheBench', 'IBM Rational Performance']
+                          'IBM Rational Performance']
 
     TRAFFIC_GENERATORS = ['TRex', 'IXIA', 'pktgen']
 
