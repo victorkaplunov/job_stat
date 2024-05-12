@@ -9,11 +9,11 @@
   <body>
 
     <!-- Prepare a DOM with a defined width and height for ECharts -->
-<div id="main" style="width: 900px; height:800px;"></div>
+<div id="main" style="width: 1000px; height:800px;"></div>
 
 <script type="text/javascript">
 var chartDom = document.getElementById('main');
-var myChart = echarts.init(document.querySelector('#main'), null,
+var myChart = echarts.init(document.querySelector('#main'), null, { renderer: 'svg' }
   );
 
 function autoFontSize() {
@@ -25,14 +25,7 @@ function autoFontSize() {
 
 var option;
 
-// There should not be negative values in rawData
-const rawData = [
-  [100, 302, 301, 334, 390],
-  [320, 132, 101, 134, 90],
-  [220, 182, 191, 234, 290],
-  [150, 212, 201, 154, 190],
-  [820, 832, 901, 934, 1290]
-];
+const rawData = {{ raw_data | safe }};
 const totalData = [];
 for (let i = 0; i < rawData[0].length; ++i) {
   let sum = 0;
@@ -44,48 +37,56 @@ for (let i = 0; i < rawData[0].length; ++i) {
 const grid = {
   left: 100,
   right: 100,
-  top: 50,
+  top: 120,
   bottom: 50
 };
-const series = [
-  'Direct',
-  'Mail Ad',
-  'Affiliate Ad',
-  'Video Ad',
-  'Search Engine'
-].map((name, sid) => {
+const series = {{ series | safe }}.map((name, sid) => {
   return {
     name,
     type: 'bar',
     stack: 'total',
     barWidth: '60%',
-    label: {
-      show: true,
-      textStyle: {
-        fontSize: autoFontSize(),
-        fontStyle: 'bold',
-      },
-      formatter: (params) => Math.round(params.value * 1000) / 10 + '%'
-    },
     data: rawData[sid].map((d, did) =>
       totalData[did] <= 0 ? 0 : d / totalData[did]
     )
   };
 });
 option = {
-  textStyle: {fontSize: 11},
+tooltip: {
+    show: true,
+    trigger: 'item',
+    textStyle: {fontSize: autoFontSize()},
+    valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+  },
   legend: {
     selectedMode: false,
-    textStyle: {fontSize: autoFontSize()}
+    textStyle: {fontSize: autoFontSize()},
+    width: '90%',
   },
   grid,
-  yAxis: {
-    type: 'value'
-  },
+    yAxis: {
+             type: 'value',
+             splitNumber: 10,
+             boundaryGap: ['0', '100%'],
+             min:0,
+             max:1,
+             scale:true,
+             splitArea : {show : true},
+             axisLabel: {
+                  show: true,
+                  fontSize: autoFontSize(),
+                  fontStyle: 'bold',
+                  formatter: value => value * 100 + '%'
+                     }
+          },
   xAxis: {
     type: 'category',
-<!--    nameTextStyle: {fontSize: autoFontSize()},-->
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+    data: {{ category | safe }},
+    axisLabel: {
+          show: true,
+          fontSize: autoFontSize(),
+          fontStyle: 'bold',
+    },
   },
   series
 };

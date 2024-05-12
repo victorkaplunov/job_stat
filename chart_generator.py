@@ -286,23 +286,30 @@ class EChartStackedColumnChart(BaseChartGenerator):
         super().__init__(chart_name, chart_title, chart_subtitle)
         self.package = ['corechart']
 
-    def get_data_for_chart(self, chart_name: str) -> list[list[str | int]]:
+    def get_data_for_chart(self, chart_name: str) -> dict:
         """Формирует данные для столбчатой диаграммы."""
-        data_list = []
-        tool_set = set()
+        data_dict = dict(series=[], category=[], raw_data=[])
+        category_set = set()
+        raw_data = []
         for year in Config.YEARS:
-            year_data = [str(year)]
+            year_data = []
             data_per_year = self.db.get_sorted_data_for_chart_per_year(year=year,
                                                                        chart_name=chart_name)
             for i in data_per_year:
+                category_set.add(i.data)
                 year_data.append(i.popularity)
-                tool_set.add(i.data)
-            data_list.append(year_data)
-        tool_list = list(tool_set)
-        tool_list.sort()
-        head = ['Год'] + tool_list
-        data_list.insert(0, head)
-        return data_list
+            raw_data.append(year_data)
+        series = list(category_set)
+        series.sort()
+        data_dict['category'] = Config.YEARS
+        data_dict['series'] = series
+        list_of_tuple = list(zip(*raw_data))
+        data_dict['raw_data'] = [list(i) for i in list_of_tuple]
+        print(f"{data_dict['category']=}")
+        print(f"{data_dict['series']=}")
+        for i in data_dict['raw_data']:
+            print(i)
+        return data_dict
 
     def generate_script(self):
         """Генерация функции JavaScript для Stacked столбчатой диаграммы."""

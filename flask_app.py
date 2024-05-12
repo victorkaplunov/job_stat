@@ -9,7 +9,7 @@ import utils
 from db.db_client import Database
 from config import Config
 from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter, \
-    HorizontalBarChart, StackedColumnChart
+    HorizontalBarChart, StackedColumnChart, EChartStackedColumnChart
 
 db = Database()
 
@@ -381,5 +381,12 @@ def word_cloud():
 @app.route('/tmp')
 def tmp():
     """Chart page"""
-
-    return render_template('tmp.html')
+    chart = EChartStackedColumnChart(chart_name='load_testing_tools',
+                                     chart_title='Популярность средств CI/CD.')
+    chart_data = chart.get_data_for_chart(chart_name='load_testing_tools')
+    return render_template(
+        'tmp.html',
+        series=chart_data['series'],
+        category=chart_data['category'],
+        raw_data=chart_data['raw_data']
+        )
