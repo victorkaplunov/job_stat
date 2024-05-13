@@ -17,7 +17,6 @@ function autoFontSize() {
     newFontSize = 14
   if (newFontSize > 16)
     newFontSize = 16
-  console.log(newFontSize)
   return newFontSize;
 };
 
@@ -32,7 +31,7 @@ for (let i = 0; i < rawData[0].length; ++i) {
   totalData.push(sum);
 }
 const grid = {
-  left: 80,
+  left: 50,
   right: 20,
   top: 50,
   bottom: 150
@@ -49,46 +48,47 @@ const series = {{ series | safe }}.map((name, sid) => {
   };
 });
 option = {
-tooltip: {
-    show: true,
-    trigger: 'axis',
-    triggerOn: 'mousemove',
-    textStyle: {fontSize: autoFontSize()},
-    valueFormatter: (value) => (value * 100).toFixed(1) + '%'
-  },
-  legend: {
-    top: '85%',
-    selectedMode: true,
-    textStyle: {fontSize: autoFontSize()},
-    width: '100%',
-  },
-  grid,
-  yAxis: {
-           type: 'value',
-           splitNumber: 10,
-           boundaryGap: ['0', '100%'],
-           min:0,
-           max:1,
-           scale:true,
-           splitArea : {show : true},
-           axisLabel: {
-                show: true,
-                fontSize: autoFontSize(),
-                fontStyle: 'bold',
-                formatter: value => value * 100 + '%'
-                   }
+    tooltip: {
+        confine: true,
+        show: true,
+        trigger: 'axis',
+        triggerOn: 'mousemove',
+        textStyle: {fontSize: autoFontSize()},
+        valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+      },
+    legend: {
+        top: '85%',
+        selectedMode: true,
+        textStyle: {fontSize: autoFontSize()},
+        width: '100%',
+      },
+    grid,
+    yAxis: {
+       type: 'value',
+       splitNumber: 10,
+       boundaryGap: ['0', '100%'],
+       min:0,
+       max:1,
+       scale:true,
+       splitArea : {show : true},
+       axisLabel: {
+            show: true,
+            fontSize: autoFontSize(),
+            fontStyle: 'bold',
+            formatter: value => value * 100 + '%'
+               }
+       },
+    xAxis: {
+        type: 'category',
+        data: {{ category | safe }},
+        axisLabel: {
+              show: true,
+              fontSize: autoFontSize(),
+              fontStyle: 'bold',
+              formatter: value => value
         },
-  xAxis: {
-    type: 'category',
-    data: {{ category | safe }},
-    axisLabel: {
-          show: true,
-          fontSize: autoFontSize(),
-          fontStyle: 'bold',
-          formatter: value => value
-    },
-  },
-  series
+      },
+    series
 };
 
 myChart.setOption(option);
