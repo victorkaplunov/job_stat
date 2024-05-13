@@ -3,7 +3,8 @@
     {{ super() }}
 {% endblock %}
 {% block content %}
-<div id="main" style="width:100%; height:600px;">
+<div id="main" style="width:100%; height:700px;"></div>
+<hr>
 <script src="/static/echarts.js"></script>
 <script type="text/javascript">
 var chartDom = document.getElementById('main');
@@ -33,8 +34,8 @@ for (let i = 0; i < rawData[0].length; ++i) {
 const grid = {
   left: 80,
   right: 20,
-  top: 130,
-  bottom: 50
+  top: 50,
+  bottom: 150
 };
 const series = {{ series | safe }}.map((name, sid) => {
   return {
@@ -56,9 +57,10 @@ tooltip: {
     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
   },
   legend: {
-    selectedMode: false,
+    top: '85%',
+    selectedMode: true,
     textStyle: {fontSize: autoFontSize()},
-    width: '80%',
+    width: '100%',
   },
   grid,
   yAxis: {
