@@ -3,8 +3,7 @@
     {{ super() }}
 {% endblock %}
 {% block content %}
-<div id="main" style="width:100%;; height:600px;">
-
+<div id="main" style="width:100%; height:600px;">
 <script src="/static/echarts.js"></script>
 <script type="text/javascript">
 var chartDom = document.getElementById('main');
@@ -13,6 +12,11 @@ var myChart = echarts.init(document.querySelector('#main'), null, { renderer: 's
 function autoFontSize() {
   let width = document.getElementById('main').offsetWidth;
   let newFontSize = Math.round(width /40);
+  if (newFontSize < 14)
+    newFontSize = 14
+  if (newFontSize > 16)
+    newFontSize = 16
+  console.log(newFontSize)
   return newFontSize;
 };
 
@@ -29,7 +33,7 @@ for (let i = 0; i < rawData[0].length; ++i) {
 const grid = {
   left: 80,
   right: 20,
-  top: 120,
+  top: 130,
   bottom: 50
 };
 const series = {{ series | safe }}.map((name, sid) => {
@@ -47,7 +51,7 @@ option = {
 tooltip: {
     show: true,
     trigger: 'axis',
-    triggerOn: 'click',
+    triggerOn: 'mousemove',
     textStyle: {fontSize: autoFontSize()},
     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
   },
@@ -79,7 +83,7 @@ tooltip: {
           show: true,
           fontSize: autoFontSize(),
           fontStyle: 'bold',
-          formatter: value => value + ' г.'
+          formatter: value => value
     },
   },
   series
