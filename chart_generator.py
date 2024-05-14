@@ -305,10 +305,6 @@ class EChartStackedColumnChart(BaseChartGenerator):
         data_dict['series'] = series
         list_of_tuple = list(zip(*raw_data))
         data_dict['raw_data'] = [list(i) for i in list_of_tuple]
-        print(f"{data_dict['category']=}")
-        print(f"{data_dict['series']=}")
-        for i in data_dict['raw_data']:
-            print(i)
         return data_dict
 
     def generate_script(self):
