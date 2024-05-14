@@ -58,9 +58,14 @@ option = {
       },
     legend: {
         top: '85%',
-        selectedMode: true,
+        selectedMode: 'multiple',
+        selectorPosition: 'start',
         textStyle: {fontSize: autoFontSize()},
-        width: '100%',
+        width: '90%',
+        selector: [{
+            type: 'inverse',
+            title: 'Inv'
+          }]
       },
     grid,
     yAxis: {
