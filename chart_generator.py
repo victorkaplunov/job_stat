@@ -1,4 +1,5 @@
 import copy
+import json
 from operator import itemgetter
 
 from db.db_client import Database
@@ -279,53 +280,136 @@ class StackedColumnChart(BaseChartGenerator):
         return f'''<div id="{self.chart_name}" style="height: 650px;"></div>'''
 
 
-class EChartStackedColumnChart(BaseChartGenerator):
-    """Класс генерации столбчатой диаграммы."""
-
+class EChartBaseChartGenerator(BaseChartGenerator):
+    """Базовый класс генерации диаграмм на базе библиотеки ECharts."""
     def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
         super().__init__(chart_name, chart_title, chart_subtitle)
         self.package = ['corechart']
-
-    def get_data_for_chart(self, chart_name: str) -> dict:
-        """Формирует данные для столбчатой диаграммы."""
-        data_dict = dict(series=[], category=[], raw_data=[])
-        category_set = set()
-        raw_data = []
-        for year in Config.YEARS:
-            year_data = []
-            data_per_year = self.db.get_sorted_data_for_chart_per_year(year=year,
-                                                                       chart_name=chart_name)
-            for i in data_per_year:
-                category_set.add(i.data)
-                year_data.append(i.popularity)
-            raw_data.append(year_data)
-        series = list(category_set)
-        series.sort()
-        data_dict['category'] = Config.YEARS
-        data_dict['series'] = series
-        list_of_tuple = list(zip(*raw_data))
-        data_dict['raw_data'] = [list(i) for i in list_of_tuple]
-        return data_dict
-
-    def generate_script(self):
-        """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
-        chart_data = self.get_data_for_chart(self.chart_name)
-        self.charts = self.charts + f'''
-            google.charts.setOnLoadCallback(drawChart{self.chart_name});
-            function drawChart{self.chart_name}() {{
-            var data = google.visualization.arrayToDataTable({chart_data});
-            var options = {{
-            title: '{self.title}',
-                legend: {{position: 'top', maxLines: 10 }},
-                isStacked: 'percent',
-                vAxis: {{direction: 1}},
-                chartArea: {{height: "55%"}}
-            }};
-            var {self.chart_name} = new google.visualization.ColumnChart(document.getElementById('{self.chart_name}'));
-            {self.chart_name}.draw(data, options);
-            }}'''
-        return self.charts
+        self.auto_font_size_function = f'''
+            function autoFontSize() {{
+              let width = document.getElementById('{self.chart_name}').offsetWidth;
+              let newFontSize = Math.round(width /40);
+              if (newFontSize < 14)
+                newFontSize = 14
+              if (newFontSize > 16)
+                newFontSize = 16
+              return newFontSize;
+            }};'''
+        self.add_event_listener_function = f"""
+             window.addEventListener('resize', function() {{
+             if (myChart != null && myChart != undefined) {{
+                 myChart.resize({{width: 'auto', height: 'auto'}});
+                    myChart.setOption({{
+                      legend: {{textStyle: {{fontSize: autoFontSize()}},}},
+                      tooltip: {{textStyle: {{fontSize: autoFontSize()}},}},
+                      xAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                      yAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                      series: {{label: {{textStyle: {{fontSize: autoFontSize()}}}}}}
+                        }})
+                    }}"""
+        self.grid = f"""
+            const grid = {{
+              left: 50,
+              right: 20,
+              top: 50,
+              bottom: 150
+              }};"""
+        self.script_header = f"""
+            <script src="/static/echarts.js"></script>
+            <script type="text/javascript">
+            var chartDom = document.getElementById('{self.chart_name}');
+            var myChart = echarts.init(document.querySelector('#{self.chart_name}'),
+                                        null, {{ renderer: 'svg' }});
+            """
 
     def generate_divs(self):
         """Генерация раздела в который будут вставляться график."""
-        return f'''<div id="{self.chart_name}" style="height: 650px;"></div>'''
+        return f'''<div id="{self.chart_name}" style="width:100%; height: 650px;"></div>
+                <hr>'''
+
+
+class EChartStackedColumnChart(EChartBaseChartGenerator):
+    """Класс генерации столбчатой Stackable диаграммы на базе библиотеки ECharts."""
+    def get_percent_data(self) -> dict:
+        """Формирует данные для столбчатой Stacked диаграммы в долях от 100%."""
+        data_dict = dict(series='', category=[])
+        obj_list = list()
+        value_list = self.db.get_unic_values_for_chart(chart_name=self.chart_name)
+        data_dict['category'] = Config.YEARS
+        for value in value_list:
+            data = self.db.get_percentage_ordered_by_years(chart_name=self.chart_name,
+                                                           param_name=value)
+            obj = dict(name=value, stack='total', type='bar', data=data)
+            obj_list.append(obj)
+        data_dict['series'] = json.dumps(obj_list)
+        return data_dict
+
+    @staticmethod
+    def set_chart_option(chart_data: dict) -> str:
+        """Устанавливает опции столбчатой Stacked диаграммы."""
+        return f"""
+        var option;
+        option = {{
+            tooltip: {{
+                confine: true,
+                show: true,
+                trigger: 'axis',
+                triggerOn: 'mousemove',
+                textStyle: {{fontSize: autoFontSize()}},
+                valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+              }},
+            legend: {{
+                top: '85%',
+                selectedMode: 'multiple',
+                selectorPosition: 'start',
+                textStyle: {{fontSize: autoFontSize()}},
+                width: '90%',
+                selector: [{{
+                    type: 'inverse',
+                    title: 'Inv'
+                  }}]
+              }},
+            grid,
+            yAxis: {{
+               type: 'value',
+               splitNumber: 10,
+               boundaryGap: ['0', '100%'],
+               min:0,
+               max:1,
+               scale:true,
+               splitArea : {{show : true}},
+               axisLabel: {{
+                    show: true,
+                    fontSize: autoFontSize(),
+                    fontStyle: 'bold',
+                    formatter: value => value * 100 + '%'
+                       }}
+               }},
+            xAxis: {{
+                type: 'category',
+                data: {chart_data['category']},
+                axisLabel: {{
+                      show: true,
+                      fontSize: autoFontSize(),
+                      fontStyle: 'bold',
+                      formatter: value => value
+                }},
+              }},
+            series
+            }};
+        myChart.setOption(option);
+            """
+
+    def generate_script(self):
+        """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
+        chart_data = self.get_percent_data()
+        return f'''
+        {self.script_header}
+        {self.auto_font_size_function}
+        {self.grid}
+        const series = {chart_data['series']}
+        {self.set_chart_option(chart_data=chart_data)}
+        { self.add_event_listener_function }
+        }});
+        </script>'''
+

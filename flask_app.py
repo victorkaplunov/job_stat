@@ -380,13 +380,11 @@ def word_cloud():
 
 @app.route('/tmp')
 def tmp():
-    """Chart page"""
+    """Temporary chart page."""
     chart = EChartStackedColumnChart(chart_name='load_testing_tools',
                                      chart_title='Популярность средств CI/CD.')
-    chart_data = chart.get_data_for_chart(chart_name='load_testing_tools')
     return render_template(
-        'tmp.html',
-        series=chart_data['series'],
-        category=chart_data['category'],
-        raw_data=chart_data['raw_data']
+        'tmp_1.html',
+        chart_function=chart.generate_script(),
+        div=chart.generate_divs(),
         )
