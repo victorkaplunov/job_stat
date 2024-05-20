@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Numeric
+from sqlalchemy import Column, Integer, String, Numeric, Float
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -23,6 +23,7 @@ class Charts(Base):
     chart_name = Column(String)
     data = Column(String)
     popularity = Column(Integer)
+    percent = Column(Float)
     parent = Column(String)
     year = Column(Integer)
 

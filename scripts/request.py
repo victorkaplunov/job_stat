@@ -83,6 +83,8 @@ for year in years_tuple:
     utils.count_salary(year=year, update=update,
                        vacancies=all_vacancies_jsons)
 
+    utils.count_percent(year=year)
+
 
 # Count data for current year only charts
 utils.fill_skill_set_chart(update=update)

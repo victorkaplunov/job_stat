@@ -2,7 +2,7 @@ import os
 from datetime import date, timedelta
 from typing import Type, Sequence, Any, NoReturn
 
-from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc, asc, text
+from sqlalchemy import create_engine, and_, select, Row, RowMapping, exc, func, text
 from sqlalchemy.orm import sessionmaker
 
 from db.models import Vacancies, Calendar, Charts, VacWithSalary
@@ -110,7 +110,7 @@ class Database(metaclass=SingletonMeta):
         return self._session.query(Charts).filter_by(chart_name=chart_name).all()
 
     def get_data_for_chart_per_year(
-            self, year: int, chart_name: str) -> list[Type[Charts]]:
+            self, year: int, chart_name:  Sequence[Row[Any] | RowMapping]) -> list[Type[Charts]]:
         return self._session.query(Charts).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name)).all()
 
@@ -127,6 +127,25 @@ class Database(metaclass=SingletonMeta):
                 Charts.data == 'pytest'
             ))
         ).one()
+
+    def get_unic_chart_names(self) -> Sequence[Row[Any] | RowMapping]:
+        return self._session.scalars(select(Charts.chart_name)
+                                     .distinct()).all()
+
+    def get_unic_values_for_chart(self, chart_name: Sequence[Row[Any] | RowMapping]) -> Sequence[Row[Any] | RowMapping]:
+        return self._session.scalars(select(Charts.data)
+                                     .filter(Charts.chart_name == chart_name)
+                                     .distinct()).all()
+
+    def get_sum_for_chart_per_year(self, year: int,  chart_name:  Sequence[Row[Any] | RowMapping]) -> int:
+        return self._session.query(func.sum(Charts.popularity)).filter(
+            and_(Charts.chart_name == chart_name, Charts.year == year)).scalar()
+
+    def get_percentage_ordered_by_years(self, chart_name:  str, param_name:  Sequence[Row[Any] | RowMapping]) -> Sequence[Row[Any] | RowMapping]:
+        return self._session.scalars(select(Charts.percent)
+                                     .filter(and_(Charts.chart_name == chart_name,
+                                                  Charts.data == param_name))
+                                     .order_by(Charts.year)).all()
 
     def insert_vacancy(self, vac_id, json, published_at) -> NoReturn:
         vacancy = Vacancies(id=vac_id, json=json, published_at=published_at)
@@ -147,6 +166,15 @@ class Database(metaclass=SingletonMeta):
             and_(Charts.year == year, Charts.chart_name == chart_name,
                  Charts.parent == parent, Charts.data == data)).one()
         row.popularity = popularity
+        self._session.commit()
+
+    def update_percentage(self,  chart_name:  Sequence[Row[Any] | RowMapping],
+                          data: str, percent: float, year: [int, None],
+                          ) -> NoReturn:
+        row = self._session.query(Charts).filter(
+            and_(Charts.year == year, Charts.chart_name == chart_name,
+                 Charts.data == data)).one()
+        row.percent = percent
         self._session.commit()
 
     def insert_in_charts(self, chart_name: str, data: str, popularity: int,

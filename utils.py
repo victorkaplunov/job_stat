@@ -499,3 +499,15 @@ def fill_top_employers_chart() -> None:
         counter -= 1
         if counter == 0:
             break
+
+
+def count_percent(year):
+    chart_names_list = db.get_unic_chart_names()
+
+    for chart_name in chart_names_list:
+        popularity_sum = db.get_sum_for_chart_per_year(chart_name=chart_name, year=year)
+        chart_data = db.get_data_for_chart_per_year(chart_name=chart_name, year=year)
+        for item in chart_data:
+            percent = item.popularity / popularity_sum
+            db.update_percentage(chart_name=chart_name, year=year,
+                                 data=item.data, percent=percent)
