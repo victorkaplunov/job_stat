@@ -384,7 +384,7 @@ def tmp():
     chart = EChartStackedColumnChart(chart_name='load_testing_tools',
                                      chart_title='Популярность средств CI/CD.')
     return render_template(
-        'tmp_1.html',
+        'tmp.html',
         chart_function=chart.generate_script(),
         div=chart.generate_divs(),
         )
