@@ -284,7 +284,6 @@ class EChartBaseChartGenerator(BaseChartGenerator):
     """Базовый класс генерации диаграмм на базе библиотеки ECharts."""
     def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
         super().__init__(chart_name, chart_title, chart_subtitle)
-        self.package = ['corechart']
         self.auto_font_size_function = f'''
             function autoFontSize() {{
               let width = document.getElementById('{self.chart_name}').offsetWidth;
@@ -296,29 +295,21 @@ class EChartBaseChartGenerator(BaseChartGenerator):
               return newFontSize;
             }};'''
         self.add_event_listener_function = f"""
-             window.addEventListener('resize', function() {{
-             if (myChart != null && myChart != undefined) {{
-                 myChart.resize({{width: 'auto', height: 'auto'}});
-                    myChart.setOption({{
-                      legend: {{textStyle: {{fontSize: autoFontSize()}},}},
-                      tooltip: {{textStyle: {{fontSize: autoFontSize()}},}},
-                      xAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
-                      yAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
-                      series: {{label: {{textStyle: {{fontSize: autoFontSize()}}}}}}
-                        }})
-                    }}"""
-        self.grid = f"""
-            const grid = {{
-              left: 50,
-              right: 20,
-              top: 50,
-              bottom: 150
-              }};"""
+            window.addEventListener('resize', function() {{
+            if (myChart_{self.chart_name} != null && myChart_{self.chart_name} != undefined) {{
+             myChart_{self.chart_name}.resize({{width: 'auto', height: 'auto'}});
+                myChart_{self.chart_name}.setOption({{
+                  legend: {{textStyle: {{fontSize: autoFontSize()}},}},
+                  tooltip: {{textStyle: {{fontSize: autoFontSize()}},}},
+                  xAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                  yAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                  series: {{label: {{textStyle: {{fontSize: autoFontSize()}}}}}}
+                    }})
+                }}
+            """
         self.script_header = f"""
-            <script src="/static/echarts.js"></script>
-            <script type="text/javascript">
-            var chartDom = document.getElementById('{self.chart_name}');
-            var myChart = echarts.init(document.querySelector('#{self.chart_name}'),
+            var chartDom_{self.chart_name} = document.getElementById('{self.chart_name}');
+            var myChart_{self.chart_name} = echarts.init(document.querySelector('#{self.chart_name}'),
                                         null, {{ renderer: 'svg' }});
             """
 
@@ -344,12 +335,11 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
         data_dict['series'] = json.dumps(obj_list)
         return data_dict
 
-    @staticmethod
-    def set_chart_option(chart_data: dict) -> str:
+    def set_chart_option(self, chart_data: dict) -> str:
         """Устанавливает опции столбчатой Stacked диаграммы."""
         return f"""
-        var option;
-        option = {{
+        var option_{self.chart_name};
+        option_{self.chart_name} = {{
             tooltip: {{
                 confine: true,
                 show: true,
@@ -369,7 +359,12 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                     title: 'Inv'
                   }}]
               }},
-            grid,
+            grid: {{
+                left: 50,
+                right: 20,
+                top: 50,
+                bottom: 150
+                }},
             yAxis: {{
                type: 'value',
                splitNumber: 10,
@@ -395,9 +390,9 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                       formatter: value => value
                 }},
               }},
-            series
+            series: {chart_data['series']}
             }};
-        myChart.setOption(option);
+        myChart_{self.chart_name}.setOption(option_{self.chart_name});
             """
 
     def generate_script(self):
@@ -405,11 +400,7 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
         chart_data = self.get_percent_data()
         return f'''
         {self.script_header}
-        {self.auto_font_size_function}
-        {self.grid}
-        const series = {chart_data['series']}
         {self.set_chart_option(chart_data=chart_data)}
         { self.add_event_listener_function }
-        }});
-        </script>'''
+        }});'''
 

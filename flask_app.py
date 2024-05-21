@@ -385,6 +385,24 @@ def tmp():
                                      chart_title='Популярность средств CI/CD.')
     return render_template(
         'tmp.html',
+        auto_font_size_function=chart.auto_font_size_function,
         chart_function=chart.generate_script(),
         div=chart.generate_divs(),
+        )
+
+
+@app.route('/tmp_1')
+def tmp_1():
+    """Temporary chart page."""
+    chart1 = EChartStackedColumnChart(chart_name='ci_cd',
+                                      chart_title='Популярность средств CI/CD.')
+    chart2 = EChartStackedColumnChart(chart_name='cvs',
+                                      chart_title='Популярность систем управления версиями.')
+    return render_template(
+        '2_charts.html',
+        auto_font_size_function=chart1.auto_font_size_function,
+        chart_function1=chart1.generate_script(),
+        div1=chart1.generate_divs(),
+        chart_function2=chart2.generate_script(),
+        div2=chart2.generate_divs(),
         )

@@ -1,20 +1,15 @@
 {% extends "base.html" %}
 {% block scripts %}
     {{ super() }}
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':{{ package | safe }}});
-      {{ charts_function_1 | safe }}
-      {{ charts_function_2 | safe }}
-    </script>
 {% endblock %}
-
-  {% block title %}Home Page{% endblock %}
-
-    {% block content %}
-<h3>{{title}}</h3>
-        {{ div_1 | safe }}
-        {{ div_2 | safe }}
-
+{% block content %}
+    {{ div1 | safe }}
+    {{ div2 | safe }}
+    <script src="/static/echarts.js"></script>
+    <script type="text/javascript">
+    {{auto_font_size_function | safe }}
+    {{ chart_function1 | safe }}
+    {{ chart_function2 | safe }}
+    </script>
     {% endblock %}
 </html>
