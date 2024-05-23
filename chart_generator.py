@@ -313,10 +313,16 @@ class EChartBaseChartGenerator(BaseChartGenerator):
                                         null, {{ renderer: 'svg' }});
             """
 
-    def generate_divs(self):
-        """Генерация раздела в который будут вставляться график."""
-        return f'''<div id="{self.chart_name}" style="width:100%; height: 650px;"></div>
-                <hr>'''
+        self.div = f'''
+            <div id="{self.chart_name}" class="collapse show" style="width:100%; height: 650px;"></div>
+            <hr>'''
+
+        self.title_button = f'''
+            <button class="btn btn-primary" type="button" data-toggle="collapse"
+             data-target="#{self.chart_name}" aria-expanded="false" aria-controls="{self.chart_name}">
+            {self.title}
+            </button>
+            '''
 
 
 class EChartStackedColumnChart(EChartBaseChartGenerator):
@@ -344,7 +350,7 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                 confine: true,
                 show: true,
                 trigger: 'axis',
-                triggerOn: 'mousemove',
+                triggerOn: 'click',
                 textStyle: {{fontSize: autoFontSize()}},
                 valueFormatter: (value) => (value * 100).toFixed(1) + '%'
               }},

@@ -400,9 +400,11 @@ def tmp_1():
                                       chart_title='Популярность систем управления версиями.')
     return render_template(
         '2_charts.html',
+        chart_title_button_1=chart1.title_button,
+        chart_title_button_2=chart2.title_button,
         auto_font_size_function=chart1.auto_font_size_function,
         chart_function1=chart1.generate_script(),
-        div1=chart1.generate_divs(),
+        div1=chart1.div,
         chart_function2=chart2.generate_script(),
-        div2=chart2.generate_divs(),
+        div2=chart2.div,
         )

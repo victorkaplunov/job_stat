@@ -3,13 +3,17 @@
     {{ super() }}
 {% endblock %}
 {% block content %}
+
+    {{ chart_title_button_1 | safe }}
     {{ div1 | safe }}
+    {{ chart_title_button_2 | safe }}
     {{ div2 | safe }}
     <script src="/static/echarts.js"></script>
     <script type="text/javascript">
-    {{auto_font_size_function | safe }}
+    {{ auto_font_size_function | safe }}
     {{ chart_function1 | safe }}
     {{ chart_function2 | safe }}
     </script>
     {% endblock %}
+
 </html>
