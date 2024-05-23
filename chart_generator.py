@@ -318,11 +318,9 @@ class EChartBaseChartGenerator(BaseChartGenerator):
             <hr>'''
 
         self.title_button = f'''
-            <button class="btn btn-primary" type="button" data-toggle="collapse"
-             data-target="#{self.chart_name}" aria-expanded="false" aria-controls="{self.chart_name}">
+            <a class="btn btn-primary" data-toggle="collapse" href="#{self.chart_name}" role="button" aria-expanded="false" aria-controls="{self.chart_name}">
             {self.title}
-            </button>
-            '''
+            </a>'''
 
 
 class EChartStackedColumnChart(EChartBaseChartGenerator):
