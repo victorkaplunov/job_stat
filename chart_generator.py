@@ -347,7 +347,7 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                 confine: true,
                 show: true,
                 trigger: 'axis',
-                triggerOn: 'click',
+                triggerOn: 'mousemove',
                 textStyle: {{fontSize: autoFontSize()}},
                 valueFormatter: (value) => (value * 100).toFixed(1) + '%'
               }},
