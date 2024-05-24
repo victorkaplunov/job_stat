@@ -172,7 +172,7 @@ def experience():
     chart1 = EChartStackedColumnChart(chart_name='experience',
                                       chart_title='Требования к опыту')
     chart2 = EChartStackedColumnChart(chart_name='with_salary',
-                                      chart_title='Количество вакансий с указанной зарплатой')
+                                      chart_title='Доля вакансий с указанной зарплатой')
     return render_template(
         '2_charts.html',
         auto_font_size_function=chart1.auto_font_size_function,
@@ -181,7 +181,6 @@ def experience():
         chart_function2=chart2.generate_script(),
         div2=chart2.div,
     )
-
 
 
 @app.route('/key_skills')
