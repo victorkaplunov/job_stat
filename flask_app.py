@@ -8,8 +8,7 @@ from flask_bootstrap import Bootstrap
 import utils
 from db.db_client import Database
 from config import Config
-from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter, \
-    HorizontalBarChart, StackedColumnChart, EChartStackedColumnChart
+from chart_generator import PieChartWithFilter, HorizontalBarChart, EChartStackedColumnChart
 
 db = Database()
 
