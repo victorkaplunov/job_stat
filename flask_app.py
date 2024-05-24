@@ -272,15 +272,14 @@ def web_ui_and_api_tools():
 @app.route('/bdd_frameworks')
 def bdd_frameworks():
     """BDD framework page"""
-    chart = PieChart(chart_title='Популярность фреймворков BDD',
-                     chart_name='bdd_frameworks')
+    chart = EChartStackedColumnChart(chart_name='bdd_frameworks',
+                                     chart_title='Популярность фреймворков BDD')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность фреймворков BDD.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
+        '1_echart.html',
+        auto_font_size_function=chart.auto_font_size_function,
+        chart_function=chart.generate_script(),
+        div=chart.div,
+        )
 
 
 @app.route('/mobile_testing_frameworks')
