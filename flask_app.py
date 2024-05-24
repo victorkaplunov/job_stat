@@ -166,31 +166,22 @@ def employment_and_schedule():
         )
 
 
-@app.route('/experience')
+@app.route('/experience_and_salary_mention')
 def experience():
-    """Experience popularity page"""
-    chart = PieChart(chart_title='Требования к опыту ',
-                     chart_name='experience')
+    """Experience and salary mention page"""
+    chart1 = EChartStackedColumnChart(chart_name='experience',
+                                      chart_title='Требования к опыту')
+    chart2 = EChartStackedColumnChart(chart_name='with_salary',
+                                      chart_title='Количество вакансий с указанной зарплатой')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Требуемый опыт работы.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        '2_charts.html',
+        auto_font_size_function=chart1.auto_font_size_function,
+        chart_function1=chart1.generate_script(),
+        div1=chart1.div,
+        chart_function2=chart2.generate_script(),
+        div2=chart2.div,
     )
 
-
-@app.route('/with_salary')
-def with_salary():
-    chart = PieChart(chart_title='Количество вакансий с указанной зарплатой',
-                     chart_name='with_salary')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Количество вакансий с указанной зарплатой.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
 
 
 @app.route('/key_skills')
@@ -351,7 +342,7 @@ def tmp():
     chart = EChartStackedColumnChart(chart_name='load_testing_tools',
                                      chart_title='Популярность средств CI/CD.')
     return render_template(
-        'tmp.html',
+        '1_echart.html',
         auto_font_size_function=chart.auto_font_size_function,
         chart_function=chart.generate_script(),
         div=chart.div,
