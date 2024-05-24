@@ -273,18 +273,23 @@ def load_testing_and_monitoring_tools():
                            )
 
 
-@app.route('/api_testing_tools')
+@app.route('/web_ui_and_api_tools')
 def api_testing_tools():
     """Load testing tools page"""
     chart = PieChart(chart_title='Популярность инструментов тестирования Web API',
                      chart_name='api_testing_tools')
+    chart1 = EChartStackedColumnChart(chart_name='api_testing_tools',
+                                      chart_title='Популярность инструментов тестирования Web API')
+    chart2 = EChartStackedColumnChart(chart_name='web_ui_tools',
+                                      chart_title='Популярность средства тестирования Web UI')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Средства тестирования Web API.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
+        '2_charts.html',
+        auto_font_size_function=chart1.auto_font_size_function,
+        chart_function1=chart1.generate_script(),
+        div1=chart1.div,
+        chart_function2=chart2.generate_script(),
+        div2=chart2.div,
+        )
 
 
 @app.route('/bdd_frameworks')
@@ -296,20 +301,6 @@ def bdd_frameworks():
         '/simple_chart.html',
         package=chart.package,
         title='Популярность фреймворков BDD.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
-
-@app.route('/web_ui_tools')
-def web_ui_tools():
-    """Web UI testing tools page"""
-    chart = PieChart(chart_title='Популярность средства тестирования Web UI',
-                     chart_name='web_ui_tools')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность средства тестирования Web UI.',
         charts_function=chart.generate_script(),
         divs=chart.generate_divs()
     )
@@ -343,19 +334,21 @@ def bugtracking_n_tms():
     )
 
 
-@app.route('/cvs')
-def cvs():
-    """CVS page"""
-    chart = PieChart(chart_title='Популярность систем управления версиями',
-                     chart_name='cvs')
+@app.route('/cvs_and_ci_cd')
+def cvs_and_ci_cd():
+    """CVS and CI/CD page"""
+    chart1 = EChartStackedColumnChart(chart_name='ci_cd',
+                                      chart_title='Популярность средств <br> CI/CD.')
+    chart2 = EChartStackedColumnChart(chart_name='cvs',
+                                      chart_title='Популярность систем управления версиями.')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность систем управления версиями.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        '2_charts.html',
+        auto_font_size_function=chart1.auto_font_size_function,
+        chart_function1=chart1.generate_script(),
+        div1=chart1.div,
+        chart_function2=chart2.generate_script(),
+        div2=chart2.div,
     )
-
 
 @app.route('/ci_cd')
 def ci_cd():
@@ -395,19 +388,14 @@ def tmp():
 def tmp_1():
     """Temporary chart page."""
     chart1 = EChartStackedColumnChart(chart_name='ci_cd',
-                                      chart_title='Популярность средств CI/CD.')
+                                      chart_title='Популярность средств <br> CI/CD.')
     chart2 = EChartStackedColumnChart(chart_name='cvs',
                                       chart_title='Популярность систем управления версиями.')
-    chart3 = EChartStackedColumnChart(chart_name='bugtracking_n_tms',
-                                      chart_title='Популярность систем управления тестированием, bugtracking system и т.п.')
-    chart3.legend_type = 'scroll'
     return render_template(
-        '3_charts.html',
+        '2_charts.html',
         auto_font_size_function=chart1.auto_font_size_function,
         chart_function1=chart1.generate_script(),
         div1=chart1.div,
         chart_function2=chart2.generate_script(),
         div2=chart2.div,
-        chart_function3=chart3.generate_script(),
-        div3=chart3.div,
         )
