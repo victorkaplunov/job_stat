@@ -285,29 +285,28 @@ def bdd_frameworks():
 @app.route('/mobile_testing_frameworks')
 def mobile_testing_frameworks():
     """Mobile app testing tools page"""
-    chart = PieChart(chart_title='Популярность инструментов тестирования мобильных приложений',
-                     chart_name='mobile_testing_frameworks')
+    chart = EChartStackedColumnChart(chart_title='Популярность инструментов тестирования мобильных приложений',
+                                     chart_name='mobile_testing_frameworks')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность инструментов тестирования мобильных приложений.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        '1_echart.html',
+        auto_font_size_function=chart.auto_font_size_function,
+        chart_function=chart.generate_script(),
+        div=chart.div,
     )
 
 
 @app.route('/bugtracking_n_tms')
 def bugtracking_n_tms():
     """Mobile app testing tools page"""
-    chart = PieChart(chart_title='Популярность систем управления тестированием, bugtracking system и т.п.',
-                     chart_name='bugtracking_n_tms')
+    chart_title = 'Популярность систем управления тестированием, bugtracking system и т.п.'
+    chart = EChartStackedColumnChart(chart_title=chart_title,
+                                     chart_name='bugtracking_n_tms')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность систем управления тестированием, bugtracking system и т.п.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
+        '1_echart.html',
+        auto_font_size_function=chart.auto_font_size_function,
+        chart_function=chart.generate_script(),
+        div=chart.div,
+        )
 
 
 @app.route('/cvs_and_ci_cd')
