@@ -314,7 +314,7 @@ class EChartBaseChartGenerator(BaseChartGenerator):
             """
         self.div = f'''
             <h4>{self.title}</h4>
-            <div id="{self.chart_name}" class="collapse show" style="width:100%; height: 700px;"></div>
+            <div id="{self.chart_name}" class="collapse show" style="width:100%; height: 600px;"></div>
             <hr>'''
         self.legend_type = 'plain'
 
@@ -350,7 +350,7 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
               }},
             legend: {{
                 type: '{self.legend_type}',
-                top: '85%',
+                top: '80%',
                 selectedMode: 'multiple',
                 selectorPosition: 'start',
                 textStyle: {{fontSize: autoFontSize()}},
@@ -363,8 +363,8 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
             grid: {{
                 left: 50,
                 right: 20,
-                top: 50,
-                bottom: 150
+                top: 20,
+                bottom: 170
                 }},
             yAxis: {{
                type: 'value',
@@ -404,4 +404,3 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
         {self.set_chart_option(chart_data=chart_data)}
         { self.add_event_listener_function }
         }});'''
-
