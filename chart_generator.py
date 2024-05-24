@@ -353,7 +353,7 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
               }},
             legend: {{
                 type: '{self.legend_type}',
-                top: '80%',
+                top: '76%',
                 selectedMode: 'multiple',
                 selectorPosition: 'start',
                 textStyle: {{fontSize: autoFontSize()}},
@@ -367,7 +367,7 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                 left: 50,
                 right: 20,
                 top: 20,
-                bottom: 170
+                bottom: 175
                 }},
             yAxis: {{
                type: 'value',
