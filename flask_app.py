@@ -150,31 +150,20 @@ def top_employers():
                            divs=chart.generate_divs())
 
 
-@app.route('/schedule')
-def schedule():
-    """Schedule type popularity page"""
-    chart = PieChart(chart_title='Популярность режимов работы',
-                     chart_name='schedule')
+@app.route('/employment_and_schedule')
+def employment_and_schedule():
+    chart1 = EChartStackedColumnChart(chart_name='employment',
+                                      chart_title='Виды занятости')
+    chart2 = EChartStackedColumnChart(chart_name='schedule',
+                                      chart_title='Популярность режимов работы')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Режимы работы.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
-
-@app.route('/employment')
-def employment():
-    chart = PieChartWithTable(chart_title='Виды занятости',
-                              chart_name='employment')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Виды занятости.',
-        charts_function=chart.generate_script() + chart.generate_table_script(),
-        divs=chart.generate_divs()
-    )
+        '2_charts.html',
+        auto_font_size_function=chart1.auto_font_size_function,
+        chart_function1=chart1.generate_script(),
+        div1=chart1.div,
+        chart_function2=chart2.generate_script(),
+        div2=chart2.div,
+        )
 
 
 @app.route('/experience')
@@ -274,10 +263,8 @@ def load_testing_and_monitoring_tools():
 
 
 @app.route('/web_ui_and_api_tools')
-def api_testing_tools():
-    """Load testing tools page"""
-    chart = PieChart(chart_title='Популярность инструментов тестирования Web API',
-                     chart_name='api_testing_tools')
+def web_ui_and_api_tools():
+    """Web UI and API testing tools page"""
     chart1 = EChartStackedColumnChart(chart_name='api_testing_tools',
                                       chart_title='Популярность инструментов тестирования Web API')
     chart2 = EChartStackedColumnChart(chart_name='web_ui_tools',
@@ -348,19 +335,6 @@ def cvs_and_ci_cd():
         div1=chart1.div,
         chart_function2=chart2.generate_script(),
         div2=chart2.div,
-    )
-
-@app.route('/ci_cd')
-def ci_cd():
-    """Mobile app testing tools page"""
-    chart = PieChart(chart_title='Популярность средств CI/CD',
-                     chart_name='ci_cd')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность средств CI/CD.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
     )
 
 
