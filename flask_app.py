@@ -202,15 +202,14 @@ def key_skills():
 @app.route('/programming_languages')
 def programming_languages():
     """Programming languages page"""
-    chart = PieChart(chart_title='Популярность языков программирования',
-                     chart_name='languages')
+    chart = EChartStackedColumnChart(chart_name='languages',
+                                     chart_title='Популярность языков программирования')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность языков программирования.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
+        '1_echart.html',
+        auto_font_size_function=chart.auto_font_size_function,
+        chart_function=chart.generate_script(),
+        div=chart.div,
+        )
 
 
 @app.route('/unit_test_frameworks')
@@ -339,8 +338,8 @@ def word_cloud():
 @app.route('/tmp')
 def tmp():
     """Temporary chart page."""
-    chart = EChartStackedColumnChart(chart_name='load_testing_tools',
-                                     chart_title='Популярность средств CI/CD.')
+    chart = EChartStackedColumnChart(chart_name='languages',
+                                     chart_title='Популярность языков программирования')
     return render_template(
         '1_echart.html',
         auto_font_size_function=chart.auto_font_size_function,
