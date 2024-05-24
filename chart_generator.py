@@ -330,7 +330,10 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
         for value in value_list:
             data = self.db.get_percentage_ordered_by_years(chart_name=self.chart_name,
                                                            param_name=value)
-            obj = dict(name=value, stack='total', type='bar', data=data)
+            if self.chart_name in ['schedule', 'employment', 'experience', 'with_salary']:
+                obj = dict(name=Config.TRANSLATIONS[value], stack='total', type='bar', data=data)
+            else:
+                obj = dict(name=value, stack='total', type='bar', data=data)
             obj_list.append(obj)
         data_dict['series'] = json.dumps(obj_list)
         return data_dict
