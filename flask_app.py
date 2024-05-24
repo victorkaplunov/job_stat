@@ -251,25 +251,25 @@ def unit_test_frameworks():
 @app.route('/load_testing_and_monitoring_tools')
 def load_testing_and_monitoring_tools():
     """Load testing tools page"""
-    chart_1 = StackedColumnChart(chart_title='Инструменты тестирования производительности',
-                                 chart_name='load_testing_tools')
-    chart_2 = StackedColumnChart(chart_title='Популярность генераторов сетевого трафика',
-                                 chart_name='traffic_generators')
-    chart_3 = StackedColumnChart(chart_title='Системы трассировки',
-                                 chart_name='tracing_system')
-    chart_4 = StackedColumnChart(chart_title='Средства мониторинга',
-                                 chart_name='monitoring')
+    chart_1 = EChartStackedColumnChart(chart_title='Инструменты тестирования производительности',
+                                       chart_name='load_testing_tools')
+    chart_2 = EChartStackedColumnChart(chart_title='Популярность генераторов сетевого трафика',
+                                       chart_name='traffic_generators')
+    chart_3 = EChartStackedColumnChart(chart_title='Системы трассировки',
+                                       chart_name='tracing_system')
+    chart_4 = EChartStackedColumnChart(chart_title='Средства мониторинга',
+                                       chart_name='monitoring')
     return render_template('4_charts.html',
-                           package=chart_1.package,
                            title='Средства нагрузочного тестирования и мониторинга.',
-                           charts_function_1=chart_1.generate_script(),
-                           div_1=chart_1.generate_divs(),
-                           charts_function_2=chart_2.generate_script(),
-                           div_2=chart_2.generate_divs(),
-                           charts_function_3=chart_3.generate_script(),
-                           div_3=chart_3.generate_divs(),
-                           charts_function_4=chart_4.generate_script(),
-                           div_4=chart_4.generate_divs()
+                           auto_font_size_function=chart_1.auto_font_size_function,
+                           chart_function_1=chart_1.generate_script(),
+                           div_1=chart_1.div,
+                           chart_function_2=chart_2.generate_script(),
+                           div_2=chart_2.div,
+                           chart_function_3=chart_3.generate_script(),
+                           div_3=chart_3.div,
+                           chart_function_4=chart_4.generate_script(),
+                           div_4=chart_4.div
                            )
 
 
@@ -387,7 +387,7 @@ def tmp():
         'tmp.html',
         auto_font_size_function=chart.auto_font_size_function,
         chart_function=chart.generate_script(),
-        div=chart.generate_divs(),
+        div=chart.div,
         )
 
 
@@ -400,11 +400,9 @@ def tmp_1():
                                       chart_title='Популярность систем управления версиями.')
     chart3 = EChartStackedColumnChart(chart_name='bugtracking_n_tms',
                                       chart_title='Популярность систем управления тестированием, bugtracking system и т.п.')
+    chart3.legend_type = 'scroll'
     return render_template(
         '3_charts.html',
-        chart_title_button_1=chart1.title_button,
-        chart_title_button_2=chart2.title_button,
-        chart_title_button_3=chart3.title_button,
         auto_font_size_function=chart1.auto_font_size_function,
         chart_function1=chart1.generate_script(),
         div1=chart1.div,

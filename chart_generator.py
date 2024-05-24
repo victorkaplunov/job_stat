@@ -312,15 +312,11 @@ class EChartBaseChartGenerator(BaseChartGenerator):
             var myChart_{self.chart_name} = echarts.init(document.querySelector('#{self.chart_name}'),
                                         null, {{ renderer: 'svg' }});
             """
-
         self.div = f'''
-            <div id="{self.chart_name}" class="collapse show" style="width:100%; height: 650px;"></div>
+            <h4>{self.title}</h4>
+            <div id="{self.chart_name}" class="collapse show" style="width:100%; height: 700px;"></div>
             <hr>'''
-
-        self.title_button = f'''
-            <a class="btn btn-primary" data-toggle="collapse" href="#{self.chart_name}" role="button" aria-expanded="false" aria-controls="{self.chart_name}">
-            {self.title}
-            </a>'''
+        self.legend_type = 'plain'
 
 
 class EChartStackedColumnChart(EChartBaseChartGenerator):
@@ -353,6 +349,7 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                 valueFormatter: (value) => (value * 100).toFixed(1) + '%'
               }},
             legend: {{
+                type: '{self.legend_type}',
                 top: '85%',
                 selectedMode: 'multiple',
                 selectorPosition: 'start',
