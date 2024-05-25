@@ -110,9 +110,16 @@ class Database(metaclass=SingletonMeta):
         return self._session.query(Charts).filter_by(chart_name=chart_name).all()
 
     def get_data_for_chart_per_year(
-            self, year: int, chart_name:  Sequence[Row[Any] | RowMapping]) -> list[Type[Charts]]:
+            self, year: int, chart_name: Sequence[Row[Any] | RowMapping]) -> list[Type[Charts]]:
         return self._session.query(Charts).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name)).all()
+
+    def get_data_for_chart_per_year_by_parent(
+            self, year: int, chart_name: Sequence[Row[Any] | RowMapping],
+            parent: Sequence[Row[Any] | RowMapping]) -> list[Type[Charts]]:
+        return self._session.query(Charts).filter(
+            and_(Charts.year == year, Charts.chart_name == chart_name,
+                 Charts.parent == parent)).all()
 
     def get_sorted_data_for_chart_per_year(
             self, year: int, chart_name: str) -> list[Type[Charts]]:
@@ -130,6 +137,10 @@ class Database(metaclass=SingletonMeta):
 
     def get_unic_chart_names(self) -> Sequence[Row[Any] | RowMapping]:
         return self._session.scalars(select(Charts.chart_name)
+                                     .distinct()).all()
+
+    def get_unic_parents(self) -> Sequence[Row[Any] | RowMapping]:
+        return self._session.scalars(select(Charts.parent).where(Charts.parent.is_not(None))
                                      .distinct()).all()
 
     def get_unic_values_for_chart(self, chart_name: Sequence[Row[Any] | RowMapping]) -> Sequence[Row[Any] | RowMapping]:

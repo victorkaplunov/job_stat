@@ -149,7 +149,6 @@ class PieChartWithFilter(BaseChartGenerator):
             'ui': {{
                 'caption': 'Выберите язык',
                 'selectedValuesLayout': 'belowStacked',
-                'labelStacking': 'vertical',
                 'label': 'Языки программирования',
                 'labelStacking': 'vertical'
             }},
@@ -287,9 +286,9 @@ class EChartBaseChartGenerator(BaseChartGenerator):
         self.auto_font_size_function = f'''
             function autoFontSize() {{
               let width = document.getElementById('{self.chart_name}').offsetWidth;
-              let newFontSize = Math.round(width /40);
-              if (newFontSize < 14)
-                newFontSize = 14
+              let newFontSize = Math.round(width /50);
+              if (newFontSize < 12)
+                newFontSize = 12
               if (newFontSize > 16)
                 newFontSize = 16
               return newFontSize;
@@ -405,5 +404,65 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
         return f'''
         {self.script_header}
         {self.set_chart_option(chart_data=chart_data)}
+        { self.add_event_listener_function }
+        }});'''
+
+
+class EchartSunburst(EChartBaseChartGenerator):
+    """Класс генерации диаграммы типа Sunburst на базе библиотеки ECharts."""
+
+    def get_data(self, year) -> list:
+        """Формирует данные для графиков по годам на основе запроса в БД."""
+        output_list = list()
+        parents = self.db.get_unic_parents()
+        for parent in parents:
+            data_dict = dict()
+            data_dict['tooltip'] = dict(valueFormatter="value => value * 100 + '%'")
+            children_from_db = self.db.get_data_for_chart_per_year_by_parent(
+                year=year, chart_name=self.chart_name,
+                parent=parent)
+            children = list()
+            data_dict['name'] = parent
+            for child in children_from_db:
+                children.append(dict(name=child.data,
+                                     value=child.percent,
+                                     # tooltip=dict(valueFormatter="value => value * 100 + '%'")
+                                     ))
+            data_dict['children'] = children
+            output_list.append(data_dict)
+        return output_list
+
+    def set_chart_option(self) -> str:
+        """Устанавливает опции столбчатой Stacked диаграммы."""
+        return f"""
+            var option_{self.chart_name};
+            option_{self.chart_name} = {{
+                tooltip: {{
+                    show: true,
+                    triggerOn: 'mousemove'}},
+                series: {{
+                    type: 'sunburst',
+                    // emphasis: {{
+                    //     focus: 'ancestor'
+                    // }},
+                    data: {self.get_data('2024')},
+                    radius: [0, '100%'],
+                    label: {{rotate: 'radial'}},
+                    levels: [
+                    {{}},
+                    {{ r0: '15%', r: '60%', label: {{rotate: 'radial', align: 'right'}}}},
+                    {{ r0: '60%', r: '70%', label: {{position: 'outside',}}}},
+                    ],
+                    tooltip: {{valueFormatter: "value => value * 100 + '%'"}}
+                }}
+            }};
+        myChart_{self.chart_name}.setOption(option_{self.chart_name});
+        """
+
+    def generate_script(self):
+        """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
+        return f'''
+        {self.script_header}
+        {self.set_chart_option()}
         { self.add_event_listener_function }
         }});'''
