@@ -426,7 +426,6 @@ class EchartSunburst(EChartBaseChartGenerator):
             for child in children_from_db:
                 children.append(dict(name=child.data,
                                      value=child.percent,
-                                     # tooltip=dict(formater="value => value * 100 + '%'")
                                      ))
             data_dict['children'] = children
             output_list.append(data_dict)
@@ -439,17 +438,19 @@ class EchartSunburst(EChartBaseChartGenerator):
             option_{self.chart_name} = {{
                 tooltip: {{
                     show: true,
-                    alwaysShowContent: true,
+                    alwaysShowContent: false,
                     triggerOn: 'mousemove',
-                    // confine: false,
+                    confine: false,
                     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
                     }},
                 series: {{
                     type: 'sunburst',
-                    // emphasis: {{
-                    //     focus: 'ancestor'
-                    // }},
+                    nodeClick: 'rootToNode',
+                    emphasis: {{
+                         focus: 'ancestor'
+                     }},
                     data: {self.get_data('2024')},
+                    sort: 'asc',
                     radius: [0, '90%'],
                     label: {{rotate: 'radial'}},
                     levels: [
