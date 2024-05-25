@@ -98,6 +98,7 @@ class Config:
 
     UNIT_FRAMEWORKS = [['pytest', 'Python'], ['py.test', 'Python'],
                        ['Unittest', 'Python'], ['Nose', 'Python'],
+                       ['Robot_Framework', 'Python'],
                        ['JUnit', 'Java'], ['TestNG', 'Java'],
                        ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
                        ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
@@ -105,8 +106,7 @@ class Config:
                        ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'],
                        ['Jest', 'JavaScript'], ['Jasmine', 'JavaScript'],
                        ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
-                       ['CodeceptJS', 'JavaScript'],
-                       ['Robot_Framework', 'multiple_language']]
+                       ['CodeceptJS', 'JavaScript']]
 
     SCHEDULE = ['fullDay', 'flexible', 'shift', 'remote', 'flyInFlyOut']
      
