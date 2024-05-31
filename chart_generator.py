@@ -404,7 +404,7 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
         return f'''
         {self.script_header}
         {self.set_chart_option(chart_data=chart_data)}
-        { self.add_event_listener_function }
+        {self.add_event_listener_function }
         }});'''
 
 
@@ -432,27 +432,27 @@ class EchartSunburst(EChartBaseChartGenerator):
         return output_list
 
     def set_chart_option(self) -> str:
-        """Устанавливает опции столбчатой Stacked диаграммы."""
+        """Устанавливает опции Sunburst диаграммы."""
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
-                tooltip: {{
-                    show: true,
-                    alwaysShowContent: false,
-                    triggerOn: 'mousemove',
-                    confine: false,
-                    valueFormatter: (value) => (value * 100).toFixed(1) + '%'
-                    }},
+                //tooltip: {{
+                    //show: true,
+                    // alwaysShowContent: false,
+                    //triggerOn: 'mousemove',
+                    //confine: false,
+                    //valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+                 //   }},
                 series: {{
                     type: 'sunburst',
-                    nodeClick: 'rootToNode',
-                    emphasis: {{
-                         focus: 'ancestor'
-                     }},
+                    // nodeClick: 'rootToNode',
+                    //emphasis: {{
+                    //     focus: 'ancestor'
+                    // }},
                     data: {self.get_data('2024')},
-                    sort: 'asc',
-                    radius: [0, '90%'],
-                    label: {{rotate: 'radial'}},
+                    // sort: 'asc',
+                    // radius: [0, '90%'],
+                    // label: {{rotate: 'radial'}},
                     levels: [
                     {{}},
                     {{ r0: '15%', r: '60%', label: {{rotate: 'radial', align: 'right'}}}},
@@ -463,7 +463,7 @@ class EchartSunburst(EChartBaseChartGenerator):
         myChart_{self.chart_name}.setOption(option_{self.chart_name});
         """
 
-    def generate_script(self):
+    def generate_script(self) -> str:
         """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
         return f'''
         {self.script_header}
