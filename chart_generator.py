@@ -237,7 +237,7 @@ class StackedColumnChart(BaseChartGenerator):
         super().__init__(chart_name, chart_title, chart_subtitle)
         self.package = ['corechart']
 
-    def get_data_for_chart(self, chart_name: str) -> list[list[str | int]]:
+    def get_data(self, chart_name: str) -> list[list[str | int]]:
         """Формирует данные для столбчатой диаграммы."""
         data_list = []
         tool_set = set()
@@ -257,7 +257,7 @@ class StackedColumnChart(BaseChartGenerator):
 
     def generate_script(self):
         """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
-        chart_data = self.get_data_for_chart(self.chart_name)
+        chart_data = self.get_data(self.chart_name)
         self.charts = self.charts + f'''
             google.charts.setOnLoadCallback(drawChart{self.chart_name});
             function drawChart{self.chart_name}() {{
@@ -320,7 +320,7 @@ class EChartBaseChartGenerator(BaseChartGenerator):
 
 class EChartStackedColumnChart(EChartBaseChartGenerator):
     """Класс генерации столбчатой Stackable диаграммы на базе библиотеки ECharts."""
-    def get_percent_data(self) -> dict:
+    def get_data(self) -> dict:
         """Формирует данные для столбчатой Stacked диаграммы в долях от 100%."""
         data_dict = dict(series='', category=[])
         obj_list = list()
@@ -337,8 +337,9 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
         data_dict['series'] = json.dumps(obj_list)
         return data_dict
 
-    def set_chart_option(self, chart_data: dict) -> str:
+    def set_chart_option(self) -> str:
         """Устанавливает опции столбчатой Stacked диаграммы."""
+        chart_data = self.get_data()
         return f"""
         var option_{self.chart_name};
         option_{self.chart_name} = {{
@@ -400,16 +401,31 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
 
     def generate_script(self):
         """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
-        chart_data = self.get_percent_data()
         return f'''
         {self.script_header}
-        {self.set_chart_option(chart_data=chart_data)}
+        {self.set_chart_option()}
         {self.add_event_listener_function }
         }});'''
 
 
 class EchartSunburst(EChartBaseChartGenerator):
     """Класс генерации диаграммы типа Sunburst на базе библиотеки ECharts."""
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
+        super().__init__(chart_name, chart_title, chart_subtitle)
+
+        self.add_event_listener_function = f"""
+            window.addEventListener('resize', function() {{
+            if (myChart_{self.chart_name} != null && myChart_{self.chart_name} != undefined) {{
+             myChart_{self.chart_name}.resize({{width: 'auto', height: 'auto'}});
+                myChart_{self.chart_name}.setOption({{
+                  legend: {{textStyle: {{fontSize: autoFontSize()}},}},
+                  tooltip: {{textStyle: {{fontSize: autoFontSize()}},}},
+                  xAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                  yAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                  series: {{label: {{fontSize: autoFontSize()}}}}
+                    }})
+                }}
+            """
 
     def get_data(self, year) -> list:
         """Формирует данные для графиков по годам на основе запроса в БД."""
@@ -417,7 +433,6 @@ class EchartSunburst(EChartBaseChartGenerator):
         parents = self.db.get_unic_parents()
         for parent in parents:
             data_dict = dict()
-            # data_dict['tooltip'] = dict(valueFormatter="value => value * 100 + '%'")
             children_from_db = self.db.get_data_for_chart_per_year_by_parent(
                 year=year, chart_name=self.chart_name,
                 parent=parent)
@@ -433,7 +448,6 @@ class EchartSunburst(EChartBaseChartGenerator):
 
     def set_chart_option(self) -> str:
         """Устанавливает опции Sunburst диаграммы."""
-        print(f"{self.get_data('2024')=}")
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
@@ -449,11 +463,11 @@ class EchartSunburst(EChartBaseChartGenerator):
                     data: {self.get_data('2024')},
                      sort: 'asc',
                      radius: [0, '90%'],
-                    label: {{rotate: 'radial'}},
+                    label: {{rotate: 'radial', fontSize: autoFontSize()}},
                     levels: [
                     {{}},
-                    {{ r0: '15%', r: '90%', label: {{rotate: 'radial', align: 'right'}}}},
-                    {{ r0: '90%', r: '100%', label: {{position: 'outside', show: false}}}},
+                    {{ r0: '15%', r: '80%', label: {{rotate: 'radial', align: 'right'}}}},
+                    {{ r0: '80%', r: '90%', label: {{position: 'outside', show: false}}}},
                     ],
                 }}
             }};
@@ -465,5 +479,5 @@ class EchartSunburst(EChartBaseChartGenerator):
         return f'''
         {self.script_header}
         {self.set_chart_option()}
-        { self.add_event_listener_function }
+        {self.add_event_listener_function }
         }});'''
