@@ -417,7 +417,7 @@ class EchartSunburst(EChartBaseChartGenerator):
         parents = self.db.get_unic_parents()
         for parent in parents:
             data_dict = dict()
-            data_dict['tooltip'] = dict(valueFormatter="value => value * 100 + '%'")
+            # data_dict['tooltip'] = dict(valueFormatter="value => value * 100 + '%'")
             children_from_db = self.db.get_data_for_chart_per_year_by_parent(
                 year=year, chart_name=self.chart_name,
                 parent=parent)
@@ -433,30 +433,27 @@ class EchartSunburst(EChartBaseChartGenerator):
 
     def set_chart_option(self) -> str:
         """Устанавливает опции Sunburst диаграммы."""
+        print(f"{self.get_data('2024')=}")
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
-                //tooltip: {{
-                    //show: true,
-                    // alwaysShowContent: false,
-                    //triggerOn: 'mousemove',
-                    //confine: false,
-                    //valueFormatter: (value) => (value * 100).toFixed(1) + '%'
-                 //   }},
+                tooltip: {{
+                    show: true,
+                     alwaysShowContent: false,
+                    triggerOn: 'mousemove',
+                    confine: false,
+                    valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+                    }},
                 series: {{
                     type: 'sunburst',
-                    // nodeClick: 'rootToNode',
-                    //emphasis: {{
-                    //     focus: 'ancestor'
-                    // }},
                     data: {self.get_data('2024')},
-                    // sort: 'asc',
-                    // radius: [0, '90%'],
-                    // label: {{rotate: 'radial'}},
+                     sort: 'asc',
+                     radius: [0, '90%'],
+                    label: {{rotate: 'radial'}},
                     levels: [
                     {{}},
-                    {{ r0: '15%', r: '60%', label: {{rotate: 'radial', align: 'right'}}}},
-                    {{ r0: '60%', r: '70%', label: {{position: 'outside',}}}},
+                    {{ r0: '15%', r: '90%', label: {{rotate: 'radial', align: 'right'}}}},
+                    {{ r0: '90%', r: '100%', label: {{position: 'outside', show: false}}}},
                     ],
                 }}
             }};
