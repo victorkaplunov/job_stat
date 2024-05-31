@@ -453,7 +453,7 @@ class EchartSunburst(EChartBaseChartGenerator):
             option_{self.chart_name} = {{
                 tooltip: {{
                     show: true,
-                     alwaysShowContent: false,
+                    alwaysShowContent: true,
                     triggerOn: 'mousemove',
                     confine: false,
                     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
