@@ -464,12 +464,12 @@ class EchartSunburst(EChartBaseChartGenerator):
                      sort: 'asc',
                      radius: [0, '90%'],
                      startAngle: 120,
-                    label: {{rotate: 'radial', fontSize: autoFontSize()}},
+                    label: {{rotate: 'radial'}},
                     labelLayout: {{hideOverlap: true}},
                     levels: [
                     {{}},
-                    {{ r0: '15%', r: '70%', label: {{rotate: 'radial', align: 'right'}}}},
-                    {{ r0: '70%', r: '80%', label: {{position: 'outside', show: true, rotate: 'radial'}}}},
+                    {{ r0: '15%', r: '60%', label: {{rotate: 'radial', align: 'right'}}}},
+                    {{ r0: '60%', r: '70%', label: {{position: 'outside', show: true, rotate: 'radial'}}}},
                     ],
                 }}
             }};
