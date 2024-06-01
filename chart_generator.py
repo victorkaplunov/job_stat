@@ -458,12 +458,14 @@ class EchartSunburst(EChartBaseChartGenerator):
                     confine: false,
                     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
                     }},
+                 dataZoom: [{{type: 'inside', type: 'slider'
+                    }}],
                 series: {{
                     type: 'sunburst',
                     data: {self.get_data('2024')},
-                     sort: 'asc',
-                     radius: [0, '90%'],
-                     startAngle: 120,
+                    sort: 'asc',
+                    radius: [0, '90%'],
+                    startAngle: 120,
                     label: {{rotate: 'radial'}},
                     labelLayout: {{hideOverlap: true}},
                     levels: [
