@@ -463,11 +463,13 @@ class EchartSunburst(EChartBaseChartGenerator):
                     data: {self.get_data('2024')},
                      sort: 'asc',
                      radius: [0, '90%'],
+                     startAngle: 120,
                     label: {{rotate: 'radial', fontSize: autoFontSize()}},
+                    labelLayout: {{hideOverlap: true}},
                     levels: [
                     {{}},
-                    {{ r0: '15%', r: '80%', label: {{rotate: 'radial', align: 'right'}}}},
-                    {{ r0: '80%', r: '90%', label: {{position: 'outside', show: false}}}},
+                    {{ r0: '15%', r: '70%', label: {{rotate: 'radial', align: 'right'}}}},
+                    {{ r0: '70%', r: '80%', label: {{position: 'outside', show: true, rotate: 'radial'}}}},
                     ],
                 }}
             }};
