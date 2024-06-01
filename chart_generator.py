@@ -458,8 +458,14 @@ class EchartSunburst(EChartBaseChartGenerator):
                     confine: false,
                     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
                     }},
-                 dataZoom: [{{type: 'inside', type: 'slider'
+                dataZoom: [{{type: 'inside', type: 'slider'
                     }}],
+                toolbox: {{
+                    show: true,
+                    feature: {{
+                        dataZoom: {{yAxisIndex: "none"}},
+                        }}
+                    }},
                 series: {{
                     type: 'sunburst',
                     data: {self.get_data('2024')},
