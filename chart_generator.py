@@ -516,13 +516,14 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
         return output_list
 
     def set_chart_option(self) -> str:
-        """Устанавливает опции Sunburst диаграммы."""
+        """Устанавливает опции TreeMap диаграммы."""
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
                 series: [{{
                     type: 'treemap',
                     data: {self.get_data('2024')},
+                    roam: 'zoom',
                     tooltip: {{
                         // formatter: '{{b}}{{c}}',
                         valueFormatter: (value) => (value * 100).toFixed(1) + '%'
