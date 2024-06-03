@@ -524,13 +524,14 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                     type: 'treemap',
                     data: {self.get_data('2024')},
                     roam: 'zoom',
+                    zoomToNodeRatio: 0.7*0.7,
                     tooltip: {{
                         // formatter: '{{b}}{{c}}',
                         valueFormatter: (value) => (value * 100).toFixed(1) + '%'
                         }},
                     label: {{
                         show: true,
-                        overflow: 'break',
+                        //overflow: 'break',
                         formatter: function (params) {{
                           console.log('params', params)
                           return `${{params.name}} ${{Number(params.value*100).toFixed(2)  + '%'}}`}}
