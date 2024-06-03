@@ -507,9 +507,11 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
             for child in children_from_db:
                 children.append(dict(name=child.data,
                                      value=child.percent,
+                                     tooltip={'padding': 5},
                                      ))
             data_dict['children'] = children
             output_list.append(data_dict)
+
         print(f"{output_list=}")
         return output_list
 
@@ -521,9 +523,16 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                 series: [{{
                     type: 'treemap',
                     data: {self.get_data('2024')},
+                    tooltip: {{
+                        // formatter: '{{b}}{{c}}',
+                        valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+                        }},
                     label: {{
                         show: true,
-                        formatter: '{{b}}'
+                        formatter: function (params) {{
+                          console.log('params', params)
+                          return `${{params.name}} ${{Number(params.value*100).toFixed(2)  + '%'}}`}}
+        
                     }},
                     upperLabel: {{
                         show: true,
