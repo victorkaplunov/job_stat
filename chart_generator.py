@@ -466,12 +466,99 @@ class EchartSunburst(EChartBaseChartGenerator):
                     startAngle: 120,
                     label: {{rotate: 'radial'}},
                     labelLayout: {{hideOverlap: true}},
+                    emphasis: {{
+                        itemStyle: {{
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }}
+                    }},
                     levels: [
                     {{}},
                     {{ r0: '15%', r: '60%', label: {{rotate: 'radial', align: 'right'}}}},
                     {{ r0: '60%', r: '70%', label: {{position: 'outside', show: true, rotate: 'radial'}}}},
                     ],
                 }}
+            }};
+        myChart_{self.chart_name}.setOption(option_{self.chart_name});
+        """
+
+    def generate_script(self) -> str:
+        """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
+        return f'''
+        {self.script_header}
+        {self.set_chart_option()}
+        {self.add_event_listener_function }
+        }});'''
+
+
+class EChartTreeMapChart(EChartBaseChartGenerator):
+    """Класс генерации TreeMap диаграммы."""
+    def get_data(self, year) -> list:
+        output_list = list()
+        parents = self.db.get_unic_parents()
+        for parent in parents:
+            data_dict = dict()
+            children_from_db = self.db.get_data_for_chart_per_year_by_parent(
+                year=year, chart_name=self.chart_name,
+                parent=parent)
+            children = list()
+            data_dict['name'] = parent
+            for child in children_from_db:
+                children.append(dict(name=child.data,
+                                     value=child.percent,
+                                     ))
+            data_dict['children'] = children
+            output_list.append(data_dict)
+        print(f"{output_list=}")
+        return output_list
+
+    def set_chart_option(self) -> str:
+        """Устанавливает опции Sunburst диаграммы."""
+        return f"""
+            var option_{self.chart_name};
+            option_{self.chart_name} = {{
+                series: [{{
+                    type: 'treemap',
+                    data: {self.get_data('2024')},
+                    label: {{
+                        show: true,
+                        formatter: '{{b}}'
+                    }},
+                    upperLabel: {{
+                        show: true,
+                        height: 30
+                        }},
+                    itemStyle: {{borderColor: '#fff'}},
+                    levels: [{{
+                        itemStyle: {{
+                            borderColor: '#777',
+                            borderWidth: 0,
+                            gapWidth: 1
+                            }},
+                        upperLabel: {{show: false}}
+                        }},
+                        {{
+                        itemStyle: {{
+                            borderColor: '#555',
+                            borderWidth: 5,
+                            gapWidth: 1
+                            }},
+                        emphasis: {{
+                            itemStyle: {{
+                                borderColor: '#ddd'
+                                }}
+                            }}
+                        }},
+                        {{
+                        colorSaturation: [0.35, 0.5],
+                        itemStyle: {{
+                            borderWidth: 5,
+                            gapWidth: 1,
+                            borderColorSaturation: 0.6
+                            }}
+                        }}],
+                }}]
             }};
         myChart_{self.chart_name}.setOption(option_{self.chart_name});
         """

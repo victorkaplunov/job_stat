@@ -8,8 +8,8 @@ from flask_bootstrap import Bootstrap
 import utils
 from db.db_client import Database
 from config import Config
-from chart_generator import PieChartWithFilter, HorizontalBarChart,\
-    EChartStackedColumnChart, EchartSunburst
+from chart_generator import PieChartWithFilter, HorizontalBarChart, \
+    EChartStackedColumnChart, EchartSunburst, EChartTreeMapChart
 
 db = Database()
 
@@ -335,8 +335,8 @@ def word_cloud():
 @app.route('/tmp')
 def tmp():
     """Temporary chart page."""
-    chart = EchartSunburst(chart_name='frameworks',
-                            chart_title='Популярность фреймворков для юнит-тестирования')
+    chart = EChartTreeMapChart(chart_name='frameworks',
+                               chart_title='Популярность фреймворков для юнит-тестирования')
     return render_template(
         '1_echart.html',
         auto_font_size_function=chart.auto_font_size_function,
