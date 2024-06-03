@@ -530,6 +530,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                         }},
                     label: {{
                         show: true,
+                        overflow: 'break',
                         formatter: function (params) {{
                           console.log('params', params)
                           return `${{params.name}} ${{Number(params.value*100).toFixed(2)  + '%'}}`}}
