@@ -451,6 +451,11 @@ class EchartSunburst(EChartBaseChartGenerator):
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
+                legend: {{
+                    type: 'plain',
+                    show: true,
+                    data: [{{name: 'test', icon: 'circle',}}],
+                    }},
                 tooltip: {{
                     show: true,
                     alwaysShowContent: true,
@@ -484,7 +489,7 @@ class EchartSunburst(EChartBaseChartGenerator):
         """
 
     def generate_script(self) -> str:
-        """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
+        """Генерация функции JavaScript для Sunburst диаграммы."""
         return f'''
         {self.script_header}
         {self.set_chart_option()}
@@ -511,67 +516,78 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                                      ))
             data_dict['children'] = children
             output_list.append(data_dict)
-
-        print(f"{output_list=}")
         return output_list
 
+    def get_series(self, year, idx) -> str:
+        """Generate series for option of TreeMap chart."""
+        seria = f"""
+            {{
+                type: 'treemap',
+                name: '{str(year)}',
+                // visualDimension: {idx},
+                data: {self.get_data(str(year))},
+                roam: 'zoom',
+                zoomToNodeRatio: 0.7*0.7,
+                tooltip: {{
+                    valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+                    }},
+                label: {{
+                    show: true,
+                    //overflow: 'break',
+                    formatter: function (params) {{
+                      return `${{params.name}} ${{Number(params.value*100).toFixed(1)  + '%'}}`}}
+
+                }},
+                upperLabel: {{
+                    show: true,
+                    height: 30
+                    }},
+                itemStyle: {{borderColor: '#fff'}},
+                levels: [{{
+                    itemStyle: {{
+                        borderColor: '#777',
+                        borderWidth: 0,
+                        gapWidth: 1
+                        }},
+                    upperLabel: {{show: false}}
+                    }},
+                    {{
+                    itemStyle: {{
+                        borderColor: '#555',
+                        borderWidth: 5,
+                        gapWidth: 1
+                        }},
+                    emphasis: {{
+                        itemStyle: {{
+                            borderColor: '#ddd'
+                            }}
+                        }}
+                    }},
+                    {{
+                    //colorSaturation: [0.35, 0.5],
+                    //colorAlpha: [1, 1],
+                    itemStyle: {{
+                        borderWidth: 5,
+                        gapWidth: 1,
+                        borderColorSaturation: 0.6
+                        }}
+                    }}],
+            }},"""
+        return seria
+
     def set_chart_option(self) -> str:
-        """Устанавливает опции TreeMap диаграммы."""
+        """Set options for TreeMap chart."""
+        series = ''
+        for idx, year in enumerate(Config.YEARS):
+            series += self.get_series(year=str(year), idx=idx)
+        print(f"{series=}")
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
-                series: [{{
-                    type: 'treemap',
-                    data: {self.get_data('2024')},
-                    roam: 'zoom',
-                    zoomToNodeRatio: 0.7*0.7,
-                    tooltip: {{
-                        // formatter: '{{b}}{{c}}',
-                        valueFormatter: (value) => (value * 100).toFixed(1) + '%'
-                        }},
-                    label: {{
-                        show: true,
-                        //overflow: 'break',
-                        formatter: function (params) {{
-                          console.log('params', params)
-                          return `${{params.name}} ${{Number(params.value*100).toFixed(2)  + '%'}}`}}
-        
-                    }},
-                    upperLabel: {{
-                        show: true,
-                        height: 30
-                        }},
-                    itemStyle: {{borderColor: '#fff'}},
-                    levels: [{{
-                        itemStyle: {{
-                            borderColor: '#777',
-                            borderWidth: 0,
-                            gapWidth: 1
-                            }},
-                        upperLabel: {{show: false}}
-                        }},
-                        {{
-                        itemStyle: {{
-                            borderColor: '#555',
-                            borderWidth: 5,
-                            gapWidth: 1
-                            }},
-                        emphasis: {{
-                            itemStyle: {{
-                                borderColor: '#ddd'
-                                }}
-                            }}
-                        }},
-                        {{
-                        colorSaturation: [0.35, 0.5],
-                        itemStyle: {{
-                            borderWidth: 5,
-                            gapWidth: 1,
-                            borderColorSaturation: 0.6
-                            }}
-                        }}],
-                }}]
-            }};
+                legend: {{data: {Config.YEARS}, selectedMode: 'single',}},
+                series: [{series}],
+                tooltip: {{}},
+                }};
         myChart_{self.chart_name}.setOption(option_{self.chart_name});
         """
 
