@@ -578,13 +578,13 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
     def set_chart_option(self) -> str:
         """Set options for TreeMap chart."""
         series = ''
-        for idx, year in enumerate(Config.YEARS):
+        for idx, year in enumerate(Config.YEARS[::-1]):
             series += self.get_series(year=str(year), idx=idx)
         print(f"{series=}")
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
-                legend: {{data: {Config.YEARS}, selectedMode: 'single',}},
+                legend: {{data: {Config.YEARS[::-1]}, selectedMode: 'single',}},
                 series: [{series}],
                 tooltip: {{}},
                 }};
