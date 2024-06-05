@@ -512,8 +512,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
             for child in children_from_db:
                 children.append(dict(name=child.data,
                                      value=child.percent,
-                                     tooltip={'padding': 5},
-                                     color='#24e499',
+                                     # tooltip={'padding': 5},
                                      ))
             data_dict['children'] = children
             output_list.append(data_dict)
