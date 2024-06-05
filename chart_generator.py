@@ -528,7 +528,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                 name: '{str(year)}',
                 // visualDimension: {idx},
                 data: {self.get_data(str(year))},
-                // roam: 'zoom',
+                roam: 'zoom',
                 //zoomToNodeRatio: 0.6*0.6,
                 leafDepth: 1,
                 drillDownIcon: '',
