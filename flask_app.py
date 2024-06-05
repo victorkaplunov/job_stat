@@ -336,7 +336,7 @@ def word_cloud():
 def tmp():
     """Temporary chart page."""
     chart = EChartTreeMapChart(chart_name='frameworks',
-                               chart_title='Популярность фреймворков для юнит-тестирования (clickable)')
+                               chart_title='Популярность фреймворков для юнит-тестирования')
     return render_template(
         '1_echart.html',
         auto_font_size_function=chart.auto_font_size_function,
