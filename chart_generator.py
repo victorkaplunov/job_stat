@@ -513,24 +513,22 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                 children.append(dict(name=child.data,
                                      value=child.percent,
                                      tooltip={'padding': 5},
-                                     color='red'
+                                     color='#24e499',
                                      ))
             data_dict['children'] = children
             output_list.append(data_dict)
         return output_list
 
-    def get_series(self, year, idx) -> str:
+    def get_series(self, year) -> str:
         """Generate series for option of TreeMap chart."""
         seria = f"""
             {{
                 type: 'treemap',
-                color: '#24e499',
-                name: '{str(year)}',
-                // visualDimension: {idx},
-                data: {self.get_data(str(year))},
+                name: '{year}',
+                data: {self.get_data(year)},
                 roam: 'zoom',
-                //zoomToNodeRatio: 0.6*0.6,
                 leafDepth: 1,
+                select: {{color: 'red'}},
                 drillDownIcon: '',
                 tooltip: {{
                     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
@@ -540,7 +538,6 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                     }},
                 label: {{
                     show: true,
-                    //overflow: 'break',
                     formatter: function (params) {{
                       return `${{params.name}} ${{Number(params.value*100).toFixed(1)  + '%'}}`}}
 
@@ -571,8 +568,6 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                         }}
                     }},
                     {{
-                    //colorSaturation: [0.35, 0.5],
-                    //colorAlpha: [1, 1],
                     itemStyle: {{
                         borderWidth: 2,
                         gapWidth: 1,
@@ -585,21 +580,13 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
     def set_chart_option(self) -> str:
         """Set options for TreeMap chart."""
         series = ''
-        for idx, year in enumerate(Config.YEARS[::-1]):
-            series += self.get_series(year=str(year), idx=idx)
-        print(f"{series=}")
+        for year in Config.YEARS[::-1]:
+            series += self.get_series(year=str(year))
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
                 legend: {{
-                    data: {Config.YEARS[::-1]},
                     selectedMode: 'single',
-                    emphasis: {{
-                         selectorLabel: {{
-                            //show: false,
-                            color: '#000'
-                            }}
-                        }}
                     }},
                 series: [{series}],
                 tooltip: {{}},
