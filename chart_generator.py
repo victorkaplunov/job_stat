@@ -561,7 +561,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                     {{
                     itemStyle: {{
                         borderColor: '#555',
-                        borderWidth: 5,
+                        borderWidth: 2,
                         gapWidth: 1
                         }},
                     emphasis: {{
@@ -574,7 +574,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                     //colorSaturation: [0.35, 0.5],
                     //colorAlpha: [1, 1],
                     itemStyle: {{
-                        borderWidth: 5,
+                        borderWidth: 2,
                         gapWidth: 1,
                         borderColorSaturation: 0.6
                         }}
