@@ -513,6 +513,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                 children.append(dict(name=child.data,
                                      value=child.percent,
                                      tooltip={'padding': 5},
+                                     color='red'
                                      ))
             data_dict['children'] = children
             output_list.append(data_dict)
@@ -523,13 +524,19 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
         seria = f"""
             {{
                 type: 'treemap',
+                color: '#24e499',
                 name: '{str(year)}',
                 // visualDimension: {idx},
                 data: {self.get_data(str(year))},
-                //roam: 'zoom',
-                zoomToNodeRatio: 0.7*0.7,
+                // roam: 'zoom',
+                //zoomToNodeRatio: 0.6*0.6,
+                leafDepth: 1,
+                drillDownIcon: '',
                 tooltip: {{
                     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+                    }},
+                select: {{
+                    label: {{show: true}}
                     }},
                 label: {{
                     show: true,
@@ -584,7 +591,16 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
         return f"""
             var option_{self.chart_name};
             option_{self.chart_name} = {{
-                legend: {{data: {Config.YEARS[::-1]}, selectedMode: 'single',}},
+                legend: {{
+                    data: {Config.YEARS[::-1]},
+                    selectedMode: 'single',
+                    emphasis: {{
+                         selectorLabel: {{
+                            show: false,
+                            color: '#000'
+                            }}
+                        }}
+                    }},
                 series: [{series}],
                 tooltip: {{}},
                 }};
