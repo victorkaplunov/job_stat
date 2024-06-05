@@ -596,7 +596,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                     selectedMode: 'single',
                     emphasis: {{
                          selectorLabel: {{
-                            show: false,
+                            //show: false,
                             color: '#000'
                             }}
                         }}
