@@ -1,6 +1,7 @@
 import os
 import json
 from functools import lru_cache
+from pprint import pprint
 
 from flask import Flask, send_from_directory, url_for, render_template
 from flask_bootstrap import Bootstrap
@@ -10,6 +11,7 @@ from db.db_client import Database
 from config import Config
 from chart_generator import PieChartWithFilter, HorizontalBarChart, \
     EChartStackedColumnChart, EchartSunburst, EChartTreeMapChart
+from echarts import EchartTreeMap
 
 db = Database()
 
@@ -364,4 +366,10 @@ def tmp_1():
 
 @app.route('/tmp_2')
 def tmp_2():
-    return render_template('treemap-obama.html')
+    chart = EchartTreeMap(name='frameworks',
+                          title='Популярность фреймворков для юнит-тестирования')
+    return render_template(
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.generate_divs()
+        )
