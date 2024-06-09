@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    {{ div | safe}}
+    {{ chart_script | safe }}
+{% endblock %}
