@@ -1,6 +1,7 @@
 from pyecharts import options as opts
 from pyecharts.charts import TreeMap
 from pyecharts.commons import utils
+from pyecharts.types import TreeMapLevel
 
 from config import Config
 from db.db_client import Database
@@ -52,7 +53,13 @@ class EchartTreeMap(BaseChart):
                         "function (params) {return `${params.name} ${Number(params.value*100).toFixed(1)  + '%'}`}"
                     ),
                 ),
-                upper_label_opts=opts.LabelOpts(is_show=False),
+                upper_label_opts=opts.LabelOpts(is_show=True),
+                levels=[
+                    opts.TreeMapLevelsOpts(
+                        upper_label_opts=opts.LabelOpts(is_show=False)),
+                    opts.TreeMapLevelsOpts(
+                        upper_label_opts=opts.LabelOpts(is_show=True))
+                ],
                 tooltip_opts=opts.TooltipOpts(
                     value_formatter=utils.JsCode("(value) => (value * 100).toFixed(1) + '%'"),
                 ),
