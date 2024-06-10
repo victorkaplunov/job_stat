@@ -6,13 +6,21 @@ from config import Config
 from db.db_client import Database
 
 
-class EchartTreeMap(TreeMap):
+class BaseChart:
     def __init__(self, name: str, title: str):
-        super().__init__()
         self.title = title
         self.name = name
         self.db = Database()
 
+    def get_div(self, height=600) -> str:
+        """Make chart`s div."""
+        return f'''
+        <h4>{self.title}</h4>
+        <div id="{self.name}" style="height: {height}px;"></div>
+        <hr>'''
+
+
+class EchartTreeMap(BaseChart):
     def get_data(self, year) -> list:
         """Get data for TreeMap chart."""
         output_list = list()
@@ -30,7 +38,7 @@ class EchartTreeMap(TreeMap):
             output_list.append(data_dict)
         return output_list
 
-    def get_options(self):
+    def get_options(self) -> str:
         chart = TreeMap().set_global_opts(title_opts=opts.TitleOpts(is_show=False),
                                           legend_opts=opts.LegendOpts(selected_mode='single', ),
                                           tooltip_opts=opts.TooltipOpts(is_show=True))
@@ -41,7 +49,7 @@ class EchartTreeMap(TreeMap):
                 leaf_depth=1,
                 label_opts=opts.LabelOpts(
                     formatter=utils.JsCode(
-                        """function (params) {return `${params.name} ${Number(params.value*100).toFixed(1)  + '%'}`}"""
+                        "function (params) {return `${params.name} ${Number(params.value*100).toFixed(1)  + '%'}`}"
                     ),
                 ),
                 upper_label_opts=opts.LabelOpts(is_show=False),
@@ -52,22 +60,15 @@ class EchartTreeMap(TreeMap):
         del chart.options['legend'][0]['data']
         return chart.dump_options()
 
-    def get_div(self):
-        """Make chart`s div."""
-        return f'''
-        <h4>{self.title}</h4>
-        <div id="{self.name}" style="height: 600px;"></div>
-        <hr>'''
-
-    def get_script(self):
+    def get_script(self) -> str:
         """Make complete chart script."""
         return f"""
         <script src="/static/echarts.js"></script>
         <script type="text/javascript">
         var chartDom_{self.name} = document.getElementById('{self.name}');
-        var myChart_{self.name} = echarts.init(document.querySelector('#{self.name}'),
+        var {self.name} = echarts.init(document.querySelector('#{self.name}'),
                                         null, {{ renderer: 'svg' }});
         var option = {self.get_options()}
-        myChart_{self.name}.setOption(option);
-    </script>
+        {self.name}.setOption(option);
+        </script>
         """
