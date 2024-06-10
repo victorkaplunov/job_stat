@@ -1,7 +1,6 @@
 from pyecharts import options as opts
 from pyecharts.charts import TreeMap
 from pyecharts.commons import utils
-from pyecharts.types import TreeMapLevel
 
 from config import Config
 from db.db_client import Database
@@ -19,6 +18,22 @@ class BaseChart:
         <h4>{self.title}</h4>
         <div id="{self.name}" style="height: {height}px;"></div>
         <hr>'''
+
+    def get_options(self) -> str:
+        return ''
+
+    def get_script(self) -> str:
+        """Get chart script."""
+        return f"""
+        <script src="/static/echarts.js"></script>
+        <script type="text/javascript">
+        var chartDom_{self.name} = document.getElementById('{self.name}');
+        var {self.name} = echarts.init(document.querySelector('#{self.name}'),
+                                        null, {{ renderer: 'svg' }});
+        var option = {self.get_options()}
+        {self.name}.setOption(option);
+        </script>
+        """
 
 
 class EchartTreeMap(BaseChart):
@@ -58,24 +73,21 @@ class EchartTreeMap(BaseChart):
                     opts.TreeMapLevelsOpts(
                         upper_label_opts=opts.LabelOpts(is_show=False)),
                     opts.TreeMapLevelsOpts(
-                        upper_label_opts=opts.LabelOpts(is_show=True))
+                        upper_label_opts=opts.LabelOpts(is_show=True),
+                    ),
+                    opts.TreeMapLevelsOpts(
+                        upper_label_opts=opts.LabelOpts(is_show=True),
+                        treemap_itemstyle_opts=opts.TreeMapItemStyleOpts(
+                            border_color='#ddd',
+                            border_width=1
+                        )
+                    )
                 ],
                 tooltip_opts=opts.TooltipOpts(
                     value_formatter=utils.JsCode("(value) => (value * 100).toFixed(1) + '%'"),
+                    trigger_on='mousemove'
                 ),
             )
         del chart.options['legend'][0]['data']
         return chart.dump_options()
 
-    def get_script(self) -> str:
-        """Make complete chart script."""
-        return f"""
-        <script src="/static/echarts.js"></script>
-        <script type="text/javascript">
-        var chartDom_{self.name} = document.getElementById('{self.name}');
-        var {self.name} = echarts.init(document.querySelector('#{self.name}'),
-                                        null, {{ renderer: 'svg' }});
-        var option = {self.get_options()}
-        {self.name}.setOption(option);
-        </script>
-        """
