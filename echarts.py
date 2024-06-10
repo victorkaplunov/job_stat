@@ -30,13 +30,6 @@ class EchartTreeMap(TreeMap):
             output_list.append(data_dict)
         return output_list
 
-    def generate_divs(self):
-        """Генерация раздела в который будут вставляться график."""
-        return f'''
-        <h4>{self.title}</h4>
-        <div id="{self.name}" style="height: 650px;"></div>
-        <hr>'''
-
     def get_options(self):
         chart = TreeMap().set_global_opts(title_opts=opts.TitleOpts(is_show=False),
                                           legend_opts=opts.LegendOpts(selected_mode='single', ),
@@ -59,7 +52,15 @@ class EchartTreeMap(TreeMap):
         del chart.options['legend'][0]['data']
         return chart.dump_options()
 
+    def get_div(self):
+        """Make chart`s div."""
+        return f'''
+        <h4>{self.title}</h4>
+        <div id="{self.name}" style="height: 600px;"></div>
+        <hr>'''
+
     def get_script(self):
+        """Make complete chart script."""
         return f"""
         <script src="/static/echarts.js"></script>
         <script type="text/javascript">

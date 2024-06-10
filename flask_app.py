@@ -371,5 +371,5 @@ def tmp_2():
     return render_template(
         'pyechart.html',
         chart_script=chart.get_script(),
-        div=chart.generate_divs()
+        div=chart.get_div()
         )
