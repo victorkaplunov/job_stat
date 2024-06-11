@@ -11,7 +11,7 @@ from db.db_client import Database
 from config import Config
 from chart_generator import PieChartWithFilter, HorizontalBarChart, \
     EChartStackedColumnChart, EchartSunburst, EChartTreeMapChart
-from echarts import EchartTreeMap
+from echarts import EchartStackedColumn
 
 db = Database()
 
@@ -366,8 +366,9 @@ def tmp_1():
 
 @app.route('/tmp_2')
 def tmp_2():
-    chart = EchartTreeMap(name='frameworks',
-                          title='Популярность фреймворков для юнит-тестирования')
+    chart = EchartStackedColumn(name='bugtracking_n_tms',
+                                title='Популярность систем управления тестированием, bugtracking system и т.п.')
+    chart.get_data()
     return render_template(
         'pyechart.html',
         chart_script=chart.get_script(),

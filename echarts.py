@@ -1,6 +1,9 @@
+import json
+
 from pyecharts import options as opts
-from pyecharts.charts import TreeMap
+from pyecharts.charts import TreeMap, Bar, Grid
 from pyecharts.commons import utils
+from pyecharts.globals import RenderType
 
 from config import Config
 from db.db_client import Database
@@ -34,6 +37,38 @@ class BaseChart:
         {self.name}.setOption(option);
         </script>
         """
+
+
+class EchartStackedColumn(BaseChart):
+    def get_data(self) -> list:
+        """Get data for Stacked Column chart."""
+        value_list = self.db.get_unic_values_for_chart(chart_name=self.name)
+        output_list = []
+        for value in value_list:
+            data = self.db.get_percentage_ordered_by_years(chart_name=self.name,
+                                                           param_name=value)
+            if self.name in ['schedule', 'employment', 'experience', 'with_salary']:
+                obj = dict(name=Config.TRANSLATIONS[value], data=data)
+            else:
+                obj = dict(name=value, data=data)
+            output_list.append(obj)
+        return output_list
+
+    def get_options(self) -> str:
+        chart = Bar(init_opts=opts.InitOpts(width="100%"))
+        chart.set_global_opts(title_opts=opts.TitleOpts(is_show=False),
+                              legend_opts=opts.LegendOpts(selector_position='start', pos_top='76%'),
+                              tooltip_opts=opts.TooltipOpts(
+                                  is_show=True, trigger_on='mousemove', trigger='axis',
+                                  value_formatter=utils.JsCode("(value) => (value * 100).toFixed(1) + '%'")),
+                              )
+        chart.add_xaxis(Config.YEARS)
+        series = self.get_data()
+        for seria in series:
+            chart.add_yaxis(seria['name'], seria['data'], stack="stack1")
+        chart.options['grid'] = {'left': 50, 'right': 20, 'top': 20, 'bottom': 175}
+        chart.set_series_opts(label_opts=opts.LabelOpts(is_show=False))
+        return chart.dump_options()
 
 
 class EchartTreeMap(BaseChart):
@@ -90,4 +125,3 @@ class EchartTreeMap(BaseChart):
             )
         del chart.options['legend'][0]['data']
         return chart.dump_options()
-
