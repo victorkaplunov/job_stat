@@ -1,5 +1,3 @@
-import json
-
 from pyecharts import options as opts
 from pyecharts.charts import TreeMap, Bar
 from pyecharts.commons import utils
