@@ -57,16 +57,21 @@ class EchartStackedColumn(BaseChart):
     def get_options(self) -> str:
         chart = Bar(init_opts=opts.InitOpts(width="100%"))
         chart.set_global_opts(title_opts=opts.TitleOpts(is_show=False),
-                              legend_opts=opts.LegendOpts(selector_position='start', pos_top='76%'),
+                              legend_opts=opts.LegendOpts(selector_position='start',
+                                                          pos_top='76%', pos_left=5,
+                                                          selector=[{'type': 'inverse'}],
+                                                          selector_button_gap=5),
                               tooltip_opts=opts.TooltipOpts(
                                   is_show=True, trigger_on='mousemove', trigger='axis',
-                                  value_formatter=utils.JsCode("(value) => (value * 100).toFixed(1) + '%'")),
+                                  value_formatter=utils.JsCode(
+                                      "(value) => (value * 100).toFixed(1) + '%'")),
                               )
         chart.add_xaxis(Config.YEARS)
         series = self.get_data()
         for seria in series:
             chart.add_yaxis(seria['name'], seria['data'], stack="stack1")
         chart.options['grid'] = {'left': 50, 'right': 20, 'top': 20, 'bottom': 175}
+        chart.options['legend'][0]['width'] = '90%'
         chart.set_series_opts(label_opts=opts.LabelOpts(is_show=False))
         return chart.dump_options()
 
@@ -94,22 +99,16 @@ class EchartTreeMap(BaseChart):
                                           legend_opts=opts.LegendOpts(selected_mode='single', ),
                                           tooltip_opts=opts.TooltipOpts(is_show=True))
 
+        js_fnc = "function (params) {return `${params.name} ${Number(params.value*100).toFixed(1)  + '%'}`}"
         for year in Config.YEARS[::-1]:
             chart.add(
                 series_name=year, data=self.get_data(year=year), roam='zoom',
                 leaf_depth=1,
-                label_opts=opts.LabelOpts(
-                    formatter=utils.JsCode(
-                        "function (params) {return `${params.name} ${Number(params.value*100).toFixed(1)  + '%'}`}"
-                    ),
-                ),
+                label_opts=opts.LabelOpts(formatter=utils.JsCode(js_fnc)),
                 upper_label_opts=opts.LabelOpts(is_show=True),
                 levels=[
-                    opts.TreeMapLevelsOpts(
-                        upper_label_opts=opts.LabelOpts(is_show=False)),
-                    opts.TreeMapLevelsOpts(
-                        upper_label_opts=opts.LabelOpts(is_show=True),
-                    ),
+                    opts.TreeMapLevelsOpts(upper_label_opts=opts.LabelOpts(is_show=False)),
+                    opts.TreeMapLevelsOpts(upper_label_opts=opts.LabelOpts(is_show=True),),
                     opts.TreeMapLevelsOpts(
                         upper_label_opts=opts.LabelOpts(is_show=True),
                         treemap_itemstyle_opts=opts.TreeMapItemStyleOpts(
