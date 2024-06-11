@@ -1,9 +1,8 @@
 import json
 
 from pyecharts import options as opts
-from pyecharts.charts import TreeMap, Bar, Grid
+from pyecharts.charts import TreeMap, Bar
 from pyecharts.commons import utils
-from pyecharts.globals import RenderType
 
 from config import Config
 from db.db_client import Database
