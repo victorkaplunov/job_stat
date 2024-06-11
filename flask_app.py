@@ -110,7 +110,7 @@ def time_series():
         vacancy_count_week_by_week=utils.get_vacancies_qty_week_by_week(),
         vacancy_rate_by_year=utils.get_vacancies_qty_by_month_of_year(),
         vacancy_count_day_by_week=utils.get_vacancies_qty_by_day_of_week(),
-           )
+    )
 
 
 @app.route('/salary')
@@ -154,34 +154,32 @@ def top_employers():
 
 @app.route('/employment_and_schedule')
 def employment_and_schedule():
-    chart1 = EChartStackedColumnChart(chart_name='employment',
-                                      chart_title='Виды занятости')
-    chart2 = EChartStackedColumnChart(chart_name='schedule',
-                                      chart_title='Популярность режимов работы')
+    chart1 = EchartStackedColumn(name='employment',
+                                 title='Виды занятости')
+    chart2 = EchartStackedColumn(name='schedule',
+                                 title='Популярность режимов работы')
     return render_template(
         '2_charts.html',
-        auto_font_size_function=chart1.auto_font_size_function,
-        chart_function1=chart1.generate_script(),
-        div1=chart1.div,
-        chart_function2=chart2.generate_script(),
-        div2=chart2.div,
-        )
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
+    )
 
 
 @app.route('/experience_and_salary_mention')
 def experience():
     """Experience and salary mention page"""
-    chart1 = EChartStackedColumnChart(chart_name='experience',
-                                      chart_title='Требования к опыту')
-    chart2 = EChartStackedColumnChart(chart_name='with_salary',
-                                      chart_title='Доля вакансий с указанной зарплатой')
+    chart1 = EchartStackedColumn(name='experience',
+                                 title='Требования к опыту')
+    chart2 = EchartStackedColumn(name='with_salary',
+                                 title='Доля вакансий с указанной зарплатой')
     return render_template(
         '2_charts.html',
-        auto_font_size_function=chart1.auto_font_size_function,
-        chart_function1=chart1.generate_script(),
-        div1=chart1.div,
-        chart_function2=chart2.generate_script(),
-        div2=chart2.div,
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
     )
 
 
@@ -210,7 +208,7 @@ def programming_languages():
         auto_font_size_function=chart.auto_font_size_function,
         chart_function=chart.generate_script(),
         div=chart.div,
-        )
+    )
 
 
 @app.route('/unit_test_frameworks')
@@ -256,18 +254,17 @@ def load_testing_and_monitoring_tools():
 @app.route('/web_ui_and_api_tools')
 def web_ui_and_api_tools():
     """Web UI and API testing tools page"""
-    chart1 = EChartStackedColumnChart(chart_name='api_testing_tools',
-                                      chart_title='Популярность инструментов тестирования Web API')
-    chart2 = EChartStackedColumnChart(chart_name='web_ui_tools',
-                                      chart_title='Популярность средства тестирования Web UI')
+    chart1 = EchartStackedColumn(name='api_testing_tools',
+                                 title='Популярность инструментов тестирования Web API')
+    chart2 = EchartStackedColumn(name='web_ui_tools',
+                                 title='Популярность средства тестирования Web UI')
     return render_template(
         '2_charts.html',
-        auto_font_size_function=chart1.auto_font_size_function,
-        chart_function1=chart1.generate_script(),
-        div1=chart1.div,
-        chart_function2=chart2.generate_script(),
-        div2=chart2.div,
-        )
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
+    )
 
 
 @app.route('/bdd_frameworks')
@@ -280,7 +277,7 @@ def bdd_frameworks():
         auto_font_size_function=chart.auto_font_size_function,
         chart_function=chart.generate_script(),
         div=chart.div,
-        )
+    )
 
 
 @app.route('/mobile_testing_frameworks')
@@ -307,23 +304,22 @@ def bugtracking_n_tms():
         auto_font_size_function=chart.auto_font_size_function,
         chart_function=chart.generate_script(),
         div=chart.div,
-        )
+    )
 
 
 @app.route('/cvs_and_ci_cd')
 def cvs_and_ci_cd():
     """CVS and CI/CD page"""
-    chart1 = EChartStackedColumnChart(chart_name='ci_cd',
-                                      chart_title='Популярность средств <br> CI/CD.')
-    chart2 = EChartStackedColumnChart(chart_name='cvs',
-                                      chart_title='Популярность систем управления версиями.')
+    chart1 = EchartStackedColumn(name='ci_cd',
+                                 title='Популярность средств <br> CI/CD.')
+    chart2 = EchartStackedColumn(name='cvs',
+                                 title='Популярность систем управления версиями.')
     return render_template(
         '2_charts.html',
-        auto_font_size_function=chart1.auto_font_size_function,
-        chart_function1=chart1.generate_script(),
-        div1=chart1.div,
-        chart_function2=chart2.generate_script(),
-        div2=chart2.div,
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
     )
 
 
@@ -344,7 +340,7 @@ def tmp():
         auto_font_size_function=chart.auto_font_size_function,
         chart_function=chart.generate_script(),
         div=chart.div,
-        )
+    )
 
 
 @app.route('/tmp_1')
@@ -361,7 +357,7 @@ def tmp_1():
         div1=chart1.div,
         chart_function2=chart2.generate_script(),
         div2=chart2.div,
-        )
+    )
 
 
 @app.route('/tmp_2')
@@ -373,4 +369,4 @@ def tmp_2():
         'pyechart.html',
         chart_script=chart.get_script(),
         div=chart.get_div()
-        )
+    )
