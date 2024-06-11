@@ -2,6 +2,8 @@ import copy
 import json
 from operator import itemgetter
 
+import gviz_api
+
 from db.db_client import Database
 from config import Config
 
@@ -500,6 +502,7 @@ class EchartSunburst(EChartBaseChartGenerator):
 class EChartTreeMapChart(EChartBaseChartGenerator):
     """Класс генерации TreeMap диаграммы."""
     def get_data(self, year) -> list:
+        """Get data for TreeMap chart."""
         output_list = list()
         parents = self.db.get_unic_parents()
         for parent in parents:
@@ -510,10 +513,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
             children = list()
             data_dict['name'] = parent
             for child in children_from_db:
-                children.append(dict(name=child.data,
-                                     value=child.percent,
-                                     # tooltip={'padding': 5},
-                                     ))
+                children.append(dict(name=child.data, value=child.percent))
             data_dict['children'] = children
             output_list.append(data_dict)
         return output_list
@@ -527,16 +527,16 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
                 data: {self.get_data(year)},
                 roam: 'zoom',
                 leafDepth: 1,
-                select: {{color: 'red'}},
+                //select: {{color: 'red'}},
                 drillDownIcon: '',
                 tooltip: {{
                     valueFormatter: (value) => (value * 100).toFixed(1) + '%'
                     }},
-                select: {{
-                    label: {{show: true}}
-                    }},
+                //select: {{
+                 //   label: {{show: true}}
+                  //  }},
                 label: {{
-                    show: true,
+                    //show: true,
                     formatter: function (params) {{
                       return `${{params.name}} ${{Number(params.value*100).toFixed(1)  + '%'}}`}}
 
@@ -594,7 +594,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
         """
 
     def generate_script(self) -> str:
-        """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
+        """JavaScript function for TreeMap chart."""
         return f'''
         {self.script_header}
         {self.set_chart_option()}
