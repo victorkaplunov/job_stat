@@ -2,8 +2,6 @@ import copy
 import json
 from operator import itemgetter
 
-import gviz_api
-
 from db.db_client import Database
 from config import Config
 
