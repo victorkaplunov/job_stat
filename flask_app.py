@@ -1,7 +1,6 @@
 import os
 import json
 from functools import lru_cache
-from pprint import pprint
 
 from flask import Flask, send_from_directory, url_for, render_template
 from flask_bootstrap import Bootstrap
@@ -9,8 +8,8 @@ from flask_bootstrap import Bootstrap
 import utils
 from db.db_client import Database
 from config import Config
-from chart_generator import PieChartWithFilter, HorizontalBarChart, \
-    EChartStackedColumnChart, EchartSunburst, EChartTreeMapChart
+from chart_generator import HorizontalBarChart, \
+    EChartStackedColumnChart, EChartTreeMapChart
 from echarts import EchartStackedColumn, EchartTreeMap
 
 db = Database()
@@ -201,28 +200,25 @@ def key_skills():
 @app.route('/programming_languages')
 def programming_languages():
     """Programming languages page"""
-    chart = EChartStackedColumnChart(chart_name='languages',
-                                     chart_title='Популярность языков программирования')
+    chart = EchartStackedColumn(name='languages',
+                                title='Популярность языков программирования')
     return render_template(
-        '1_echart.html',
-        auto_font_size_function=chart.auto_font_size_function,
-        chart_function=chart.generate_script(),
-        div=chart.div,
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
     )
 
 
 @app.route('/unit_test_frameworks')
 def unit_test_frameworks():
     """Unit test frameworks popularity page"""
-    chart = PieChartWithFilter(chart_title='Популярность фреймворков для юнит-тестирования',
-                               chart_name='frameworks')
+    chart = EchartTreeMap(title='Популярность фреймворков для юнит-тестирования',
+                          name='frameworks')
 
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность фреймворков для юнит-тестирования.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
     )
 
 
@@ -270,26 +266,24 @@ def web_ui_and_api_tools():
 @app.route('/bdd_frameworks')
 def bdd_frameworks():
     """BDD framework page"""
-    chart = EChartStackedColumnChart(chart_name='bdd_frameworks',
-                                     chart_title='Популярность фреймворков BDD')
+    chart = EchartStackedColumn(name='bdd_frameworks',
+                                title='Популярность фреймворков BDD')
     return render_template(
-        '1_echart.html',
-        auto_font_size_function=chart.auto_font_size_function,
-        chart_function=chart.generate_script(),
-        div=chart.div,
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
     )
 
 
 @app.route('/mobile_testing_frameworks')
 def mobile_testing_frameworks():
     """Mobile app testing tools page"""
-    chart = EChartStackedColumnChart(chart_title='Популярность инструментов тестирования мобильных приложений',
-                                     chart_name='mobile_testing_frameworks')
+    chart = EchartStackedColumn(title='Популярность инструментов тестирования мобильных приложений',
+                                name='mobile_testing_frameworks')
     return render_template(
-        '1_echart.html',
-        auto_font_size_function=chart.auto_font_size_function,
-        chart_function=chart.generate_script(),
-        div=chart.div,
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
     )
 
 
@@ -347,7 +341,7 @@ def tmp():
 def tmp_1():
     """Temporary chart page."""
     chart1 = EchartTreeMap(name='frameworks',
-                            title='Популярность фреймворков для юнит-тестирования')
+                           title='Популярность фреймворков для юнит-тестирования')
     chart2 = EchartStackedColumn(name='cvs',
                                  title='Популярность систем управления версиями.')
     return render_template(
