@@ -24,7 +24,7 @@ class Database(metaclass=SingletonMeta):
 
     def __init__(self):
         self._db_engine = create_engine(
-            'sqlite:///' + os.path.join(Config.basedir, Config.DB_FILE_NAME))
+            'sqlite:///' + str(os.path.join(Config.basedir, Config.DB_FILE_NAME)))
         self._session = sessionmaker(bind=self._db_engine)()
 
     def get_date_from_calendar_by_vacancy(
@@ -115,8 +115,7 @@ class Database(metaclass=SingletonMeta):
             and_(Charts.year == year, Charts.chart_name == chart_name)).all()
 
     def get_data_for_chart_per_year_by_parent(
-            self, year: int, chart_name: Sequence[Row[Any] | RowMapping],
-            parent: Sequence[Row[Any] | RowMapping]) -> list[Type[Charts]]:
+            self, year: int, chart_name: str, parent: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter(
             and_(Charts.year == year, Charts.chart_name == chart_name,
                  Charts.parent == parent)).all()
@@ -143,7 +142,7 @@ class Database(metaclass=SingletonMeta):
         return self._session.scalars(select(Charts.parent).where(Charts.parent.is_not(None))
                                      .distinct()).all()
 
-    def get_unic_values_for_chart(self, chart_name: Sequence[Row[Any] | RowMapping]) -> Sequence[Row[Any] | RowMapping]:
+    def get_unic_values_for_chart(self, chart_name: str) -> Sequence[Row[Any] | RowMapping]:
         return self._session.scalars(select(Charts.data)
                                      .filter(Charts.chart_name == chart_name)
                                      .distinct()).all()
@@ -152,7 +151,8 @@ class Database(metaclass=SingletonMeta):
         return self._session.query(func.sum(Charts.popularity)).filter(
             and_(Charts.chart_name == chart_name, Charts.year == year)).scalar()
 
-    def get_percentage_ordered_by_years(self, chart_name:  str, param_name:  Sequence[Row[Any] | RowMapping]) -> Sequence[Row[Any] | RowMapping]:
+    def get_percentage_ordered_by_years(
+            self, chart_name:  str, param_name:  Sequence[Row[Any] | RowMapping]) -> Sequence[Row[Any] | RowMapping]:
         return self._session.scalars(select(Charts.percent)
                                      .filter(and_(Charts.chart_name == chart_name,
                                                   Charts.data == param_name))
