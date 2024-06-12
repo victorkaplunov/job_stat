@@ -225,25 +225,24 @@ def unit_test_frameworks():
 @app.route('/load_testing_and_monitoring_tools')
 def load_testing_and_monitoring_tools():
     """Load testing tools page"""
-    chart_1 = EChartStackedColumnChart(chart_title='Инструменты тестирования производительности',
-                                       chart_name='load_testing_tools')
-    chart_2 = EChartStackedColumnChart(chart_title='Популярность генераторов сетевого трафика',
-                                       chart_name='traffic_generators')
-    chart_3 = EChartStackedColumnChart(chart_title='Системы трассировки',
-                                       chart_name='tracing_system')
-    chart_4 = EChartStackedColumnChart(chart_title='Средства мониторинга',
-                                       chart_name='monitoring')
+    chart_1 = EchartStackedColumn(title='Инструменты тестирования производительности',
+                                  name='load_testing_tools')
+    chart_2 = EchartStackedColumn(title='Популярность генераторов сетевого трафика',
+                                  name='traffic_generators')
+    chart_3 = EchartStackedColumn(title='Системы трассировки',
+                                  name='tracing_system')
+    chart_4 = EchartStackedColumn(title='Средства мониторинга',
+                                  name='monitoring')
     return render_template('4_charts.html',
                            title='Средства нагрузочного тестирования и мониторинга.',
-                           auto_font_size_function=chart_1.auto_font_size_function,
-                           chart_function_1=chart_1.generate_script(),
-                           div_1=chart_1.div,
-                           chart_function_2=chart_2.generate_script(),
-                           div_2=chart_2.div,
-                           chart_function_3=chart_3.generate_script(),
-                           div_3=chart_3.div,
-                           chart_function_4=chart_4.generate_script(),
-                           div_4=chart_4.div
+                           chart_function_1=chart_1.get_script(),
+                           div_1=chart_1.get_div(),
+                           chart_function_2=chart_2.get_script(),
+                           div_2=chart_2.get_div(),
+                           chart_function_3=chart_3.get_script(),
+                           div_3=chart_3.get_div(),
+                           chart_function_4=chart_4.get_script(),
+                           div_4=chart_4.get_div()
                            )
 
 
@@ -291,13 +290,12 @@ def mobile_testing_frameworks():
 def bugtracking_n_tms():
     """Mobile app testing tools page"""
     chart_title = 'Популярность систем управления тестированием, bugtracking system и т.п.'
-    chart = EChartStackedColumnChart(chart_title=chart_title,
-                                     chart_name='bugtracking_n_tms')
+    chart = EchartStackedColumn(title=chart_title,
+                                name='bugtracking_n_tms')
     return render_template(
-        '1_echart.html',
-        auto_font_size_function=chart.auto_font_size_function,
-        chart_function=chart.generate_script(),
-        div=chart.div,
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
     )
 
 
