@@ -63,7 +63,8 @@ class EchartStackedColumn(BaseChart):
                                   axislabel_opts=opts.LabelOpts(
                                     formatter=utils.JsCode("value => value * 100 + '%'"))),
                               tooltip_opts=opts.TooltipOpts(
-                                  is_show=True, trigger_on='mousemove', trigger='axis',
+                                  is_show=True, trigger_on='mousemove',
+                                  trigger='axis', is_confine=True,
                                   value_formatter=utils.JsCode(
                                       "(value) => (value * 100).toFixed(1) + '%'")),
                               )
@@ -86,7 +87,7 @@ class EchartTreeMap(BaseChart):
             data_dict = dict()
             children_from_db = self.db.get_data_for_chart_per_year_by_parent(
                 year=year, chart_name=self.name,
-                parent=parent)
+                parent=str(parent))
             children = list()
             data_dict['name'] = parent
             for child in children_from_db:
