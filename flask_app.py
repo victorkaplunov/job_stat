@@ -11,7 +11,7 @@ from db.db_client import Database
 from config import Config
 from chart_generator import PieChartWithFilter, HorizontalBarChart, \
     EChartStackedColumnChart, EchartSunburst, EChartTreeMapChart
-from echarts import EchartStackedColumn
+from echarts import EchartStackedColumn, EchartTreeMap
 
 db = Database()
 
@@ -346,17 +346,16 @@ def tmp():
 @app.route('/tmp_1')
 def tmp_1():
     """Temporary chart page."""
-    chart1 = EchartSunburst(chart_name='frameworks',
-                            chart_title='Популярность фреймворков для юнит-тестирования')
-    chart2 = EChartStackedColumnChart(chart_name='cvs',
-                                      chart_title='Популярность систем управления версиями.')
+    chart1 = EchartTreeMap(name='frameworks',
+                            title='Популярность фреймворков для юнит-тестирования')
+    chart2 = EchartStackedColumn(name='cvs',
+                                 title='Популярность систем управления версиями.')
     return render_template(
         '2_charts.html',
-        auto_font_size_function=chart1.auto_font_size_function,
-        chart_function1=chart1.generate_script(),
-        div1=chart1.div,
-        chart_function2=chart2.generate_script(),
-        div2=chart2.div,
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
     )
 
 
