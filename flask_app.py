@@ -8,8 +8,7 @@ from flask_bootstrap import Bootstrap
 import utils
 from db.db_client import Database
 from config import Config
-from chart_generator import HorizontalBarChart, \
-    EChartStackedColumnChart, EChartTreeMapChart
+from chart_generator import HorizontalBarChart, EChartTreeMapChart
 from echarts import EchartStackedColumn, EchartTreeMap
 
 db = Database()
@@ -167,7 +166,7 @@ def employment_and_schedule():
 
 
 @app.route('/experience_and_salary_mention')
-def experience():
+def experience_and_salary_mention():
     """Experience and salary mention page"""
     chart1 = EchartStackedColumn(name='experience',
                                  title='Требования к опыту')
