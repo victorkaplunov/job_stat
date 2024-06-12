@@ -59,7 +59,8 @@ class EchartStackedColumn(BaseChart):
                                                           selector=[{'type': 'inverse'}],
                                                           selector_button_gap=5),
                               yaxis_opts=opts.AxisOpts(
-                                axislabel_opts=opts.LabelOpts(
+                                  max_=1,
+                                  axislabel_opts=opts.LabelOpts(
                                     formatter=utils.JsCode("value => value * 100 + '%'"))),
                               tooltip_opts=opts.TooltipOpts(
                                   is_show=True, trigger_on='mousemove', trigger='axis',
