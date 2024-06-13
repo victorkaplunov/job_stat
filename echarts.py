@@ -19,7 +19,7 @@ class BaseChart:
         <div id="{self.name}" style="height: {height}px;"></div>
         <hr>'''
 
-    def get_options(self) -> str:
+    def _get_options(self) -> str:
         return ''
 
     def get_script(self) -> str:
@@ -30,14 +30,14 @@ class BaseChart:
         var chartDom_{self.name} = document.getElementById('{self.name}');
         var {self.name} = echarts.init(document.querySelector('#{self.name}'),
                                         null, {{ renderer: 'svg' }});
-        var option = {self.get_options()}
+        var option = {self._get_options()}
         {self.name}.setOption(option);
         </script>
         """
 
 
 class EchartStackedColumn(BaseChart):
-    def get_data(self) -> list:
+    def _get_data(self) -> list:
         """Get data for Stacked Column chart."""
         value_list = self.db.get_unic_values_for_chart(chart_name=self.name)
         output_list = []
@@ -51,7 +51,7 @@ class EchartStackedColumn(BaseChart):
             output_list.append(obj)
         return output_list
 
-    def get_options(self) -> str:
+    def _get_options(self) -> str:
         chart = Bar(init_opts=opts.InitOpts(width="100%"))
         chart.set_global_opts(title_opts=opts.TitleOpts(is_show=False),
                               legend_opts=opts.LegendOpts(selector_position='start',
@@ -61,7 +61,7 @@ class EchartStackedColumn(BaseChart):
                               yaxis_opts=opts.AxisOpts(
                                   max_=1,
                                   axislabel_opts=opts.LabelOpts(
-                                    formatter=utils.JsCode("value => value * 100 + '%'"))),
+                                      formatter=utils.JsCode("value => value * 100 + '%'"))),
                               tooltip_opts=opts.TooltipOpts(
                                   is_show=True, trigger_on='mousemove',
                                   trigger='axis', is_confine=True,
@@ -69,7 +69,7 @@ class EchartStackedColumn(BaseChart):
                                       "(value) => (value * 100).toFixed(1) + '%'")),
                               )
         chart.add_xaxis(Config.YEARS)
-        series = self.get_data()
+        series = self._get_data()
         for seria in series:
             chart.add_yaxis(seria['name'], seria['data'], stack="stack1")
         chart.options['grid'] = {'left': 50, 'right': 20, 'top': 20, 'bottom': 175}
@@ -79,7 +79,7 @@ class EchartStackedColumn(BaseChart):
 
 
 class EchartTreeMap(BaseChart):
-    def get_data(self, year) -> list:
+    def _get_data(self, year) -> list:
         """Get data for TreeMap chart."""
         output_list = list()
         parents = self.db.get_unic_parents()
@@ -96,7 +96,7 @@ class EchartTreeMap(BaseChart):
             output_list.append(data_dict)
         return output_list
 
-    def get_options(self) -> str:
+    def _get_options(self) -> str:
         chart = TreeMap().set_global_opts(title_opts=opts.TitleOpts(is_show=False),
                                           legend_opts=opts.LegendOpts(selected_mode='single', ),
                                           tooltip_opts=opts.TooltipOpts(is_show=True))
@@ -104,13 +104,13 @@ class EchartTreeMap(BaseChart):
         fn = "function (params) {return `${params.name} ${Number(params.value*100).toFixed(1)  + '%'}`}"
         for year in Config.YEARS[::-1]:
             chart.add(
-                series_name=year, data=self.get_data(year=year), roam='zoom',
+                series_name=year, data=self._get_data(year=year), roam='zoom',
                 leaf_depth=1,
                 label_opts=opts.LabelOpts(formatter=utils.JsCode(fn)),
                 upper_label_opts=opts.LabelOpts(is_show=True),
                 levels=[
                     opts.TreeMapLevelsOpts(upper_label_opts=opts.LabelOpts(is_show=False)),
-                    opts.TreeMapLevelsOpts(upper_label_opts=opts.LabelOpts(is_show=True),),
+                    opts.TreeMapLevelsOpts(upper_label_opts=opts.LabelOpts(is_show=True)),
                     opts.TreeMapLevelsOpts(
                         upper_label_opts=opts.LabelOpts(is_show=True),
                         treemap_itemstyle_opts=opts.TreeMapItemStyleOpts(
