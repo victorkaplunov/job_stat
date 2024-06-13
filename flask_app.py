@@ -354,7 +354,6 @@ def tmp_1():
 def tmp_2():
     chart = EchartStackedColumn(name='bugtracking_n_tms',
                                 title='Популярность систем управления тестированием, bugtracking system и т.п.')
-    chart.get_data()
     return render_template(
         'pyechart.html',
         chart_script=chart.get_script(),

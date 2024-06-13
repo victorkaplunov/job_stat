@@ -324,7 +324,8 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
         """Формирует данные для столбчатой Stacked диаграммы в долях от 100%."""
         data_dict = dict(series='', category=[])
         obj_list = list()
-        value_list = self.db.get_unic_values_for_chart(chart_name=self.chart_name)
+        value_list = self.db.get_unic_values_for_chart_sorted_by_last_year_percent(
+            chart_name=self.chart_name)
         data_dict['category'] = Config.YEARS
         for value in value_list:
             data = self.db.get_percentage_ordered_by_years(chart_name=self.chart_name,
@@ -435,7 +436,7 @@ class EchartSunburst(EChartBaseChartGenerator):
             data_dict = dict()
             children_from_db = self.db.get_data_for_chart_per_year_by_parent(
                 year=year, chart_name=self.chart_name,
-                parent=parent)
+                parent=str(parent))
             children = list()
             data_dict['name'] = parent
             for child in children_from_db:
@@ -507,7 +508,7 @@ class EChartTreeMapChart(EChartBaseChartGenerator):
             data_dict = dict()
             children_from_db = self.db.get_data_for_chart_per_year_by_parent(
                 year=year, chart_name=self.chart_name,
-                parent=parent)
+                parent=str(parent))
             children = list()
             data_dict['name'] = parent
             for child in children_from_db:

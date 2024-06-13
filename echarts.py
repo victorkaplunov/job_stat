@@ -39,7 +39,7 @@ class BaseChart:
 class EchartStackedColumn(BaseChart):
     def _get_data(self) -> list:
         """Get data for Stacked Column chart."""
-        value_list = self.db.get_unic_values_for_chart(chart_name=self.name)
+        value_list = self.db.get_unic_values_for_chart_sorted_by_last_year_percent(chart_name=self.name)
         output_list = []
         for value in value_list:
             data = self.db.get_percentage_ordered_by_years(chart_name=self.name,
