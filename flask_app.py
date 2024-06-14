@@ -138,16 +138,13 @@ def salary_by_category():
 @app.route('/top_employers')
 def top_employers():
     """Employers by vacancies quantity page"""
-    chart = HorizontalBarChart(
-        chart_title='Топ 50 работодателей',
-        chart_subtitle=f'по количеству вакансий в {Config.YEARS[-1]} году.',
-        chart_name='top_employers')
-    return render_template('/simple_chart.html',
-                           package=chart.package,
-                           title=chart.title,
-                           subtitle=chart.subtitle,
-                           charts_function=chart.generate_script(chart_name=chart.chart_name),
-                           divs=chart.generate_divs())
+    chart = EchartHorizontalBar(name='top_employers',
+                                title='Топ 50 работодателей по количеству публикаций вакансий')
+    return render_template(
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(height=2500)
+    )
 
 
 @app.route('/employment_and_schedule')
@@ -184,16 +181,13 @@ def experience_and_salary_mention():
 @app.route('/key_skills')
 def key_skills():
     """Key skills popularity page"""
-    chart = HorizontalBarChart(
-        chart_title='Ключевые навыки.',
-        chart_subtitle=f'Пятьдесят наиболее популярных тегов в {Config.YEARS[-1]} году.',
-        chart_name='key_skills')
-    return render_template('/simple_chart.html',
-                           package=chart.package,
-                           title=chart.title,
-                           subtitle=chart.subtitle,
-                           charts_function=chart.generate_script(chart_name=chart.chart_name),
-                           divs=chart.generate_divs())
+    chart = EchartHorizontalBar(name='key_skills',
+                                title='Наиболее популярные ключевые навыки')
+    return render_template(
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(height=2000)
+    )
 
 
 @app.route('/programming_languages')
@@ -352,10 +346,10 @@ def tmp_1():
 
 @app.route('/tmp_2')
 def tmp_2():
-    chart = EchartHorizontalBar(name='key_skills',
-                                title='Key skills')
+    chart = EchartHorizontalBar(name='top_employers',
+                                title='Top employers')
     return render_template(
         'pyechart.html',
         chart_script=chart.get_script(),
-        div=chart.get_div(height=2000)
+        div=chart.get_div(height=2500)  # 2000
     )

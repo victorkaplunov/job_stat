@@ -128,8 +128,11 @@ class EchartTreeMap(BaseChart):
 
 
 def overflow(name_list: list) -> list:
+    """Clean up strings for horizontal bar charts"""
     output_list = list()
     for name in name_list:
+        name = name.replace('(JSC «OTP Bank»)', '')
+        name = name.replace('-специализированный застройщик', '')
         if len(name) > 20:
             name = name.replace(' ', '\n')
         output_list.append(name)
@@ -137,7 +140,6 @@ def overflow(name_list: list) -> list:
 
 
 class EchartHorizontalBar(BaseChart):
-
     def _get_data(self) -> dict:
         """Get data for Horizontal Bar chart."""
         statistics_data = self.db.get_data_for_chart(chart_name=self.name)
@@ -150,6 +152,7 @@ class EchartHorizontalBar(BaseChart):
         return output_dict
 
     def _get_options(self) -> str:
+        """Get options for Horizontal Bar chart."""
         chart_data = self._get_data()
         chart = (((Bar(init_opts=opts.InitOpts(width="100%"))
                  .add_xaxis(chart_data['name_list'], ))
@@ -161,26 +164,6 @@ class EchartHorizontalBar(BaseChart):
             xaxis_opts=opts.AxisOpts(type_='value'),
             yaxis_opts=opts.AxisOpts(type_='category')
         ).set_series_opts(label_opts=opts.LabelOpts(is_show=False),
-                          tooltip_opts=opts.TooltipOpts(formatter='упоминалось за год {c} раз')))
-        # chart.set_global_opts(title_opts=opts.TitleOpts(is_show=False),
-        #                       legend_opts=opts.LegendOpts(selector_position='start',
-        #                                                   pos_top='76%', pos_left='center',
-        #                                                   selector=[{'type': 'inverse'}],
-        #                                                   selector_button_gap=5),
-        #                       yaxis_opts=opts.AxisOpts(
-        #                           axislabel_opts=opts.LabelOpts(
-        #                               formatter=utils.JsCode("value => value * 100 + '%'"))),
-        #                       tooltip_opts=opts.TooltipOpts(
-        #                           is_show=True, trigger_on='mousemove',
-        #                           trigger='axis', is_confine=True,
-        #                           value_formatter=utils.JsCode(
-        #                               "(value) => (value * 100).toFixed(1) + '%'")),
-        #                       )
-        # chart.add_xaxis(Config.YEARS)
-        # series = self._get_data()
-        # for seria in series:
-        #     chart.add_yaxis(seria['name'], seria['data'], stack="stack1")
+                          tooltip_opts=opts.TooltipOpts(formatter='{c}')))
         chart.options['grid'] = {'left': 140, 'right': 20, 'top': 30, 'bottom': 175}
-        # chart.options['legend'][0]['width'] = '90%'
-        # chart.set_series_opts(label_opts=opts.LabelOpts(is_show=False))
         return chart.dump_options()
