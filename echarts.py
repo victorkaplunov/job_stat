@@ -164,6 +164,6 @@ class EchartHorizontalBar(BaseChart):
             xaxis_opts=opts.AxisOpts(type_='value'),
             yaxis_opts=opts.AxisOpts(type_='category')
         ).set_series_opts(label_opts=opts.LabelOpts(is_show=False),
-                          tooltip_opts=opts.TooltipOpts(formatter='{c}')))
+                          tooltip_opts=opts.TooltipOpts(formatter='{c}'), position='inside'))
         chart.options['grid'] = {'left': 140, 'right': 20, 'top': 30, 'bottom': 175}
         return chart.dump_options()
