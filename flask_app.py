@@ -9,7 +9,7 @@ import utils
 from db.db_client import Database
 from config import Config
 from chart_generator import HorizontalBarChart, EChartTreeMapChart
-from echarts import EchartStackedColumn, EchartTreeMap
+from echarts import EchartStackedColumn, EchartTreeMap, EchartHorizontalBar
 
 db = Database()
 
@@ -352,10 +352,10 @@ def tmp_1():
 
 @app.route('/tmp_2')
 def tmp_2():
-    chart = EchartStackedColumn(name='bugtracking_n_tms',
-                                title='Популярность систем управления тестированием, bugtracking system и т.п.')
+    chart = EchartHorizontalBar(name='key_skills',
+                                title='Key skills')
     return render_template(
         'pyechart.html',
         chart_script=chart.get_script(),
-        div=chart.get_div()
+        div=chart.get_div(height=2000)
     )
