@@ -405,7 +405,25 @@ def get_salary_by_category_data() -> list[list]:
     return data_list
 
 
-def fill_skill_set_chart(update: bool) -> None:
+def get_unic_employers() -> set:
+    employers = set()
+    for str_json in db.get_all_vacancies_jsons():
+        dict_json = json.loads(str_json)
+        employers.add(dict_json['employer']['name'])
+    return employers
+
+
+def get_unic_key_skills() -> set:
+    skill_set = set()
+    for str_json in db.get_all_vacancies_jsons():
+        dict_json = json.loads(str_json)
+        key_skills = dict_json['key_skills']
+        for skill in key_skills:
+            skill_set.add(skill['name'])
+    return skill_set
+
+
+def fill_skill_set_chart(update: bool, year: int) -> None:
     """Заполнение данных для графика 'Ключевые навыки'."""
     current_year_vacancies = db.get_json_from_vacancies_by_year(Config.YEARS[-1])
     # Populate skills set
