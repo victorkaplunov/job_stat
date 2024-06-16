@@ -423,7 +423,7 @@ def get_unic_key_skills() -> set:
     return skill_set
 
 
-def fill_skill_set_chart(update: bool, year: int) -> None:
+def fill_skill_set_chart(update: bool) -> None:
     """Заполнение данных для графика 'Ключевые навыки'."""
     current_year_vacancies = db.get_json_from_vacancies_by_year(Config.YEARS[-1])
     # Populate skills set
