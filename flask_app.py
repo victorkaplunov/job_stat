@@ -33,11 +33,11 @@ def home_page():
 def api():
     return f"""
 <html>
-<a href="{url_for('show_vac_calendar', vacancy_id='14658327')}">
-        {url_for('show_vac_calendar', vacancy_id='14658327')}</a>
+<a href="{url_for('show_vac_calendar', vacancy_id='101279526')}">
+        {url_for('show_vac_calendar', vacancy_id='101279526')}</a>
 <br>
-<a href="{url_for('show_vac_description', vacancy_id='14658327')}">
-        {url_for('show_vac_description', vacancy_id='14658327')}</a>
+<a href="{url_for('show_vac_description', vacancy_id='101279526')}">
+        {url_for('show_vac_description', vacancy_id='101279526')}</a>
 <br>
 <a href="{url_for('show_vac_top_new_by_id')}">{url_for('show_vac_top_new_by_id')}"</a>
 <br>
