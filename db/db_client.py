@@ -79,6 +79,9 @@ class Database(metaclass=SingletonMeta):
     def get_all_vacancies_ids(self) -> Sequence[Row[Any] | RowMapping]:
         return self._session.scalars(select(Vacancies.id)).all()
 
+    def get_all_vacancies_jsons(self):
+        return self._session.scalars(select(Vacancies.json)).all()
+
     def count_vacancy_by_search_phrase_and_year(
             self, search_phrase: str, year: int) -> int:
         start_date = date(year, 1, 1)
