@@ -524,7 +524,7 @@ def count_percent(year):
 
     for chart_name in chart_names_list:
         popularity_sum = db.get_sum_for_chart_per_year(chart_name=chart_name, year=year)
-        chart_data = db.get_data_for_chart_per_year(chart_name=chart_name, year=year)
+        chart_data = db.get_data_for_chart_per_year(chart_name=str(chart_name), year=year)
         for item in chart_data:
             percent = item.popularity / popularity_sum
             db.update_percentage(chart_name=chart_name, year=year,
