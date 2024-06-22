@@ -22,7 +22,7 @@ def test_annotation_row_in_salary_chart_data(charts_data):
 
 
 def test_salary_chart_values_qty(charts_data):
-    """Длина списка со значениями не совпадает с длинной списка заголовка."""
+    """Длина списка со значениями совпадает с длинной списка заголовка."""
     testing_data = charts_data(rout=rout)[0]
     for exp_range in testing_data[1:-1]:
         assert len(exp_range) == len(testing_data[0]),\
@@ -30,7 +30,7 @@ def test_salary_chart_values_qty(charts_data):
 
 
 def test_scatter_chart(scatter_charts_data):
-    """Проверка данных для точечных диаграм."""
+    """Проверка данных для точечных диаграмм."""
     testing_data = scatter_charts_data(rout=rout)
     assert len(testing_data) == 4, 'Данные для точечных графиков не найдены или найдены не полностью.'
     assert isinstance(testing_data, list), 'Тип данных для точечных графиков не совпадает с ожидаемым.'
