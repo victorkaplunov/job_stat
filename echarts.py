@@ -145,8 +145,6 @@ class EchartHorizontalBar(BaseChart):
         statistics_data = self.db.get_data_for_chart(chart_name=self.name)
         name_list = [i.data for i in statistics_data]
         name_list = overflow(name_list=name_list)
-        for i in name_list:
-            print(i)
         data_list = [i.popularity for i in statistics_data]
         output_dict = dict(name_list=name_list[::-1], data_list=data_list[::-1])
         return output_dict
