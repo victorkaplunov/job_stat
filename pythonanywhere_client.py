@@ -72,7 +72,7 @@ class PythonAnywhereClient:
         response = requests.get(url=url, headers=self.headers)
         return response.json()['output']
 
-    def get_first_webapps_name(self) -> str:
+    def get_domain_name(self) -> str:
         url = posixpath.join(self.base_url, 'webapps/')
         response = requests.get(url=url, headers=self.headers)
         return response.json()[0]['domain_name']
