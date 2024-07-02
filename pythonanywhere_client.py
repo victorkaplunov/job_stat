@@ -47,7 +47,7 @@ class PythonAnywhereClient:
         response = requests.get(url, headers=self.headers)
         return response.json()
 
-    def get_console_info(self, console_id: int):
+    def get_console_info(self, console_id: int) -> str:
         url = posixpath.join(self.base_url, f'consoles/{console_id}')
         response = requests.get(url, headers=self.headers)
         return response.json()
