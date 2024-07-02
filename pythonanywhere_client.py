@@ -47,28 +47,28 @@ class PythonAnywhereClient:
         response = requests.get(url, headers=self.headers)
         return response.json()
 
-    def get_console_info(self, console_id: int) -> str:
+    def get_console_info(self, console_id: str) -> str:
         url = posixpath.join(self.base_url, f'consoles/{console_id}')
         response = requests.get(url, headers=self.headers)
         return response.json()
 
-    def get_first_console_id(self) -> int:
+    def get_first_console_id(self) -> str:
         url = posixpath.join(self.base_url, 'consoles/')
         response = requests.get(url, headers=self.headers)
-        return response.json()[0]['id']
+        return str(response.json()[0]['id'])
 
-    def send_command_to_console(self, console_id: int, command: str) -> int:
+    def send_command_to_console(self, console_id: str, command: str) -> int:
         """
         Input format: 'pwd\n ls\n'
         Add a "\n" to the command line end for return.
         """
         command_json = {'input': f'{command}'}
-        url = posixpath.join(self.base_url, f'consoles/{str(console_id)}/send_input/')
+        url = posixpath.join(self.base_url, f'consoles/{console_id}/send_input/')
         response = requests.post(url=url, json=command_json, headers=self.headers)
         return response.status_code
 
-    def get_latest_output(self, console_id: int) -> str:
-        url = posixpath.join(self.base_url, f'consoles/{str(console_id)}/get_latest_output/')
+    def get_latest_output(self, console_id: str) -> str:
+        url = posixpath.join(self.base_url, f'consoles/{console_id}/get_latest_output/')
         response = requests.get(url=url, headers=self.headers)
         return response.json()['output']
 
@@ -81,4 +81,3 @@ class PythonAnywhereClient:
         url = posixpath.join(self.base_url, f'webapps/{domain_name}/reload/')
         response = requests.post(url=url, headers=self.headers)
         return response.status_code
-
