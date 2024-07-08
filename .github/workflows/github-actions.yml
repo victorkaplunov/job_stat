@@ -16,4 +16,4 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements_CI.txt
-          python pull_and_reload.py
+          python scripts/pull_and_reload.py
