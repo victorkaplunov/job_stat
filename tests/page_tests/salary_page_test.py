@@ -13,7 +13,7 @@ def test_salary_chart_data_type(charts_data):
 
 
 def test_annotation_row_in_salary_chart_data(charts_data):
-    """Тне annotation row contain 'Range' and years value."""
+    """Тне annotation row contains 'Range' and years value."""
     title_row = charts_data(rout=rout)[0][0]
     assert title_row[0] == 'Range', 'Первый элемент аннотации имеет неверное значение.'
     for n, i in enumerate(Config.YEARS):
