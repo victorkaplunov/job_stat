@@ -104,7 +104,7 @@ def time_series():
     """Time series page"""
     return render_template(
         '/time_series.html',
-        title='Количество вакансий по месяцам и неделям.',
+        title='Количество вакансий по месяцам и неделям',
         vacancy_count_week_by_week=utils.get_vacancies_qty_week_by_week(),
         vacancy_rate_by_year=utils.get_vacancies_qty_by_month_of_year(),
         vacancy_count_day_by_week=utils.get_vacancies_qty_by_day_of_week(),
@@ -116,7 +116,7 @@ def salary():
     """Time series page"""
     return render_template(
         '/salary.html',
-        title='Заработная плата в зависимости от опыта.',
+        title='Заработная плата в зависимости от опыта',
         salary=utils.get_salary_data_per_year(),
         no_experience_salary=utils.get_vacancies_with_salary(experience='noExperience'),
         between1And3_salary=utils.get_vacancies_with_salary(experience='between1And3'),
@@ -227,7 +227,7 @@ def load_testing_and_monitoring_tools():
     chart_4 = EchartStackedColumn(title='Средства мониторинга',
                                   name='monitoring')
     return render_template('4_charts.html',
-                           title='Средства нагрузочного тестирования и мониторинга.',
+                           title='Средства нагрузочного тестирования и мониторинга',
                            chart_function_1=chart_1.get_script(),
                            div_1=chart_1.get_div(),
                            chart_function_2=chart_2.get_script(),
