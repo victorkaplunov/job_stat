@@ -15,6 +15,7 @@ class PythonAnywhereClient:
         self.username = Config.PA_USERNAME
         self.headers = {'Authorization': f'Token {os.getenv("PA_TOKEN")}'}
         self.base_url = f'https://www.pythonanywhere.com/api/v0/user/{self.username}'
+        self.site_url = f'https://{self.username}.pythonanywhere.com'
         self.app_dir = Config.PA_APP_DIR
 
     def get_file(self, file_name: str) -> int:
@@ -56,6 +57,11 @@ class PythonAnywhereClient:
         url = posixpath.join(self.base_url, 'consoles/')
         response = requests.get(url, headers=self.headers)
         return str(response.json()[0]['id'])
+
+    def get_route(self, route: str) -> str:
+        url = posixpath.join(self.site_url, route)
+        response = requests.get(url, headers=self.headers)
+        return str(response.status_code)
 
     def send_command_to_console(self, console_id: str, command: str) -> int:
         """
