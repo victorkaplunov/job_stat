@@ -84,7 +84,6 @@ class PythonAnywhereClient:
         return output_list
 
     def get_last_console_string(self) -> str:
-        print(f"{self.get_latest_output(console_id=self.get_first_console_id())[-1]=}")
         return self.get_latest_output(console_id=self.get_first_console_id())[-1]
 
     def get_domain_name(self) -> str:
