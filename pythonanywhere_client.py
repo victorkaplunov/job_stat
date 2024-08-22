@@ -3,6 +3,7 @@ import os
 import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import posixpath
+import re
 
 from config import Config
 
@@ -71,12 +72,20 @@ class PythonAnywhereClient:
         command_json = {'input': f'{command}'}
         url = posixpath.join(self.base_url, f'consoles/{console_id}/send_input/')
         response = requests.post(url=url, json=command_json, headers=self.headers)
-        return response.status_code
+        return response.text
 
-    def get_latest_output(self, console_id: str) -> str:
+    def get_latest_output(self, console_id: str) -> list:
         url = posixpath.join(self.base_url, f'consoles/{console_id}/get_latest_output/')
         response = requests.get(url=url, headers=self.headers)
-        return response.json()['output']
+        output = response.json()['output']
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        output = ansi_escape.sub('', output)
+        output_list = output.split('\r')
+        return output_list
+
+    def get_last_console_string(self) -> str:
+        print(f"{self.get_latest_output(console_id=self.get_first_console_id())[-1]=}")
+        return self.get_latest_output(console_id=self.get_first_console_id())[-1]
 
     def get_domain_name(self) -> str:
         url = posixpath.join(self.base_url, 'webapps/')
