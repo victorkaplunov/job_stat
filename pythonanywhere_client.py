@@ -64,7 +64,7 @@ class PythonAnywhereClient:
         response = requests.get(url, headers=self.headers)
         return str(response.status_code)
 
-    def send_command_to_console(self, console_id: str, command: str) -> int:
+    def send_command_to_console(self, console_id: str, command: str) -> str:
         """
         Input format: 'pwd\n ls\n'
         Add a "\n" to the command line end for return.
