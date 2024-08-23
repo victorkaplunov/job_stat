@@ -109,8 +109,7 @@ venv.bak/
 /not_for_git/
 testdb.db
 /scripts/super_script.py
-/scripts/unpack_db.py
-/scripts/upload_db.py
+/scripts/upload_and_unpack_db.py
 /scripts/testdb.zip
 /tests/visual_test.py
 chromedriver.exe
