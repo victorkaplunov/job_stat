@@ -112,6 +112,9 @@ class Database(metaclass=SingletonMeta):
     def get_data_for_chart(self, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter_by(chart_name=chart_name).all()
 
+    def get_sorted_data_for_chart(self, chart_name: str) -> list[Type[Charts]]:
+        return self._session.query(Charts).order_by(Charts.popularity.desc()).filter_by(chart_name=chart_name).all()
+
     def get_data_for_chart_per_year(
             self, year: int, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).filter(

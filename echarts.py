@@ -142,7 +142,7 @@ def overflow(name_list: list) -> list:
 class EchartHorizontalBar(BaseChart):
     def _get_data(self) -> dict:
         """Get data for Horizontal Bar chart."""
-        statistics_data = self.db.get_data_for_chart(chart_name=self.name)
+        statistics_data = self.db.get_sorted_data_for_chart(chart_name=self.name)
         name_list = [i.data for i in statistics_data]
         name_list = overflow(name_list=name_list)
         data_list = [i.popularity for i in statistics_data]
