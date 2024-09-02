@@ -46,6 +46,7 @@ for year in years_tuple:
         'traffic_generators': Config.TRAFFIC_GENERATORS,
         'tracing_system': Config.TRACING_SYSTEM,
         'api_testing_tools': Config.API_TESTING_TOOLS,
+        'sniffers': Config.SNIFFERS,
         'ci_cd': Config.CI_CD,
         'monitoring': Config.MONITORING,
         'web_ui_tools': Config.WEB_UI_TOOLS,

@@ -67,7 +67,7 @@ class EchartStackedColumn(BaseChart):
                                   value_formatter=utils.JsCode(
                                       "(value) => (value * 100).toFixed(1) + '%'")),
                               )
-        chart.add_xaxis(Config.YEARS)
+        chart.add_xaxis(self.db.get_years_for_chart(self.name))
         series = self._get_data()
         for seria in series:
             chart.add_yaxis(seria['name'], seria['data'], stack="stack1")

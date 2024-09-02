@@ -255,6 +255,18 @@ def web_ui_and_api_tools():
     )
 
 
+@app.route('/sniffers')
+def sniffers():
+    """Sniffers"""
+    chart1 = EchartStackedColumn(name='sniffers',
+                                 title='Популярность анализаторов трафика (сниферов)')
+    return render_template(
+        '1_echart.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+    )
+
+
 @app.route('/bdd_frameworks')
 def bdd_frameworks():
     """BDD framework page"""
@@ -313,19 +325,6 @@ def word_cloud():
     """Chart page"""
     return render_template('/word_cloud.html',
                            title='"Облако слов" на основе текстов вакансий.')
-
-
-@app.route('/tmp')
-def tmp():
-    """Temporary chart page."""
-    chart = EChartTreeMapChart(chart_name='frameworks',
-                               chart_title='Популярность фреймворков для юнит-тестирования')
-    return render_template(
-        '1_echart.html',
-        auto_font_size_function=chart.auto_font_size_function,
-        chart_function=chart.generate_script(),
-        div=chart.div,
-    )
 
 
 @app.route('/tmp_1')

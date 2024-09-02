@@ -96,6 +96,10 @@ class Config:
 
     API_TESTING_TOOLS = ['Postman', 'Insomnia', 'SoapUI', 'cURL', 'Swagger']
 
+    SNIFFERS = ['Fiddler', 'Charles', 'Burp', 'Proxyman', 'mitmproxy', 'Wireshark',
+                # 'Reqable', 'PCAPdroid', 'Packet Capture', 'HTTP Catcher'
+                ]
+
     CI_CD = ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
              'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity']
 

@@ -3,10 +3,8 @@
     {{ super() }}
 {% endblock %}
 {% block content %}
-{{ div | safe }}
-    <script src="/static/echarts.js"></script>
-    <script type="text/javascript">
-    {{auto_font_size_function | safe }}
-{{ chart_function | safe }}
-    </script>
+    {{ div1 | safe}}
+    {{ chart_script1 | safe }}
 {% endblock %}
+
+</html>
