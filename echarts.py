@@ -20,7 +20,7 @@ class BaseChart:
         <hr>'''
 
     def _get_options(self) -> str:
-        return ''
+        raise NotImplementedError('Не определен метод _get_options')
 
     def get_script(self) -> str:
         """Get chart script."""
