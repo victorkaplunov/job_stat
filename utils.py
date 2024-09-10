@@ -156,7 +156,6 @@ def count_salary_median(vacancies: Sequence[Row[Any] | RowMapping],
         salary = json.loads(str(vacancy))['salary']
         if json.loads(str(vacancy))['experience']['id'] == experience and salary is not None:
             salary_dict = salary
-            print(f"{salary_dict=}")
             salary_dict.update({'id': json.loads(str(vacancy))['id']})
             salary_dict.update({'published_at': json.loads(str(vacancy))['published_at']})
             salary_dict.update({'alternate_url': json.loads(str(vacancy))['alternate_url']})
