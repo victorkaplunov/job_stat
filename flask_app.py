@@ -9,7 +9,7 @@ import utils
 from db.db_client import Database
 from config import Config
 from chart_generator import HorizontalBarChart, EChartTreeMapChart
-from echarts import EchartStackedColumn, EchartTreeMap, EchartHorizontalBar
+from echarts import EchartStackedColumn, EchartTreeMap, EchartHorizontalBar, EchartBoxplot
 
 db = Database()
 
@@ -327,6 +327,18 @@ def word_cloud():
                            title='"Облако слов" на основе текстов вакансий.')
 
 
+@app.route('/tmp')
+def tmp():
+    """Temporary chart page."""
+    chart1 = EchartBoxplot(name='frameworks',
+                           title='Зарплата в зависимости от упоминания языка.')
+    return render_template(
+        '1_echart.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(height=600),
+    )
+
+
 @app.route('/tmp_1')
 def tmp_1():
     """Temporary chart page."""
@@ -350,5 +362,5 @@ def tmp_2():
     return render_template(
         'pyechart.html',
         chart_script=chart.get_script(),
-        div=chart.get_div(height=2500)  # 2000
+        div=chart.get_div()  # 2000
     )
