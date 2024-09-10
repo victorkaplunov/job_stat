@@ -1,5 +1,7 @@
+import statistics
+
 from pyecharts import options as opts
-from pyecharts.charts import TreeMap, Bar
+from pyecharts.charts import TreeMap, Bar, Boxplot
 from pyecharts.commons import utils
 
 from config import Config
@@ -164,4 +166,45 @@ class EchartHorizontalBar(BaseChart):
         ).set_series_opts(label_opts=opts.LabelOpts(is_show=False),
                           tooltip_opts=opts.TooltipOpts(formatter='{c}'), position='inside'))
         chart.options['grid'] = {'left': 140, 'right': 20, 'top': 30, 'bottom': 175}
+        return chart.dump_options()
+
+
+def _get_formatted_salary(salary: int) -> str:
+    salary = str(salary)
+    return f'{salary[:-3]} {salary[-3:]}'
+
+
+class EchartBoxplot(BaseChart):
+    def _get_data(self) -> (list[list], list):
+        """Get data for Boxplot chart."""
+        language_list = list()
+        data_list = []
+        for language in Config.PROGRAM_LANGUAGES:
+            salary_list = self.db.find_salary_by_substring_in_description(search_phrase=language)
+            if len(salary_list) < 10:
+                continue
+            data_list.append(list(salary_list))
+            language_list.append(language)
+        print(f"{language_list=}")
+        for i in data_list:
+            print(i)
+
+        return data_list, language_list
+
+    def _get_options(self) -> str:
+        """Get options for Boxplot chart."""
+        chart_data = self._get_data()
+        chart = (Boxplot(init_opts=opts.InitOpts(width="100%")))
+        # chart.add_dataset()
+        chart.add_xaxis(chart_data[1])
+        chart.add_yaxis('2024 г.', chart.prepare_data(chart_data[0]))
+        chart.set_global_opts(xaxis_opts=opts.AxisOpts(type_='value', split_number=2),
+                              yaxis_opts=opts.AxisOpts(type_='category'),
+                              tooltip_opts=opts.TooltipOpts(
+                                  value_formatter=utils.JsCode("(value) => '₽' + (value*1).toFixed(0)"),
+                                  trigger_on='mousemove')
+                              )
+        chart.set_series_opts(label_opts=opts.LabelOpts(is_show=False))
+        chart.reversal_axis()
+        chart.options['grid'] = {'left': 70, 'right': 20, 'top': 40}
         return chart.dump_options()
