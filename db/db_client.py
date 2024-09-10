@@ -53,9 +53,14 @@ class Database(metaclass=SingletonMeta):
 
     def find_vacancy_with_salary_by_substring(
             self, search_phrase: str) -> list[Type[VacWithSalary]]:
-        return ((self._session.query(VacWithSalary)
-                 .filter(VacWithSalary.description.like(f'%{search_phrase}%')))
-                .order_by(VacWithSalary.published_at.desc()).all())
+        return (self._session.query(VacWithSalary)
+                .filter(VacWithSalary.description.like(f'%{search_phrase}%'))).all()
+
+    def find_salary_by_substring_in_description(
+            self, search_phrase: str) -> Sequence[Row[Any] | RowMapping]:
+        return (self._session.execute(
+            select(VacWithSalary.calc_salary)
+            .filter(VacWithSalary.description.like(f'%{search_phrase}%')))).scalars().all()
 
     def find_vacancy_with_salary_by_substring_per_period(
             self, experience: str, start_day: date, end_day: date
