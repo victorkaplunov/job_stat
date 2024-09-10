@@ -41,7 +41,7 @@ class VacWithSalary(Base):
     __tablename__ = "vac_with_salary"
     id = Column(Integer, primary_key=True)
     published_at = Column(String)
-    calc_salary = Column(Numeric)
+    calc_salary = Column(Float)
     experience = Column(String)
     url = Column(String)
     description = Column(String)
