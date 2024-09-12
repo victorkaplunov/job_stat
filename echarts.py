@@ -175,31 +175,33 @@ def _get_formatted_salary(salary: int) -> str:
 
 
 class EchartBoxplot(BaseChart):
-    def _get_data(self) -> (list[list], list):
+    def get_data(self) -> (list[list], list):
         """Get data for Boxplot chart."""
+        param_list = self.db.get_unic_values_for_chart(self.name)
         tmp_dict = dict()
-        for language in Config.PROGRAM_LANGUAGES:
-            salary_list = self.db.find_salary_by_substring_in_description(search_phrase=language)
+        for param in param_list:
+            salary_list = self.db.find_salary_by_substring_in_description(search_phrase=str(param))
             if len(salary_list) < 10:
                 continue
-            tmp_dict[language] = salary_list
+            if param == 'Robot_Framework':
+                param = 'Robot\nFramework'
+            tmp_dict[str(param)] = salary_list
         # Сортируем по медиане для списка зарплат.
         sorted_dict = dict(sorted(tmp_dict.items(), key=lambda item: statistics.median(item[1])))
         return sorted_dict
 
     def _get_options(self) -> str:
         """Get options for Boxplot chart."""
-        chart_data = self._get_data()
+        chart_data = self.get_data()
         chart = (Boxplot(init_opts=opts.InitOpts(width="100%")))
         chart.add_xaxis(list(chart_data.keys()))
         chart.add_yaxis('2024 г.', chart.prepare_data(chart_data.values()))
         chart.set_global_opts(xaxis_opts=opts.AxisOpts(type_='value', split_number=2),
                               yaxis_opts=opts.AxisOpts(type_='category'),
                               tooltip_opts=opts.TooltipOpts(
-                                  # formatter='{a}, {b0}<br/>{c}<br/>{@[0]}',
                                   value_formatter=utils.JsCode("(value) => '₽' + (value*1).toFixed(0)"),
                                   trigger_on='mousemove')
                               )
         chart.reversal_axis()
-        chart.options['grid'] = {'left': 70, 'right': 20, 'top': 40}
+        chart.options['grid'] = {'left': 72, 'right': 25, 'top': 40}
         return chart.dump_options()

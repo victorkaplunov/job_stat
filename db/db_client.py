@@ -149,6 +149,10 @@ class Database(metaclass=SingletonMeta):
         return self._session.scalars(select(Charts.chart_name)
                                      .distinct()).all()
 
+    def get_unic_values_for_chart(self, chart_name: str) -> Sequence[Row[Any] | RowMapping]:
+        return self._session.scalars(select(Charts.data).where(Charts.chart_name == chart_name)
+                                     .distinct()).all()
+
     def get_unic_parents(self) -> Sequence[Row[Any] | RowMapping]:
         return self._session.scalars(select(Charts.parent).where(Charts.parent.is_not(None))
                                      .distinct()).all()
