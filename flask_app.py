@@ -335,9 +335,9 @@ def tmp():
     chart_2 = EchartBoxplot(name='frameworks',
                             title='...тестового фреймворка.')
     chart_3 = EchartBoxplot(name='web_ui_tools',
-                            title='...от средства тестирования web UI.')
+                            title='...средства тестирования web UI.')
     chart_4 = EchartBoxplot(name='load_testing_tools',
-                            title='...от инструмента нагрузочного тестирования.')
+                            title='...инструмента нагрузочного тестирования.')
     return render_template(
         '4_charts.html',
         title='Зарплаты в зависимости от...',
