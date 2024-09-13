@@ -127,11 +127,25 @@ def salary():
 @app.route('/salary_by_category')
 def salary_by_category():
     """Salary by category"""
+    chart_1 = EchartBoxplot(name='languages',
+                            title='...упоминания языка программирования.')
+    chart_2 = EchartBoxplot(name='frameworks',
+                            title='...тестового фреймворка.')
+    chart_3 = EchartBoxplot(name='web_ui_tools',
+                            title='...средства тестирования web UI.')
+    chart_4 = EchartBoxplot(name='load_testing_tools',
+                            title='...инструмента нагрузочного тестирования.')
     return render_template(
-        '/candle.html',
-        chart_data=utils.get_salary_by_category_data(),
-        year=Config.YEARS[-1],
-        title='Медианная зарплата в зависимости от упоминания языка.'
+        '4_charts.html',
+        title='Зарплаты в зависимости от...',
+        chart_function_1=chart_1.get_script(),
+        div_1=chart_1.get_div(),
+        chart_function_2=chart_2.get_script(),
+        div_2=chart_2.get_div(),
+        chart_function_3=chart_3.get_script(),
+        div_3=chart_3.get_div(),
+        chart_function_4=chart_4.get_script(),
+        div_4=chart_4.get_div()
     )
 
 
