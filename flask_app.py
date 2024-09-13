@@ -125,6 +125,7 @@ def salary():
 
 
 @app.route('/salary_by_category')
+@lru_cache(maxsize=None)
 def salary_by_category():
     """Salary by category"""
     chart_1 = EchartBoxplot(name='languages',
