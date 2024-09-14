@@ -203,5 +203,5 @@ class EchartBoxplot(BaseChart):
                                   trigger_on='mousemove')
                               )
         chart.reversal_axis()
-        chart.options['grid'] = {'left': 72, 'right': 25, 'top': 40}
+        chart.options['grid'] = {'left': 76, 'right': 25, 'top': 40}
         return chart.dump_options()
