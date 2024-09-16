@@ -7,8 +7,6 @@ from flask_bootstrap import Bootstrap
 
 import utils
 from db.db_client import Database
-from config import Config
-from chart_generator import HorizontalBarChart, EChartTreeMapChart
 from echarts import EchartStackedColumn, EchartTreeMap, EchartHorizontalBar, EchartBoxplot
 
 db = Database()
@@ -281,8 +279,8 @@ def programming_languages():
     )
 
 
-@app.route('/unit_test_frameworks')
-def unit_test_frameworks():
+@app.route('/test_frameworks')
+def test_frameworks():
     """Unit test frameworks popularity page"""
     chart1 = EchartTreeMap(title='Популярность тестовых фреймворков',
                            name='frameworks')
@@ -296,6 +294,12 @@ def unit_test_frameworks():
         chart_script2=chart2.get_script(),
         div2=chart2.get_div(),
     )
+
+
+@app.route('/unit_test_frameworks')
+def unit_test_frameworks():
+    """BDD framework page"""
+    return redirect("https://clingon.pythonanywhere.com/test_frameworks", code=302)
 
 
 @app.route('/bdd_frameworks')
@@ -369,7 +373,7 @@ def tmp():
 def tmp_1():
     """Temporary chart page."""
     chart1 = EchartTreeMap(name='frameworks',
-                           title='Популярность фреймворков для юнит-тестирования')
+                           title='Популярность фреймворков для unit-тестирования')
     chart2 = EchartStackedColumn(name='cvs',
                                  title='Популярность систем управления версиями.')
     return render_template(
