@@ -117,7 +117,7 @@ class Config:
                          'Deviniti', 'Qase', 'IBM Rational Quality Manager',
                          'HP Quality Center', 'HP ALM', 'TestIt']
 
-    CVS = ['git', 'SVN', 'Subversion', 'Mercurial']
+    CVS = ['git', 'SVN', 'Subversion', 'Mercurial', 'TFS']
 
     UNIT_FRAMEWORKS = [['pytest', 'Python'], ['py.test', 'Python'],
                        ['Unittest', 'Python'], ['Nose', 'Python'],
