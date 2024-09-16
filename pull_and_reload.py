@@ -12,3 +12,4 @@ git pull --rebase
 pa.send_command_to_console(console_id=console_id, command=command)
 pa.reload_webapps(domain_name=pa.get_domain_name())
 print(pa.get_route(route='time_series'))
+print(pa.get_route(route='salary_by_category'))
