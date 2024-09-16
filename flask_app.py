@@ -247,8 +247,8 @@ def web_ui_and_api_tools():
 
 @app.route('/mobile_testing_frameworks')
 def mobile_testing_frameworks():
-    """Mobile app testing tools page"""
-    chart = EchartStackedColumn(title='Популярность инструментов тестирования мобильных приложений',
+    """Mobile app testing frameworks page"""
+    chart = EchartStackedColumn(title='Популярность фреймворков тестирования мобильных приложений',
                                 name='mobile_testing_frameworks')
     return render_template(
         'pyechart.html',
