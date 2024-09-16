@@ -1,3 +1,5 @@
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -102,5 +104,14 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.idea
 /not_for_git/
-/testdb.db
+testdb.db
+/scripts/super_script.py
+/scripts/upload_and_unpack_db.py
+/scripts/testdb.zip
+/tests/visual_test.py
+chromedriver.exe
+word_cloud.py
+sqlite3.exe

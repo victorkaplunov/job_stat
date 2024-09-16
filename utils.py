@@ -153,8 +153,9 @@ def count_salary_median(vacancies: Sequence[Row[Any] | RowMapping],
     # Отбираем вакансии с нужным опытом и собираем зарплаты в список
     salary_list = []
     for vacancy in vacancies:
-        if json.loads(str(vacancy))['experience']['id'] == experience and json.loads(str(vacancy))['salary'] is not None:
-            salary_dict = json.loads(str(vacancy))['salary']
+        salary = json.loads(str(vacancy))['salary']
+        if json.loads(str(vacancy))['experience']['id'] == experience and salary is not None:
+            salary_dict = salary
             salary_dict.update({'id': json.loads(str(vacancy))['id']})
             salary_dict.update({'published_at': json.loads(str(vacancy))['published_at']})
             salary_dict.update({'alternate_url': json.loads(str(vacancy))['alternate_url']})
@@ -405,6 +406,24 @@ def get_salary_by_category_data() -> list[list]:
     return data_list
 
 
+def get_unic_employers() -> set:
+    employers = set()
+    for str_json in db.get_all_vacancies_jsons():
+        dict_json = json.loads(str_json)
+        employers.add(dict_json['employer']['name'])
+    return employers
+
+
+def get_unic_key_skills() -> set:
+    skill_set = set()
+    for str_json in db.get_all_vacancies_jsons():
+        dict_json = json.loads(str_json)
+        key_skills = dict_json['key_skills']
+        for skill in key_skills:
+            skill_set.add(skill['name'])
+    return skill_set
+
+
 def fill_skill_set_chart(update: bool) -> None:
     """Заполнение данных для графика 'Ключевые навыки'."""
     current_year_vacancies = db.get_json_from_vacancies_by_year(Config.YEARS[-1])
@@ -506,7 +525,7 @@ def count_percent(year):
 
     for chart_name in chart_names_list:
         popularity_sum = db.get_sum_for_chart_per_year(chart_name=chart_name, year=year)
-        chart_data = db.get_data_for_chart_per_year(chart_name=chart_name, year=year)
+        chart_data = db.get_data_for_chart_per_year(chart_name=str(chart_name), year=year)
         for item in chart_data:
             percent = item.popularity / popularity_sum
             db.update_percentage(chart_name=chart_name, year=year,

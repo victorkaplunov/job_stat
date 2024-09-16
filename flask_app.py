@@ -2,14 +2,12 @@ import os
 import json
 from functools import lru_cache
 
-from flask import Flask, send_from_directory, url_for, render_template
+from flask import Flask, send_from_directory, url_for, render_template, redirect
 from flask_bootstrap import Bootstrap
 
 import utils
 from db.db_client import Database
-from config import Config
-from chart_generator import PieChart, PieChartWithTable, PieChartWithFilter, \
-    HorizontalBarChart, StackedColumnChart, EChartStackedColumnChart
+from echarts import EchartStackedColumn, EchartTreeMap, EchartHorizontalBar, EchartBoxplot
 
 db = Database()
 
@@ -33,11 +31,11 @@ def home_page():
 def api():
     return f"""
 <html>
-<a href="{url_for('show_vac_calendar', vacancy_id='14658327')}">
-        {url_for('show_vac_calendar', vacancy_id='14658327')}</a>
+<a href="{url_for('show_vac_calendar', vacancy_id='101279526')}">
+        {url_for('show_vac_calendar', vacancy_id='101279526')}</a>
 <br>
-<a href="{url_for('show_vac_description', vacancy_id='14658327')}">
-        {url_for('show_vac_description', vacancy_id='14658327')}</a>
+<a href="{url_for('show_vac_description', vacancy_id='101279526')}">
+        {url_for('show_vac_description', vacancy_id='101279526')}</a>
 <br>
 <a href="{url_for('show_vac_top_new_by_id')}">{url_for('show_vac_top_new_by_id')}"</a>
 <br>
@@ -104,11 +102,11 @@ def time_series():
     """Time series page"""
     return render_template(
         '/time_series.html',
-        title='Количество вакансий по месяцам и неделям.',
+        title='Количество вакансий по месяцам и неделям',
         vacancy_count_week_by_week=utils.get_vacancies_qty_week_by_week(),
         vacancy_rate_by_year=utils.get_vacancies_qty_by_month_of_year(),
         vacancy_count_day_by_week=utils.get_vacancies_qty_by_day_of_week(),
-           )
+    )
 
 
 @app.route('/salary')
@@ -116,7 +114,7 @@ def salary():
     """Time series page"""
     return render_template(
         '/salary.html',
-        title='Заработная плата в зависимости от опыта.',
+        title='Заработная плата в зависимости от опыта',
         salary=utils.get_salary_data_per_year(),
         no_experience_salary=utils.get_vacancies_with_salary(experience='noExperience'),
         between1And3_salary=utils.get_vacancies_with_salary(experience='between1And3'),
@@ -125,249 +123,217 @@ def salary():
 
 
 @app.route('/salary_by_category')
+@lru_cache(maxsize=None)
 def salary_by_category():
     """Salary by category"""
+    chart_1 = EchartBoxplot(name='languages',
+                            title='...упоминания языка программирования.')
+    chart_2 = EchartBoxplot(name='frameworks',
+                            title='...тестового фреймворка.')
+    chart_3 = EchartBoxplot(name='web_ui_tools',
+                            title='...средства тестирования web UI.')
+    chart_4 = EchartBoxplot(name='load_testing_tools',
+                            title='...инструмента нагрузочного тестирования.')
     return render_template(
-        '/candle.html',
-        chart_data=utils.get_salary_by_category_data(),
-        year=Config.YEARS[-1],
-        title='Медианная зарплата в зависимости от упоминания языка.'
+        '4_charts.html',
+        title='Зарплаты в зависимости от...',
+        chart_function_1=chart_1.get_script(),
+        div_1=chart_1.get_div(),
+        chart_function_2=chart_2.get_script(),
+        div_2=chart_2.get_div(),
+        chart_function_3=chart_3.get_script(),
+        div_3=chart_3.get_div(),
+        chart_function_4=chart_4.get_script(),
+        div_4=chart_4.get_div()
     )
 
 
 @app.route('/top_employers')
 def top_employers():
     """Employers by vacancies quantity page"""
-    chart = HorizontalBarChart(
-        chart_title='Топ 50 работодателей',
-        chart_subtitle=f'по количеству вакансий в {Config.YEARS[-1]} году.',
-        chart_name='top_employers')
-    return render_template('/simple_chart.html',
-                           package=chart.package,
-                           title=chart.title,
-                           subtitle=chart.subtitle,
-                           charts_function=chart.generate_script(chart_name=chart.chart_name),
-                           divs=chart.generate_divs())
-
-
-@app.route('/schedule')
-def schedule():
-    """Schedule type popularity page"""
-    chart = PieChart(chart_title='Популярность режимов работы',
-                     chart_name='schedule')
+    chart = EchartHorizontalBar(name='top_employers',
+                                title='Топ 50 работодателей по количеству публикаций вакансий')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Режимы работы.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(height=2500)
     )
 
 
-@app.route('/employment')
-def employment():
-    chart = PieChartWithTable(chart_title='Виды занятости',
-                              chart_name='employment')
+@app.route('/employment_and_schedule')
+def employment_and_schedule():
+    chart1 = EchartStackedColumn(name='employment',
+                                 title='Виды занятости')
+    chart2 = EchartStackedColumn(name='schedule',
+                                 title='Популярность режимов работы')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Виды занятости.',
-        charts_function=chart.generate_script() + chart.generate_table_script(),
-        divs=chart.generate_divs()
+        '2_charts.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
     )
 
 
-@app.route('/experience')
-def experience():
-    """Experience popularity page"""
-    chart = PieChart(chart_title='Требования к опыту ',
-                     chart_name='experience')
+@app.route('/experience_and_salary_mention')
+def experience_and_salary_mention():
+    """Experience and salary mention page"""
+    chart1 = EchartStackedColumn(name='experience',
+                                 title='Требования к опыту')
+    chart2 = EchartStackedColumn(name='with_salary',
+                                 title='Доля вакансий с указанной зарплатой')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Требуемый опыт работы.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
-
-@app.route('/with_salary')
-def with_salary():
-    chart = PieChart(chart_title='Количество вакансий с указанной зарплатой',
-                     chart_name='with_salary')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Количество вакансий с указанной зарплатой.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        '2_charts.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
     )
 
 
 @app.route('/key_skills')
 def key_skills():
     """Key skills popularity page"""
-    chart = HorizontalBarChart(
-        chart_title='Ключевые навыки.',
-        chart_subtitle=f'Пятьдесят наиболее популярных тегов в {Config.YEARS[-1]} году.',
-        chart_name='key_skills')
-    return render_template('/simple_chart.html',
-                           package=chart.package,
-                           title=chart.title,
-                           subtitle=chart.subtitle,
-                           charts_function=chart.generate_script(chart_name=chart.chart_name),
-                           divs=chart.generate_divs())
-
-
-@app.route('/programming_languages')
-def programming_languages():
-    """Programming languages page"""
-    chart = PieChart(chart_title='Популярность языков программирования',
-                     chart_name='languages')
+    chart = EchartHorizontalBar(name='key_skills',
+                                title='Наиболее популярные ключевые навыки')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность языков программирования.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
-
-@app.route('/unit_test_frameworks')
-def unit_test_frameworks():
-    """Unit test frameworks popularity page"""
-    chart = PieChartWithFilter(chart_title='Популярность фреймворков для юнит-тестирования',
-                               chart_name='frameworks')
-
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность фреймворков для юнит-тестирования.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(height=2000)
     )
 
 
 @app.route('/load_testing_and_monitoring_tools')
 def load_testing_and_monitoring_tools():
     """Load testing tools page"""
-    chart_1 = StackedColumnChart(chart_title='Инструменты тестирования производительности',
-                                 chart_name='load_testing_tools')
-    chart_2 = StackedColumnChart(chart_title='Популярность генераторов сетевого трафика',
-                                 chart_name='traffic_generators')
-    chart_3 = StackedColumnChart(chart_title='Системы трассировки',
-                                 chart_name='tracing_system')
-    chart_4 = StackedColumnChart(chart_title='Средства мониторинга',
-                                 chart_name='monitoring')
+    chart_1 = EchartStackedColumn(title='Инструменты тестирования производительности',
+                                  name='load_testing_tools')
+    chart_2 = EchartStackedColumn(title='Популярность генераторов сетевого трафика',
+                                  name='traffic_generators')
+    chart_3 = EchartStackedColumn(title='Системы трассировки',
+                                  name='tracing_system')
+    chart_4 = EchartStackedColumn(title='Средства мониторинга',
+                                  name='monitoring')
     return render_template('4_charts.html',
-                           package=chart_1.package,
-                           title='Средства нагрузочного тестирования и мониторинга.',
-                           charts_function_1=chart_1.generate_script(),
-                           div_1=chart_1.generate_divs(),
-                           charts_function_2=chart_2.generate_script(),
-                           div_2=chart_2.generate_divs(),
-                           charts_function_3=chart_3.generate_script(),
-                           div_3=chart_3.generate_divs(),
-                           charts_function_4=chart_4.generate_script(),
-                           div_4=chart_4.generate_divs()
+                           title='Средства нагрузочного тестирования и мониторинга',
+                           chart_function_1=chart_1.get_script(),
+                           div_1=chart_1.get_div(),
+                           chart_function_2=chart_2.get_script(),
+                           div_2=chart_2.get_div(),
+                           chart_function_3=chart_3.get_script(),
+                           div_3=chart_3.get_div(),
+                           chart_function_4=chart_4.get_script(),
+                           div_4=chart_4.get_div()
                            )
 
 
-@app.route('/api_testing_tools')
-def api_testing_tools():
-    """Load testing tools page"""
-    chart = PieChart(chart_title='Популярность инструментов тестирования Web API',
-                     chart_name='api_testing_tools')
+@app.route('/web_ui_and_api_tools')
+def web_ui_and_api_tools():
+    """Web UI and API testing tools page"""
+    chart1 = EchartStackedColumn(name='api_testing_tools',
+                                 title='Популярность инструментов тестирования Web API')
+    chart2 = EchartStackedColumn(name='web_ui_tools',
+                                 title='Популярность средства тестирования Web UI')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Средства тестирования Web API.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
-
-@app.route('/bdd_frameworks')
-def bdd_frameworks():
-    """BDD framework page"""
-    chart = PieChart(chart_title='Популярность фреймворков BDD',
-                     chart_name='bdd_frameworks')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность фреймворков BDD.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
-
-@app.route('/web_ui_tools')
-def web_ui_tools():
-    """Web UI testing tools page"""
-    chart = PieChart(chart_title='Популярность средства тестирования Web UI',
-                     chart_name='web_ui_tools')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность средства тестирования Web UI.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        '2_charts.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
     )
 
 
 @app.route('/mobile_testing_frameworks')
 def mobile_testing_frameworks():
-    """Mobile app testing tools page"""
-    chart = PieChart(chart_title='Популярность инструментов тестирования мобильных приложений',
-                     chart_name='mobile_testing_frameworks')
+    """Mobile app testing frameworks page"""
+    chart = EchartStackedColumn(title='Популярность фреймворков тестирования мобильных приложений',
+                                name='mobile_testing_frameworks')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность инструментов тестирования мобильных приложений.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
     )
+
+
+@app.route('/sniffers')
+def sniffers():
+    """Sniffers"""
+    chart1 = EchartStackedColumn(name='sniffers',
+                                 title='Популярность анализаторов трафика (сниферов)')
+    return render_template(
+        '1_echart.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+    )
+
+
+@app.route('/programming_languages')
+def programming_languages():
+    """Programming languages page"""
+    chart = EchartStackedColumn(name='languages',
+                                title='Популярность языков программирования')
+    return render_template(
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
+    )
+
+
+@app.route('/test_frameworks')
+def test_frameworks():
+    """Unit test frameworks popularity page"""
+    chart1 = EchartTreeMap(title='Популярность тестовых фреймворков',
+                           name='frameworks')
+    chart2 = EchartStackedColumn(name='bdd_frameworks',
+                                 title='Популярность фреймворков BDD')
+
+    return render_template(
+        '2_charts.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
+    )
+
+
+@app.route('/unit_test_frameworks')
+def unit_test_frameworks():
+    """BDD framework page"""
+    return redirect("https://clingon.pythonanywhere.com/test_frameworks", code=302)
+
+
+@app.route('/bdd_frameworks')
+def bdd_frameworks():
+    """BDD framework page"""
+    return redirect("https://clingon.pythonanywhere.com/unit_test_frameworks", code=302)
 
 
 @app.route('/bugtracking_n_tms')
 def bugtracking_n_tms():
     """Mobile app testing tools page"""
-    chart = PieChart(chart_title='Популярность систем управления тестированием, bugtracking system и т.п.',
-                     chart_name='bugtracking_n_tms')
+    chart_title = 'Популярность систем управления тестированием, bugtracking system и т.п.'
+    chart = EchartStackedColumn(title=chart_title,
+                                name='bugtracking_n_tms')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность систем управления тестированием, bugtracking system и т.п.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
     )
 
 
-@app.route('/cvs')
-def cvs():
-    """CVS page"""
-    chart = PieChart(chart_title='Популярность систем управления версиями',
-                     chart_name='cvs')
+@app.route('/cvs_and_ci_cd')
+def cvs_and_ci_cd():
+    """CVS and CI/CD page"""
+    chart1 = EchartStackedColumn(name='ci_cd',
+                                 title='Популярность средств <br> CI/CD.')
+    chart2 = EchartStackedColumn(name='cvs',
+                                 title='Популярность систем управления версиями.')
     return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность систем управления версиями.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
-    )
-
-
-@app.route('/ci_cd')
-def ci_cd():
-    """Mobile app testing tools page"""
-    chart = PieChart(chart_title='Популярность средств CI/CD',
-                     chart_name='ci_cd')
-    return render_template(
-        '/simple_chart.html',
-        package=chart.package,
-        title='Популярность средств CI/CD.',
-        charts_function=chart.generate_script(),
-        divs=chart.generate_divs()
+        '2_charts.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
     )
 
 
@@ -381,10 +347,50 @@ def word_cloud():
 @app.route('/tmp')
 def tmp():
     """Temporary chart page."""
-    chart = EChartStackedColumnChart(chart_name='load_testing_tools',
-                                     chart_title='Популярность средств CI/CD.')
+    chart_1 = EchartBoxplot(name='languages',
+                            title='...упоминания языка программирования.')
+    chart_2 = EchartBoxplot(name='frameworks',
+                            title='...тестового фреймворка.')
+    chart_3 = EchartBoxplot(name='web_ui_tools',
+                            title='...средства тестирования web UI.')
+    chart_4 = EchartBoxplot(name='load_testing_tools',
+                            title='...инструмента нагрузочного тестирования.')
     return render_template(
-        'tmp_1.html',
-        chart_function=chart.generate_script(),
-        div=chart.generate_divs(),
-        )
+        '4_charts.html',
+        title='Зарплаты в зависимости от...',
+        chart_function_1=chart_1.get_script(),
+        div_1=chart_1.get_div(),
+        chart_function_2=chart_2.get_script(),
+        div_2=chart_2.get_div(),
+        chart_function_3=chart_3.get_script(),
+        div_3=chart_3.get_div(),
+        chart_function_4=chart_4.get_script(),
+        div_4=chart_4.get_div()
+    )
+
+
+@app.route('/tmp_1')
+def tmp_1():
+    """Temporary chart page."""
+    chart1 = EchartTreeMap(name='frameworks',
+                           title='Популярность фреймворков для unit-тестирования')
+    chart2 = EchartStackedColumn(name='cvs',
+                                 title='Популярность систем управления версиями.')
+    return render_template(
+        '2_charts.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
+    )
+
+
+@app.route('/tmp_2')
+def tmp_2():
+    chart = EchartHorizontalBar(name='top_employers',
+                                title='Top employers')
+    return render_template(
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div()  # 2000
+    )

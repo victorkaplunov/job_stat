@@ -149,7 +149,6 @@ class PieChartWithFilter(BaseChartGenerator):
             'ui': {{
                 'caption': 'Выберите язык',
                 'selectedValuesLayout': 'belowStacked',
-                'labelStacking': 'vertical',
                 'label': 'Языки программирования',
                 'labelStacking': 'vertical'
             }},
@@ -238,7 +237,7 @@ class StackedColumnChart(BaseChartGenerator):
         super().__init__(chart_name, chart_title, chart_subtitle)
         self.package = ['corechart']
 
-    def get_data_for_chart(self, chart_name: str) -> list[list[str | int]]:
+    def get_data(self, chart_name: str) -> list[list[str | int]]:
         """Формирует данные для столбчатой диаграммы."""
         data_list = []
         tool_set = set()
@@ -258,7 +257,7 @@ class StackedColumnChart(BaseChartGenerator):
 
     def generate_script(self):
         """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
-        chart_data = self.get_data_for_chart(self.chart_name)
+        chart_data = self.get_data(self.chart_name)
         self.charts = self.charts + f'''
             google.charts.setOnLoadCallback(drawChart{self.chart_name});
             function drawChart{self.chart_name}() {{
@@ -284,72 +283,67 @@ class EChartBaseChartGenerator(BaseChartGenerator):
     """Базовый класс генерации диаграмм на базе библиотеки ECharts."""
     def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
         super().__init__(chart_name, chart_title, chart_subtitle)
-        self.package = ['corechart']
         self.auto_font_size_function = f'''
             function autoFontSize() {{
               let width = document.getElementById('{self.chart_name}').offsetWidth;
-              let newFontSize = Math.round(width /40);
-              if (newFontSize < 14)
-                newFontSize = 14
+              let newFontSize = Math.round(width /50);
+              if (newFontSize < 12)
+                newFontSize = 12
               if (newFontSize > 16)
                 newFontSize = 16
               return newFontSize;
             }};'''
         self.add_event_listener_function = f"""
-             window.addEventListener('resize', function() {{
-             if (myChart != null && myChart != undefined) {{
-                 myChart.resize({{width: 'auto', height: 'auto'}});
-                    myChart.setOption({{
-                      legend: {{textStyle: {{fontSize: autoFontSize()}},}},
-                      tooltip: {{textStyle: {{fontSize: autoFontSize()}},}},
-                      xAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
-                      yAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
-                      series: {{label: {{textStyle: {{fontSize: autoFontSize()}}}}}}
-                        }})
-                    }}"""
-        self.grid = f"""
-            const grid = {{
-              left: 50,
-              right: 20,
-              top: 50,
-              bottom: 150
-              }};"""
+            window.addEventListener('resize', function() {{
+            if (myChart_{self.chart_name} != null && myChart_{self.chart_name} != undefined) {{
+             myChart_{self.chart_name}.resize({{width: 'auto', height: 'auto'}});
+                myChart_{self.chart_name}.setOption({{
+                  legend: {{textStyle: {{fontSize: autoFontSize()}},}},
+                  tooltip: {{textStyle: {{fontSize: autoFontSize()}},}},
+                  xAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                  yAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                  series: {{label: {{textStyle: {{fontSize: autoFontSize()}}}}}}
+                    }})
+                }}
+            """
         self.script_header = f"""
-            <script src="/static/echarts.js"></script>
-            <script type="text/javascript">
-            var chartDom = document.getElementById('{self.chart_name}');
-            var myChart = echarts.init(document.querySelector('#{self.chart_name}'),
+            var chartDom_{self.chart_name} = document.getElementById('{self.chart_name}');
+            var myChart_{self.chart_name} = echarts.init(document.querySelector('#{self.chart_name}'),
                                         null, {{ renderer: 'svg' }});
             """
-
-    def generate_divs(self):
-        """Генерация раздела в который будут вставляться график."""
-        return f'''<div id="{self.chart_name}" style="width:100%; height: 650px;"></div>
-                <hr>'''
+        self.div = f'''
+            <h4>{self.title}</h4>
+            <div id="{self.chart_name}" class="collapse show" style="width:100%; height: 600px;"></div>
+            <hr>'''
+        self.legend_type = 'plain'
 
 
 class EChartStackedColumnChart(EChartBaseChartGenerator):
     """Класс генерации столбчатой Stackable диаграммы на базе библиотеки ECharts."""
-    def get_percent_data(self) -> dict:
+    def get_data(self) -> dict:
         """Формирует данные для столбчатой Stacked диаграммы в долях от 100%."""
         data_dict = dict(series='', category=[])
         obj_list = list()
-        value_list = self.db.get_unic_values_for_chart(chart_name=self.chart_name)
+        value_list = self.db.get_unic_values_for_chart_sorted_by_last_year_percent(
+            chart_name=self.chart_name)
         data_dict['category'] = Config.YEARS
         for value in value_list:
             data = self.db.get_percentage_ordered_by_years(chart_name=self.chart_name,
                                                            param_name=value)
-            obj = dict(name=value, stack='total', type='bar', data=data)
+            if self.chart_name in ['schedule', 'employment', 'experience', 'with_salary']:
+                obj = dict(name=Config.TRANSLATIONS[value], stack='total', type='bar', data=data)
+            else:
+                obj = dict(name=value, stack='total', type='bar', data=data)
             obj_list.append(obj)
         data_dict['series'] = json.dumps(obj_list)
         return data_dict
 
-    @staticmethod
-    def set_chart_option(chart_data: dict) -> str:
+    def set_chart_option(self) -> str:
         """Устанавливает опции столбчатой Stacked диаграммы."""
+        chart_data = self.get_data()
         return f"""
-        var option;
-        option = {{
+        var option_{self.chart_name};
+        option_{self.chart_name} = {{
             tooltip: {{
                 confine: true,
                 show: true,
@@ -359,7 +353,8 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                 valueFormatter: (value) => (value * 100).toFixed(1) + '%'
               }},
             legend: {{
-                top: '85%',
+                type: '{self.legend_type}',
+                top: '76%',
                 selectedMode: 'multiple',
                 selectorPosition: 'start',
                 textStyle: {{fontSize: autoFontSize()}},
@@ -369,7 +364,12 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                     title: 'Inv'
                   }}]
               }},
-            grid,
+            grid: {{
+                left: 50,
+                right: 20,
+                top: 20,
+                bottom: 175
+                }},
             yAxis: {{
                type: 'value',
                splitNumber: 10,
@@ -395,21 +395,207 @@ class EChartStackedColumnChart(EChartBaseChartGenerator):
                       formatter: value => value
                 }},
               }},
-            series
+            series: {chart_data['series']}
             }};
-        myChart.setOption(option);
+        myChart_{self.chart_name}.setOption(option_{self.chart_name});
             """
 
     def generate_script(self):
         """Генерация функции JavaScript для Stacked столбчатой диаграммы."""
-        chart_data = self.get_percent_data()
         return f'''
         {self.script_header}
-        {self.auto_font_size_function}
-        {self.grid}
-        const series = {chart_data['series']}
-        {self.set_chart_option(chart_data=chart_data)}
-        { self.add_event_listener_function }
-        }});
-        </script>'''
+        {self.set_chart_option()}
+        {self.add_event_listener_function }
+        }});'''
 
+
+class EchartSunburst(EChartBaseChartGenerator):
+    """Класс генерации диаграммы типа Sunburst на базе библиотеки ECharts."""
+    def __init__(self, chart_name: str, chart_title: str, chart_subtitle=''):
+        super().__init__(chart_name, chart_title, chart_subtitle)
+
+        self.add_event_listener_function = f"""
+            window.addEventListener('resize', function() {{
+            if (myChart_{self.chart_name} != null && myChart_{self.chart_name} != undefined) {{
+             myChart_{self.chart_name}.resize({{width: 'auto', height: 'auto'}});
+                myChart_{self.chart_name}.setOption({{
+                  legend: {{textStyle: {{fontSize: autoFontSize()}},}},
+                  tooltip: {{textStyle: {{fontSize: autoFontSize()}},}},
+                  xAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                  yAxis: {{axisLabel: {{fontSize: autoFontSize(),}},}},
+                  series: {{label: {{fontSize: autoFontSize()}}}}
+                    }})
+                }}
+            """
+
+    def get_data(self, year) -> list:
+        """Формирует данные для графиков по годам на основе запроса в БД."""
+        output_list = list()
+        parents = self.db.get_unic_parents()
+        for parent in parents:
+            data_dict = dict()
+            children_from_db = self.db.get_data_for_chart_per_year_by_parent(
+                year=year, chart_name=self.chart_name,
+                parent=str(parent))
+            children = list()
+            data_dict['name'] = parent
+            for child in children_from_db:
+                children.append(dict(name=child.data,
+                                     value=child.percent,
+                                     ))
+            data_dict['children'] = children
+            output_list.append(data_dict)
+        return output_list
+
+    def set_chart_option(self) -> str:
+        """Устанавливает опции Sunburst диаграммы."""
+        return f"""
+            var option_{self.chart_name};
+            option_{self.chart_name} = {{
+                legend: {{
+                    type: 'plain',
+                    show: true,
+                    data: [{{name: 'test', icon: 'circle',}}],
+                    }},
+                tooltip: {{
+                    show: true,
+                    alwaysShowContent: true,
+                    triggerOn: 'mousemove',
+                    confine: false,
+                    valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+                    }},
+                series: {{
+                    type: 'sunburst',
+                    data: {self.get_data('2024')},
+                    sort: 'asc',
+                    radius: [0, '90%'],
+                    startAngle: 120,
+                    label: {{rotate: 'radial'}},
+                    labelLayout: {{hideOverlap: true}},
+                    emphasis: {{
+                        itemStyle: {{
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }}
+                    }},
+                    levels: [
+                    {{}},
+                    {{ r0: '15%', r: '60%', label: {{rotate: 'radial', align: 'right'}}}},
+                    {{ r0: '60%', r: '70%', label: {{position: 'outside', show: true, rotate: 'radial'}}}},
+                    ],
+                }}
+            }};
+        myChart_{self.chart_name}.setOption(option_{self.chart_name});
+        """
+
+    def generate_script(self) -> str:
+        """Генерация функции JavaScript для Sunburst диаграммы."""
+        return f'''
+        {self.script_header}
+        {self.set_chart_option()}
+        {self.add_event_listener_function }
+        }});'''
+
+
+class EChartTreeMapChart(EChartBaseChartGenerator):
+    """Класс генерации TreeMap диаграммы."""
+    def get_data(self, year) -> list:
+        """Get data for TreeMap chart."""
+        output_list = list()
+        parents = self.db.get_unic_parents()
+        for parent in parents:
+            data_dict = dict()
+            children_from_db = self.db.get_data_for_chart_per_year_by_parent(
+                year=year, chart_name=self.chart_name,
+                parent=str(parent))
+            children = list()
+            data_dict['name'] = parent
+            for child in children_from_db:
+                children.append(dict(name=child.data, value=child.percent))
+            data_dict['children'] = children
+            output_list.append(data_dict)
+        return output_list
+
+    def get_series(self, year) -> str:
+        """Generate series for option of TreeMap chart."""
+        seria = f"""
+            {{
+                type: 'treemap',
+                name: '{year}',
+                data: {self.get_data(year)},
+                roam: 'zoom',
+                leafDepth: 1,
+                //select: {{color: 'red'}},
+                drillDownIcon: '',
+                tooltip: {{
+                    valueFormatter: (value) => (value * 100).toFixed(1) + '%'
+                    }},
+                //select: {{
+                 //   label: {{show: true}}
+                  //  }},
+                label: {{
+                    //show: true,
+                    formatter: function (params) {{
+                      return `${{params.name}} ${{Number(params.value*100).toFixed(1)  + '%'}}`}}
+
+                }},
+                upperLabel: {{
+                    show: true,
+                    height: 30
+                    }},
+                itemStyle: {{borderColor: '#fff'}},
+                levels: [{{
+                    itemStyle: {{
+                        borderColor: '#777',
+                        borderWidth: 0,
+                        gapWidth: 1
+                        }},
+                    upperLabel: {{show: false}}
+                    }},
+                    {{
+                    itemStyle: {{
+                        borderColor: '#555',
+                        borderWidth: 2,
+                        gapWidth: 1
+                        }},
+                    emphasis: {{
+                        itemStyle: {{
+                            borderColor: '#ddd'
+                            }}
+                        }}
+                    }},
+                    {{
+                    itemStyle: {{
+                        borderWidth: 2,
+                        gapWidth: 1,
+                        borderColorSaturation: 0.6
+                        }}
+                    }}],
+            }},"""
+        return seria
+
+    def set_chart_option(self) -> str:
+        """Set options for TreeMap chart."""
+        series = ''
+        for year in Config.YEARS[::-1]:
+            series += self.get_series(year=str(year))
+        return f"""
+            var option_{self.chart_name};
+            option_{self.chart_name} = {{
+                legend: {{
+                    selectedMode: 'single',
+                    }},
+                series: [{series}],
+                tooltip: {{}},
+                }};
+        myChart_{self.chart_name}.setOption(option_{self.chart_name});
+        """
+
+    def generate_script(self) -> str:
+        """JavaScript function for TreeMap chart."""
+        return f'''
+        {self.script_header}
+        {self.set_chart_option()}
+        {self.add_event_listener_function }
+        }});'''

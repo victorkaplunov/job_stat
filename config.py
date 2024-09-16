@@ -25,12 +25,31 @@ class Config:
     YEARS = [2020, 2021, 2022, 2023, 2024]
 
     STOP_LIST = ['Формовщик теста', 'тестомес', 'Тестомес', 'Тестовод',
-                 'Пекарь-тестомес',
+                 'Пекарь-тестомес', 'Пекарь/тестовод', 'Тестодел',
+                 'тестоприготовления', 'тесторазделочных',
                  'Key Account Manager', 'Комплектовщик-Тестировщик',
                  'Специалист по подбору материалов для учебных курсов',
                  'Составитель теста и фарша', '(Ввод в гражданский оборот)',
                  'Менеджер по качеству и пищевой безопасности',
-                 'Тестировщик бытовой техники']
+                 'Materials Operations Intern',
+                 'Тестировщик бытовой техники', 'Тестировщик женских сумок',
+                 'мастер-тестировщик',
+                 'Начинающий специалист в отдел тестирование крупной техники',
+                 'Начинающий специалист в отдел тестирование крупной техники',
+                 'Начинающий специалист в отдел тестирования крупной техники',
+                 'Начинающий специалист в отдел тестирования крупной техники',
+                 'Стажер в центр сборки и тестирования техники',
+                 'Сотрудник на тестирование ИИ (нейросетей)',
+                 'Тестировщик Чат Ботов ИИ(Нейросетей)',
+                 'Тестировщик крупно-бытовой техники',
+                 'FixItRight', 'Тестировщик устройств Apple',
+                 'Тестировщик компьютерной техники/ Оптимизация и ремонт',
+                 'Начинающий тестировщик компьютерной техники',
+                 'Тестировщик игровых приставок', 'Тестировщик-установщик оборудования',
+                 'Тестировщик мобильных телефонов',
+                 'Мастер по ремонту оборудования, техники',
+                 'ИП Дмитриев Александр Петрович'
+                 ]
     # ToDo: Запрашивать в API, включая обменный курс.
     EXCHANGE_RATES = {'RUR': 1, 'EUR': 86,
                       'USD': 73, 'UAH': 2.58,
@@ -77,6 +96,10 @@ class Config:
 
     API_TESTING_TOOLS = ['Postman', 'Insomnia', 'SoapUI', 'cURL', 'Swagger']
 
+    SNIFFERS = ['Fiddler', 'Charles', 'Burp', 'Proxyman', 'mitmproxy', 'Wireshark',
+                # 'Reqable', 'PCAPdroid', 'Packet Capture', 'HTTP Catcher'
+                ]
+
     CI_CD = ['GitLab', 'GitHub', 'Bitbucket', 'Jenkins',
              'Cirlce CI', 'Travis CI', 'Bamboo', 'TeamCity']
 
@@ -98,6 +121,7 @@ class Config:
 
     UNIT_FRAMEWORKS = [['pytest', 'Python'], ['py.test', 'Python'],
                        ['Unittest', 'Python'], ['Nose', 'Python'],
+                       ['Robot_Framework', 'Python'],
                        ['JUnit', 'Java'], ['TestNG', 'Java'],
                        ['PHPUnit', 'PHP'], ['Codeception', 'PHP'],
                        ['RSpec', 'Ruby'], ['Capybara', 'Ruby'],
@@ -105,8 +129,7 @@ class Config:
                        ['Mocha', 'JavaScript'], ['Serenity', 'JavaScript'],
                        ['Jest', 'JavaScript'], ['Jasmine', 'JavaScript'],
                        ['Nightwatch', 'JavaScript'], ['Karma', 'JavaScript'],
-                       ['CodeceptJS', 'JavaScript'],
-                       ['Robot_Framework', 'multiple_language']]
+                       ['CodeceptJS', 'JavaScript']]
 
     SCHEDULE = ['fullDay', 'flexible', 'shift', 'remote', 'flyInFlyOut']
      

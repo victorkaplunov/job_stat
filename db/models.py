@@ -28,11 +28,20 @@ class Charts(Base):
     year = Column(Integer)
 
 
+class HorizontalBarCharts(Base):
+    __tablename__ = "h_bar_charts"
+    chart_name = Column(String, primary_key=True)
+    category = Column(String)
+    value = Column(Integer)
+    date_start = Column(String)
+    date_end = Column(String)
+
+
 class VacWithSalary(Base):
     __tablename__ = "vac_with_salary"
     id = Column(Integer, primary_key=True)
     published_at = Column(String)
-    calc_salary = Column(Numeric)
+    calc_salary = Column(Float)
     experience = Column(String)
     url = Column(String)
     description = Column(String)

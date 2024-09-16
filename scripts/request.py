@@ -1,4 +1,3 @@
-import os
 from argparse import ArgumentParser
 
 import requests
@@ -27,7 +26,7 @@ if args.rebuild:
 for page_num in range(0, Config.PAGES_QTY):
     search_url = Config.BASE_URL + Config.SEARCH_STRING.replace("page=0", "page=" + str(page_num))
     resp = requests.get(search_url)
-    s = utils.write_vacancies(resp, Config.BASE_URL)
+    utils.write_vacancies(resp, Config.BASE_URL)
 
 for word in Config.STOP_LIST:
     db.delete_vacancy_with_json_like(word=word)
@@ -47,6 +46,7 @@ for year in years_tuple:
         'traffic_generators': Config.TRAFFIC_GENERATORS,
         'tracing_system': Config.TRACING_SYSTEM,
         'api_testing_tools': Config.API_TESTING_TOOLS,
+        'sniffers': Config.SNIFFERS,
         'ci_cd': Config.CI_CD,
         'monitoring': Config.MONITORING,
         'web_ui_tools': Config.WEB_UI_TOOLS,
