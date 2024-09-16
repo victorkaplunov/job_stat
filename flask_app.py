@@ -2,7 +2,7 @@ import os
 import json
 from functools import lru_cache
 
-from flask import Flask, send_from_directory, url_for, render_template
+from flask import Flask, send_from_directory, url_for, render_template, redirect
 from flask_bootstrap import Bootstrap
 
 import utils
@@ -205,31 +205,6 @@ def key_skills():
     )
 
 
-@app.route('/programming_languages')
-def programming_languages():
-    """Programming languages page"""
-    chart = EchartStackedColumn(name='languages',
-                                title='Популярность языков программирования')
-    return render_template(
-        'pyechart.html',
-        chart_script=chart.get_script(),
-        div=chart.get_div(),
-    )
-
-
-@app.route('/unit_test_frameworks')
-def unit_test_frameworks():
-    """Unit test frameworks popularity page"""
-    chart = EchartTreeMap(title='Популярность фреймворков для юнит-тестирования',
-                          name='frameworks')
-
-    return render_template(
-        'pyechart.html',
-        chart_script=chart.get_script(),
-        div=chart.get_div(),
-    )
-
-
 @app.route('/load_testing_and_monitoring_tools')
 def load_testing_and_monitoring_tools():
     """Load testing tools page"""
@@ -270,6 +245,18 @@ def web_ui_and_api_tools():
     )
 
 
+@app.route('/mobile_testing_frameworks')
+def mobile_testing_frameworks():
+    """Mobile app testing tools page"""
+    chart = EchartStackedColumn(title='Популярность инструментов тестирования мобильных приложений',
+                                name='mobile_testing_frameworks')
+    return render_template(
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
+    )
+
+
 @app.route('/sniffers')
 def sniffers():
     """Sniffers"""
@@ -282,28 +269,39 @@ def sniffers():
     )
 
 
+@app.route('/programming_languages')
+def programming_languages():
+    """Programming languages page"""
+    chart = EchartStackedColumn(name='languages',
+                                title='Популярность языков программирования')
+    return render_template(
+        'pyechart.html',
+        chart_script=chart.get_script(),
+        div=chart.get_div(),
+    )
+
+
+@app.route('/unit_test_frameworks')
+def unit_test_frameworks():
+    """Unit test frameworks popularity page"""
+    chart1 = EchartTreeMap(title='Популярность тестовых фреймворков',
+                           name='frameworks')
+    chart2 = EchartStackedColumn(name='bdd_frameworks',
+                                 title='Популярность фреймворков BDD')
+
+    return render_template(
+        '2_charts.html',
+        chart_script1=chart1.get_script(),
+        div1=chart1.get_div(),
+        chart_script2=chart2.get_script(),
+        div2=chart2.get_div(),
+    )
+
+
 @app.route('/bdd_frameworks')
 def bdd_frameworks():
     """BDD framework page"""
-    chart = EchartStackedColumn(name='bdd_frameworks',
-                                title='Популярность фреймворков BDD')
-    return render_template(
-        'pyechart.html',
-        chart_script=chart.get_script(),
-        div=chart.get_div(),
-    )
-
-
-@app.route('/mobile_testing_frameworks')
-def mobile_testing_frameworks():
-    """Mobile app testing tools page"""
-    chart = EchartStackedColumn(title='Популярность инструментов тестирования мобильных приложений',
-                                name='mobile_testing_frameworks')
-    return render_template(
-        'pyechart.html',
-        chart_script=chart.get_script(),
-        div=chart.get_div(),
-    )
+    return redirect("https://clingon.pythonanywhere.com/unit_test_frameworks", code=302)
 
 
 @app.route('/bugtracking_n_tms')
