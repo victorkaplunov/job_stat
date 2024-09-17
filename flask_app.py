@@ -135,8 +135,9 @@ def salary_by_category():
     chart_4 = EchartBoxplot(name='load_testing_tools',
                             title='...инструмента нагрузочного тестирования.')
     return render_template(
-        'salary_by.html',
+        '4_charts.html',
         title='Зарплаты в зависимости от...',
+        description='В российских рублях, в месяц, за вычетом 13% НДФЛ.',
         chart_function_1=chart_1.get_script(),
         div_1=chart_1.get_div(),
         chart_function_2=chart_2.get_script(),
