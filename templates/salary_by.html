@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <h3>{{title}}</h3>
+    <p>
+        В российских рублях, в месяц, за вычетом 13% НДФЛ.
+    </p>
+    <hr>
+    {{ div_1 | safe }}
+    {{ div_2 | safe }}
+    {{ div_3 | safe }}
+    {{ div_4 | safe }}
+
+    <script src="/static/echarts.js"></script>
+    <script type="text/javascript">
+    {{auto_font_size_function | safe }}
+    {{ chart_function_1 | safe }}
+    {{ chart_function_2 | safe }}
+    {{ chart_function_3 | safe }}
+    {{ chart_function_4 | safe }}
+    </script>
+    {% endblock %}
+</html>
