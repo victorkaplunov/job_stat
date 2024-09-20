@@ -26,7 +26,7 @@
       function drawMonthByYear() {
         var data = new google.visualization.arrayToDataTable({{vacancy_rate_by_year | safe }});
         var options = {
-          title: 'Количество вакансий по месяцам',
+          title: 'Количество публикаций вакансий по месяцам',
           legend: {position: 'top', maxLines: 2 },
           bars: 'horizontal', // Required for Material Bar Charts.
           chartArea: {left:55,top:90,width:'100%',height:'70%'}
@@ -41,7 +41,7 @@
       function drawDayByWeek() {
         var data = new google.visualization.arrayToDataTable({{vacancy_count_day_by_week | safe }});
         var options = {
-          title: 'Количество вакансий по дням недели',
+          title: 'Количество публикаций вакансий по дням недели',
           legend: {position: 'top', maxLines: 4 },
 <!--          curveType: 'function',-->
           chartArea: {left:55,top:50,width:'100%',height:'80%'}
