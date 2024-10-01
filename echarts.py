@@ -199,7 +199,6 @@ class EchartBoxplot(BaseChart):
         chart.set_global_opts(xaxis_opts=opts.AxisOpts(type_='value', split_number=2),
                               yaxis_opts=opts.AxisOpts(type_='category'),
                               tooltip_opts=opts.TooltipOpts(
-                                  value_formatter=utils.JsCode("(value) => '₽' + (value*1).toFixed(0)"),
                                   trigger_on='mousemove')
                               )
         chart.reversal_axis()
