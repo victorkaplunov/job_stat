@@ -323,9 +323,9 @@ def get_vacancies_qty_by_month_of_year() -> list[list]:
             # Удаляем данные в неполных месяцах, вместо неполных данных пишем ноль.
             if year == 2019:
                 if month[1] == 'февраль':
-                    output_list.append([month[1], 0])
+                    output_list[n].append(0)
                 else:
-                    output_list.append([month[1], vacancies_qty])
+                    output_list[n].append(vacancies_qty)
             elif year == 2023:
                 if (month[1] == 'июнь') or (month[1] == 'июль'):
                     output_list[n].append(0)
