@@ -156,7 +156,7 @@ class EchartHorizontalBar(BaseChart):
         chart_data = self._get_data()
         chart = (((Bar(init_opts=opts.InitOpts(width="100%"))
                  .add_xaxis(chart_data['name_list'], ))
-                 .add_yaxis('2024 г.', chart_data['data_list'],
+                 .add_yaxis(Config.YEARS[-1], chart_data['data_list'],
                             label_opts=opts.LabelOpts(
                     overflow='break', position='insideRight')))
                  .reversal_axis()
@@ -195,7 +195,7 @@ class EchartBoxplot(BaseChart):
         chart_data = self.get_data()
         chart = (Boxplot(init_opts=opts.InitOpts(width="100%")))
         chart.add_xaxis(list(chart_data.keys()))
-        chart.add_yaxis('2024 г.', chart.prepare_data(chart_data.values()))
+        chart.add_yaxis(Config.YEARS[-1], chart.prepare_data(chart_data.values()))
         chart.set_global_opts(xaxis_opts=opts.AxisOpts(type_='value', split_number=2),
                               yaxis_opts=opts.AxisOpts(type_='category'),
                               tooltip_opts=opts.TooltipOpts(
