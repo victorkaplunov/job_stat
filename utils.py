@@ -301,45 +301,54 @@ def get_vacancies_qty_week_by_week() -> list[list[str | int | dict]]:
 
 
 def get_vacancies_qty_by_month_of_year() -> list[list]:
-    month_tuples = ((1, 'январь', 31), (2, 'февраль', 28), (3, 'март', 31),
-                    (4, 'апрель', 30), (5, 'май', 31), (6, 'июнь', 30),
-                    (7, 'июль', 31), (8, 'август', 31), (9, 'сентябрь', 30),
-                    (10, 'октябрь', 31), (11, 'ноябрь', 30), (12, 'декабрь', 31))
-    years = Config.YEARS
+    month_tuples = Config.MONTH_TUPLES
     head_time_series = [['Месяц']]
     output_list = [[i[1]] for i in month_tuples]
-
-    for year in years:
+    for year in Config.YEARS:
         head_time_series[0].append(str(year))
+        db_objects_list = db.get_data_for_chart_per_year(year=year, chart_name='vacancies_qty')
+        vacancies_qty = [i.popularity for i in db_objects_list]
         for n, month in enumerate(month_tuples):
-            start_day = datetime(year, month[0], 1)
-            # Processing for leap years
-            if isleap(year) and (month[0] == 2):
-                end_day = datetime(year, month[0], 29)
-            else:
-                end_day = datetime(year, month[0], month[2])
-            vacancies_qty = db.get_vacancies_qty_by_period(start_day=start_day,
-                                                           end_day=end_day)
-            # Удаляем данные в неполных месяцах, вместо неполных данных пишем ноль.
-            if year == 2019:
-                if month[1] == 'февраль':
-                    output_list[n].append(0)
-                else:
-                    output_list[n].append(vacancies_qty)
-            elif year == 2023:
-                if (month[1] == 'июнь') or (month[1] == 'июль'):
-                    output_list[n].append(0)
-                else:
-                    output_list[n].append(vacancies_qty)
-            elif year == 2024:
-                if month[1] == 'январь':
-                    output_list[n].append(0)
-                else:
-                    output_list[n].append(vacancies_qty)
-            else:
-                output_list[n].append(vacancies_qty)
+            output_list[n].append(vacancies_qty[n])
     output_list = head_time_series + output_list
     return output_list
+
+
+def count_n_write_vacancies_by_month_of_year(year):
+    for n, month in enumerate(Config.MONTH_TUPLES):
+        start_day = datetime(year, month[0], 1)
+        # Processing for leap years
+        if isleap(year) and (month[0] == 2):
+            end_day = datetime(year, month[0], 29)
+        else:
+            end_day = datetime(year, month[0], month[2])
+        vacancies_qty = db.count_vacancies_qty_by_period(start_day=start_day,
+                                                         end_day=end_day)
+        # Удаляем данные в неполных месяцах, вместо неполных данных пишем ноль.
+        if year == 2019:
+            if month[1] == 'февраль':
+                db.update_charts(chart_name='vacancies_qty', data=month[1],
+                                 popularity=0, year=year)
+            else:
+                db.update_charts(chart_name='vacancies_qty', data=month[1],
+                                 popularity=vacancies_qty, year=year)
+        elif year == 2023:
+            if (month[1] == 'июнь') or (month[1] == 'июль'):
+                db.update_charts(chart_name='vacancies_qty', data=month[1],
+                                 popularity=0, year=year)
+            else:
+                db.update_charts(chart_name='vacancies_qty', data=month[1],
+                                 popularity=vacancies_qty, year=year)
+        elif year == 2024:
+            if month[1] == 'январь':
+                db.update_charts(chart_name='vacancies_qty', data=month[1],
+                                 popularity=0, year=year)
+            else:
+                db.update_charts(chart_name='vacancies_qty', data=month[1],
+                                 popularity=vacancies_qty, year=year)
+        else:
+            db.update_charts(chart_name='vacancies_qty', data=month[1],
+                             popularity=vacancies_qty, year=year)
 
 
 def get_salary_data_per_year() -> list[list[str | int]]:
