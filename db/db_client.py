@@ -75,7 +75,7 @@ class Database(metaclass=SingletonMeta):
         return self._session.query(Calendar).distinct(Calendar.id) \
             .filter(Calendar.data.between(day, day + timedelta(days=1))).count()
 
-    def get_vacancies_qty_by_period(self, start_day: date, end_day: date) -> int:
+    def count_vacancies_qty_by_period(self, start_day: date, end_day: date) -> int:
         """From start to finis, includes end date."""
         return self._session.query(Calendar.id.distinct()) \
             .filter(Calendar.data.between(start_day,
