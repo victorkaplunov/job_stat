@@ -289,8 +289,13 @@ def get_vacancies_qty_week_by_week() -> list[list[str | int | dict]]:
     output_list[0].append(json.loads('{"role": "tooltip"}'))
 
     def get_start_and_finish_of_calendar_week(year: int, calendar_week: int):
-        monday = datetime.strptime(f'{year}.{calendar_week}.1', "%Y.%W.%w").date()
-        return monday, monday + timedelta(days=6.9)
+
+        if calendar_week == 1:
+            first_sunday = first_day_of_current_year + timedelta(days=6 - first_day_of_current_year.weekday())
+            return first_day_of_current_year, first_sunday
+        else:
+            monday = datetime.strptime(f'{year}.{calendar_week-1}.1', "%Y.%W.%w").date()
+            return monday, monday + timedelta(days=6.9)
 
     for week in output_list[1:]:
         start_n_end = get_start_and_finish_of_calendar_week(Config.YEARS[-1], int(week[0]))
