@@ -37,6 +37,7 @@ if update is False:
 
 # Count data for charts per year.
 for year in years_tuple:
+
     all_vacancies_jsons = db.get_json_from_vacancies_by_year(year=year)
 
     utils.count_n_write_vacancies_by_month_of_year(year=year)
