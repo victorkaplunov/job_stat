@@ -7,7 +7,8 @@ from flask_bootstrap import Bootstrap
 
 import utils
 from db.db_client import Database
-from echarts import EchartStackedColumn, EchartTreeMap, EchartHorizontalBar, EchartBoxplot
+from echarts import EchartStackedColumn, EchartTreeMap, EchartHorizontalBar, EchartBoxplot,\
+    EchartHorizontalBarByCategory
 
 db = Database()
 
@@ -388,10 +389,28 @@ def tmp_1():
 
 @app.route('/tmp_2')
 def tmp_2():
-    chart = EchartHorizontalBar(name='top_employers',
-                                title='Top employers')
+    chart_1 = EchartHorizontalBarByCategory(name='salary',
+                                            title='Без опыта, ₽, net',
+                                            category='noExperience')
+    chart_2 = EchartHorizontalBarByCategory(name='salary',
+                                            title='От года до трех лет, ₽, net',
+                                            category='between1And3')
+    chart_3 = EchartHorizontalBarByCategory(name='salary',
+                                            title='От трех до шести лет, ₽, net',
+                                            category='between3And6')
+    chart_4 = EchartHorizontalBarByCategory(name='salary',
+                                            title='Больше шести лет, ₽, net',
+                                            category='moreThan6')
     return render_template(
-        'pyechart.html',
-        chart_script=chart.get_script(),
-        div=chart.get_div()  # 2000
+
+        '4_charts.html',
+        title='Медианная заработная плата в зависимости от опыта',
+        chart_function_1=chart_1.get_script(),
+        div_1=chart_1.get_div(height=300),
+        chart_function_2=chart_2.get_script(),
+        div_2=chart_2.get_div(),
+        chart_function_3=chart_3.get_script(),
+        div_3=chart_3.get_div(),
+        chart_function_4=chart_4.get_script(),
+        div_4=chart_4.get_div()
     )
