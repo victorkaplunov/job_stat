@@ -131,6 +131,12 @@ class Database(metaclass=SingletonMeta):
             and_(Charts.year == year, Charts.chart_name == chart_name,
                  Charts.parent == parent)).all()
 
+    def get_data_for_chart_per_year_by_category(
+            self, chart_name: str, category: str) -> list[Type[Charts]]:
+        return self._session.query(Charts).filter(
+            and_(Charts.chart_name == chart_name,
+                 Charts.data == category)).all()
+
     def get_sorted_data_for_chart_per_year(
             self, year: int, chart_name: str) -> list[Type[Charts]]:
         return self._session.query(Charts).order_by(Charts.data).filter(
