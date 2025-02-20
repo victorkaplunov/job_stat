@@ -5,9 +5,7 @@ import requests
 import utils
 from config import Config
 from db import db_client
-from pythonanywhere_client import PythonAnywhereClient
 
-pa = PythonAnywhereClient()
 db = db_client.Database()
 
 parser = ArgumentParser()
