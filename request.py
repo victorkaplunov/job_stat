@@ -95,7 +95,3 @@ utils.fill_skill_set_chart(update=update)
 utils.fill_top_employers_chart()
 db.vacuum_db()
 db.close_session()
-
-pa.reload_webapps(domain_name=pa.get_domain_name())
-print(pa.get_route(route='time_series'))
-print(pa.get_route(route='salary_by_category'))
