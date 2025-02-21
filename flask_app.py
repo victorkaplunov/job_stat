@@ -1,6 +1,5 @@
 import os
 import json
-from functools import lru_cache
 
 from flask import Flask, send_from_directory, url_for, render_template, redirect
 from flask_bootstrap import Bootstrap
@@ -98,7 +97,6 @@ def search_vac(search_phrase):
 
 
 @app.route('/time_series')
-@lru_cache(maxsize=None)
 def time_series():
     """Time series page"""
     return render_template(
@@ -124,7 +122,6 @@ def salary():
 
 
 @app.route('/salary_by_category')
-@lru_cache(maxsize=None)
 def salary_by_category():
     """Salary by category"""
     chart_1 = EchartBoxplot(name='languages',
