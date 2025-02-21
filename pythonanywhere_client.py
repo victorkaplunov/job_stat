@@ -1,7 +1,7 @@
 import os
 
 import requests
-from requests_toolbelt.multipart.encoder import MultipartEncoder
+# from requests_toolbelt.multipart.encoder import MultipartEncoder
 import posixpath
 import re
 
@@ -25,14 +25,14 @@ class PythonAnywhereClient:
         response = requests.get(url, headers=self.headers)
         return response.status_code
 
-    def upload_file(self, file_name: str) -> int:
-        encoder = MultipartEncoder(
-            [('content', (os.path.basename(file_name), open(file_name, 'rb'), 'text/plain'))],
-            None)
-        self.headers['Content-Type'] = encoder.content_type
-        url = posixpath.join(self.base_url, 'files/path/home', self.username, self.app_dir, file_name)
-        response = requests.post(url=url, data=encoder, headers=self.headers)
-        return response.status_code
+    # def upload_file(self, file_name: str) -> int:
+    #     encoder = MultipartEncoder(
+    #         [('content', (os.path.basename(file_name), open(file_name, 'rb'), 'text/plain'))],
+    #         None)
+    #     self.headers['Content-Type'] = encoder.content_type
+    #     url = posixpath.join(self.base_url, 'files/path/home', self.username, self.app_dir, file_name)
+    #     response = requests.post(url=url, data=encoder, headers=self.headers)
+    #     return response.status_code
 
     def delete_file(self, file_name: str) -> int:
         url = posixpath.join(self.base_url, 'files/path/home', self.username, self.app_dir, file_name)
