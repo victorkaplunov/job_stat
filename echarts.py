@@ -1,4 +1,5 @@
 import statistics
+from distutils.command.config import config
 
 from pyecharts import options as opts
 from pyecharts.charts import TreeMap, Bar, Boxplot
@@ -169,9 +170,56 @@ class EchartHorizontalBar(BaseChart):
         return chart.dump_options()
 
 
-def _get_formatted_salary(salary: int) -> str:
-    salary = str(salary)
-    return f'{salary[:-3]} {salary[-3:]}'
+class EchartHorizontalBarByCategory(BaseChart):
+    def __init__(self, name: str, title: str, category: str):
+        self.title = title
+        self.name = name
+        self.category = category
+        self.db = Database()
+
+    def _get_data(self) -> list:
+        """Get data for Horizontal Bar chart."""
+        data = self.db.get_data_for_chart_per_year_by_category(chart_name=self.name,
+                                                               category=self.category)
+        return [i.popularity for i in data]
+
+    def _get_options(self) -> str:
+        """Get options for Horizontal Bar chart."""
+        chart = Bar(init_opts=opts.InitOpts(width="100%", page_title='fgfdgfd'))
+        chart.add_xaxis(Config.YEARS)
+        chart.add_yaxis(series_name=self.category, y_axis=self._get_data(),
+                        label_opts=opts.LabelOpts(
+                            overflow='break', position='insideRight'))
+
+        chart.reversal_axis()
+        chart.set_global_opts(
+            title_opts=opts.TitleOpts(title=self.title),
+            xaxis_opts=opts.AxisOpts(type_='value',
+                                     max_=300000,
+                                     split_number=3,
+                                     axislabel_opts=opts.LabelOpts(
+                                         is_show=True,
+                                         formatter=utils.JsCode(
+                                             "value => '₽' +(value / 1000).toFixed(0) + ' тыс.'"))
+                                     ),
+            yaxis_opts=opts.AxisOpts(type_='category',
+
+                                     axislabel_opts=opts.LabelOpts(
+                                         is_show=True,
+                                         formatter=utils.JsCode(
+                                             "value => value + ' г.'"))
+                                     ),
+            legend_opts=opts.LegendOpts(is_show=False),
+        )
+        chart.add_xaxis(self.db.get_years_for_chart(self.name))
+        chart.options['grid'] = {'left': 76, 'right': 25, 'top': 40}
+        return chart.dump_options()
+
+    def get_div(self, height=600) -> str:
+        """Make chart`s div."""
+        return f'''
+        <div id="{self.name}" style="height: {height}px;"></div>
+        '''
 
 
 class EchartBoxplot(BaseChart):
@@ -198,8 +246,7 @@ class EchartBoxplot(BaseChart):
         chart.add_yaxis(Config.YEARS[-1], chart.prepare_data(chart_data.values()))
         chart.set_global_opts(xaxis_opts=opts.AxisOpts(type_='value', split_number=2),
                               yaxis_opts=opts.AxisOpts(type_='category'),
-                              tooltip_opts=opts.TooltipOpts(
-                                  trigger_on='mousemove')
+                              tooltip_opts=opts.TooltipOpts(trigger_on='mousemove')
                               )
         chart.reversal_axis()
         chart.options['grid'] = {'left': 76, 'right': 25, 'top': 40}
